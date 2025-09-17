@@ -1,0 +1,226 @@
+<html>
+<head>
+<title>Vasudevan "Vasu" Govardhanen – Projects</title>
+<style>
+/* Dropdown styling */
+.dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  min-width: 220px;
+  border: 2px solid #000000;
+  padding: 10px;
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Links bar styling */
+.links-bar {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.links-bar a {
+  color: #000000;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 8px;
+}
+
+.links-bar a:hover {
+  text-decoration: underline;
+}
+
+/* Footer styling */
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  font-size: smaller;
+  color: #000000;
+  border-top: 1px solid #000000;
+  margin-top: 30px;
+  background-color: #ddddff;
+}
+.footer a {
+  color: #000000;
+  text-decoration: none;
+  margin: 0 6px;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Bottom section styling */
+.bottom-section {
+  width: 100%;
+  background-color: #ccccff;
+  padding: 20px 15px;
+  margin-top: 30px;
+  font-size: smaller;
+  border: 1px solid #000000;
+}
+.bottom-section ul {
+  margin: 5px 0 10px 20px;
+}
+.bottom-section i {
+  display: block;
+  margin: 15px 0;
+  text-align: center;
+}
+</style>
+</head>
+
+<body bgcolor="#eeeeff" text="#000000" link="#0303E5" vlink="#F20505" alink="#CACC04">
+
+<!-- Header with Contact Dropdown -->
+<font size="+3"><strong>Vasudevan "Vasu" Govardhanen</strong></font>
+<div class="dropdown">
+  <font size="+1"><b>[Contact]</b></font>
+  <div class="dropdown-content">
+    Manalapan High School, NJ (12)<br>
+    Email: vgovardhanen [at] gmail [dot] com
+  </div>
+</div>
+
+<!-- Links Bar -->
+<div class="links-bar">
+  <a href="about.html">About Me</a> |
+  <a href="projects.html">Projects</a> |
+  <a href="notes.html">Notes</a> |
+  <a href="https://github.com/yourusername" target="_blank">GitHub</a>
+</div>
+
+<hr>
+
+<table width="100%" align="center" cellspacing="5" cellpadding="5">
+<tr valign="top">
+<td width="70%">
+
+<!-- Updates Section -->
+<table border="2" cellspacing="2" cellpadding="6" width="100%" bgcolor="#ffffff">
+<tr valign="middle">
+<td>
+<b><font color="black">Updates (09-16-2025)</font></b><br>
+<ul>
+  <li>Launched <b>Bidmachine</b>, an advanced contract bid evaluation engine with anomaly detection and audit trails.</li>
+</ul>
+</td>
+</tr>
+</table>
+<br>
+
+<!-- About Me Blurb -->
+<font size="+2"><b><font color="black">Interests</font></b></font>
+<p>
+I am interested in mathematics, both pure and applied. On the pure side, I focus on algebra, while on the applied side I study dynamical systems and economics. 
+I enjoy combining theoretical understanding with practical problem-solving and exploring the connections between abstract mathematics and real-world applications.
+</p>
+<br>
+
+<!-- Projects Section -->
+
+<!-- Bidmachine -->
+<table border="2" cellspacing="2" cellpadding="6" width="100%">
+<tr valign="middle">
+<td>
+<b><font color="black">Bidmachine</font></b><br>
+Bidmachine is an advanced contract bid evaluation engine that automatically scores, ranks, and audits supplier proposals. 
+The system ensures full transparency and accountability, flags potential anomalies, and generates downloadable audit reports for compliance purposes. 
+Its modular design allows organizations to adapt scoring criteria to their specific requirements, making it ideal for government and corporate procurement processes.
+</td>
+</tr>
+</table>
+<br>
+
+<!-- Nakashima Bundles -->
+<table border="2" cellspacing="2" cellpadding="6" width="100%">
+<tr valign="middle">
+<td>
+<b><font color="black">Nakashima Bundles on Calabi-Yau (N+2)-folds</font></b><br>
+This project explores stable vector bundles over Calabi-Yau (n+2)-folds. 
+Following Tohru Nakashima, we establish fundamental results regarding the structure of these "Nakashima Bundles'" moduli spaces by demonstrating that they form a projective scheme of finite-type over an algebraically-closed field.
+</td>
+</tr>
+</table>
+<br>
+
+<!-- Formal Verification of ECC -->
+<table border="2" cellspacing="2" cellpadding="6" width="100%">
+<tr valign="middle">
+<td>
+<b><font color="black">Formal Verification of ECC via Typed Lambda Calculus</font></b><br>
+This project presents a rigorous formalization of Elliptic Curve Cryptography (ECC) and the ECDSA using the Coq proof assistant. 
+Using dependent type theory, it establishes machine-checked proofs of security properties including signature correctness, unforgeability, and side-channel resistance. 
+The framework extends from finite field arithmetic through curve operations to cryptographic protocols, emphasizing practical vulnerabilities such as nonce reuse, timing attacks, and signature malleability. 
+It lays the foundation for verifying quantum-resistant cryptographic schemes.
+</td>
+</tr>
+</table>
+<br>
+
+</td>
+
+<td width="30%">
+<img src="images/me.jpeg" width="420" border="2">
+</td>
+</tr>
+</table>
+
+<!-- Bottom Section -->
+<div style="border:2px solid #000000; padding:20px; background-color:#eeeeff; margin-top:30px;">
+
+  <b>Notes</b>
+  <ul>
+    <li>Studying predator-prey models in population dynamics; one interesting equation I explored is the Lotka-Volterra system:
+      <pre style="margin:5px 0; background-color:#cfcfff; padding:8px; display:inline-block;">
+dx/dt = αx - βxy
+dy/dt = δxy - γy
+      </pre>
+      where x is prey, y is predator, and α, β, γ, δ are positive constants. Stability analysis shows fascinating oscillatory behavior between populations.
+    </li>
+    <li>Exploring bifurcation behavior in discrete-time systems and its parallels with economic boom-bust cycles.</li>
+  </ul>
+
+  <!-- Currently Reading + Quote Side by Side -->
+  <div style="display:flex; gap:20px; margin-top:20px; align-items:flex-start;">
+    
+    <!-- Currently Reading Section -->
+    <div>
+      <b>Currently Reading</b>
+      <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:10px;">
+        <a href="#"><img src="images/plost.jpg" alt="Book 1" width="120" style="border:2px solid #000000;"></a>
+        <a href="#"><img src="images/dummitandfoote.jpg" alt="Book 2" width="120" style="border:2px solid #000000;"></a>
+        <a href="#"><img src="images/nlin.jpg" alt="Book 3" width="120" style="border:2px solid #000000;"></a>
+        <a href="#"><img src="images/antio.jpg" alt="Book 4" width="120" style="border:2px solid #000000;"></a>
+        <a href="#"><img src="https://m.media-amazon.com/images/I/51kRD-pyNWL._UF1000,1000_QL80_.jpg" alt="Book 4" width="120" style="border:2px solid #000000;"></a>
+        <a href="#"><img src="https://m.media-amazon.com/images/I/51OS+nZ1bEL._UF1000,1000_QL80_.jpg" alt="Book 4" width="120" style="border:2px solid #000000;"></a>
+        <a href="#"><img src="https://covers2.booksamillion.com/covers/bam/0/89/871/389/0898713897.jpg" alt="Book 4" width="120" style="border:2px solid #000000;"></a>
+
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer" style="margin-top:30px;">
+  <a href="about.html">About Me</a> | 
+  <a href="projects.html">Projects</a> | 
+  <a href="notes.html">Notes</a> | 
+  <a href="https://github.com/yourusername" target="_blank">GitHub</a>
+</div>
+
+
+
+</body>
+</html>
