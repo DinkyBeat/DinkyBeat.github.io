@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vasudevan Govardhanen – Blog</title>
+
+<style>
+/* ===== Global Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  background-color: #ffffff;
+  color: #111111;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+}
+
+/* ===== Layout ===== */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ===== Navigation ===== */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+nav .logo {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #555555;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+nav a:hover {
+  color: #000000;
+}
+
+/* ===== Hero Section ===== */
+.hero {
+  margin-bottom: 60px;
+}
+
+.hero h1 {
+  font-size: 42px;
+  font-weight: 600;
+  color: #111111;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  color: #444444;
+  font-size: 16px;
+}
+
+/* ===== Blog Posts List ===== */
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.blog-post {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  transition: all 0.2s ease;
+}
+
+.blog-post:hover {
+  transform: translateY(-2px);
+}
+
+.blog-post a {
+  text-decoration: none;
+  color: #111111;
+  font-size: 20px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.blog-post a:hover {
+  color: #555555;
+}
+
+.blog-post .date {
+  color: #777777;
+  font-size: 12px;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  padding-top: 40px;
+  border-top: 1px solid #e5e5e5;
+  font-size: 14px;
+  color: #777777;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+footer a {
+  text-decoration: none;
+  color: #555555;
+  transition: color 0.2s ease;
+}
+
+footer a:hover {
+  color: #000000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">VASUDEVAN GOVARDHANEN</div>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#notes">Notes</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Blog</h1>
+    <p>Record of my learning, thoughts, and notes. Minimalist, focused, and technical.</p>
+  </div>
+
+  <!-- Blog Posts -->
+  <div class="blog-list">
+    <!-- Example Post 1 -->
+    <div class="blog-post">
+      <a href="#">Exploring Algebraic Geometry Foundations</a>
+      <div class="date">Feb 15, 2026</div>
+    </div>
+
+    <!-- Example Post 2 -->
+    <div class="blog-post">
+      <a href="#">Notes on Dynamical Systems</a>
+      <div class="date">Feb 10, 2026</div>
+    </div>
+
+    <!-- Example Post 3 -->
+    <div class="blog-post">
+      <a href="#">Minimalist Approaches to Learning Math</a>
+      <div class="date">Feb 5, 2026</div>
+    </div>
+
+    <!-- You can add more posts here -->
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div>© 2026 Vasudevan Govardhanen</div>
+    <div><a href="../index.html">Home</a></div>
+  </footer>
+
+</div>
+
+</body>
+</html>
