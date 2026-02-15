@@ -5,150 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vasudevan Govardhanen – Blog</title>
 
-<!-- Load MathJax for rendering LaTeX -->
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async
- src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+<!-- MathJax -->
+<script>
+window.MathJax = {
+  tex: {
+    macros: { Ima: "\\operatorname{im}" }
+  }
+};
 </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
 <style>
-/* ===== Global Reset ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background-color: #ffffff;
-  color: #111111;
-  line-height: 1.6;
-  letter-spacing: 0.3px;
-}
-
-/* ===== Layout ===== */
-.container {
-  display: flex;
-  min-height: 100vh;
-}
-
-/* ===== Sidebar ===== */
-.sidebar {
-  width: 220px;
-  background-color: #f8f8f8;
-  border-right: 1px solid #e5e5e5;
-  padding: 40px 20px;
-  flex-shrink: 0;
-}
-
-.sidebar h2 {
-  font-size: 14px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #777777;
-  margin-bottom: 20px;
-}
-
-.sidebar ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.sidebar a {
-  text-decoration: none;
-  color: #111111;
-  font-size: 14px;
-  transition: color 0.2s ease;
-}
-
-.sidebar a:hover {
-  color: #555555;
-}
-
-/* ===== Main Content ===== */
-.main {
-  flex: 1;
-  padding: 60px 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
-}
-
-/* Blog post styling */
-.blog-post {
-  max-width: 800px;
-}
-
-.blog-post h1 {
-  font-size: 36px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #111111;
-}
-
-.blog-post .meta {
-  font-size: 12px;
-  color: #777777;
-  letter-spacing: 1px;
-  margin-bottom: 30px;
-}
-
-.blog-post h2, .blog-post h3 {
-  font-weight: 500;
-  color: #111111;
-  margin-top: 25px;
-  margin-bottom: 10px;
-}
-
-.blog-post p {
-  margin-bottom: 15px;
-  color: #333333;
-}
-
-.blog-post pre {
-  background-color: #f5f5f5;
-  padding: 15px;
-  overflow-x: auto;
-  border-left: 3px solid #111111;
-  margin-bottom: 15px;
-}
-
-.blog-post blockquote {
-  border-left: 3px solid #777777;
-  margin-left: 0;
-  padding-left: 15px;
-  color: #555555;
-  font-style: italic;
-}
-
-.blog-post .remark-diagram {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.blog-post svg {
-  max-width: 100%;
-}
-
-/* Footnotes */
-.footnote {
-  font-size: 12px;
-  color: #777777;
-  margin-top: 10px;
-}
-
-.footnote a {
-  text-decoration: none;
-  color: #555555;
-}
-
-.footnote a:hover {
-  color: #000000;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; background:#fff; color:#111; margin:0; }
+.container { display:flex; min-height:100vh; }
+.sidebar { width:220px; background:#f8f8f8; border-right:1px solid #e5e5e5; padding:40px 20px; }
+.sidebar h2 { font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#777; margin-bottom:20px; }
+.sidebar ul { list-style:none; display:flex; flex-direction:column; gap:15px; }
+.sidebar a { text-decoration:none; color:#111; font-size:14px; transition:color 0.2s ease; }
+.sidebar a:hover { color:#555; }
+.main { flex:1; padding:60px 40px; display:flex; flex-direction:column; gap:20px; }
+.post-link { cursor:pointer; color:#111; text-decoration:none; border-left:3px solid transparent; padding:5px 10px; display:block; transition:all 0.2s ease; }
+.post-link:hover { border-left:3px solid #111; color:#555; }
+.post-content { display:none; padding:20px 15px; border-left:3px solid #111; background:#f9f9f9; margin-bottom:20px; }
+.post-content h1 { font-size:28px; margin-bottom:10px; }
+.post-content .meta { font-size:12px; color:#777; margin-bottom:15px; }
 </style>
 </head>
 
@@ -156,11 +36,10 @@ body {
 
 <div class="container">
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <h2>Navigation</h2>
     <ul>
-      <li><a href="../">Home</a></li>
+      <li><a href="../index.html">Home</a></li>
       <li><a href="../index.html#about">About</a></li>
       <li><a href="../index.html#notes">Notes</a></li>
       <li><a href="#">Blog</a></li>
@@ -168,71 +47,40 @@ body {
     </ul>
   </div>
 
-  <!-- Main content -->
   <div class="main">
+    <h1>Recent Posts</h1>
 
-    <!-- Blog post -->
-    <div class="blog-post">
-      <h1>Note on Homological Algebra</h1>
-      <div class="meta">June 2024 – Vasudevan Govardhanen</div>
+    <!-- Post links -->
+    <a class="post-link" data-post="posts/homological-algebra.html">Note on Homological Algebra – June 2024</a>
+    <div class="post-content" id="post-homological-algebra"></div>
 
-      <p>Let us formalize some foundational lemmas in homological algebra.</p>
-
-      <h2>Lemma 1</h2>
-      <p>
-        Let \( u: (C, d_C) \to (D, d_D) \) be a morphism of chain complexes with a family of \( R \)-module homomorphisms \( (u_i)_{i\in I} \). Then, \( u \) maps cycles to cycles and boundaries to boundaries, i.e. \( H_n(C) \to H_n(D) \).
-      </p>
-
-      <h3>Proof</h3>
-      <p>
-        We must show that \( u \) induces the maps 
-        <strong>(1)</strong> \( \ker d_{n,C} \to \ker d_{n,D} \) and 
-        <strong>(2)</strong> \( \Ima {d_{n+1, C}} \to \Ima {d_{n+1, D}} \). 
-      </p>
-      <p>
-        For <strong>(1)</strong>, observe that \( u \) contains a set of \( R \)-module homomorphisms, \( u_n: C_n \to D_n \) mapping the zero elements \( 0_C \to 0_D \). If \( k \in \ker d_{n,C} \), then \( u(k) \in \ker d_{n,D} \) since \( d_{n,D}(u(k)) = u_{n-1}(d_{n,C}(k)) = 0 \).  
-      </p>
-      <p>
-        For <strong>(2)</strong>, if \( j \in \Ima {d_{n+1,C}} \), there exists \( j^{-1} \in C_n \) with \( d(j^{-1}) = j \). By commutativity, \( u_n(j) = d_{n+1,D}(u_{n+1}(j)) \in \Ima {d_{n+1,D}} \).
-      </p>
-
-      <h2>Lemma 2</h2>
-      <p>
-        Each \( H_n \) is a functor \( \mathbf{Ch(mod R)} \to \mathbf{mod R} \).
-      </p>
-      <h3>Proof</h3>
-      <p>
-        For any object \( \{C_n\} \) in \( \mathbf{Ch(mod R)} \), \( H_n({C_n}) \) is a right \( R \)-module as a quotient module. By Lemma 1, any morphism \( u_{C,D}: \{C\} \to \{D\} \) is mapped to a well-defined map \( H_n(u_{C,D}): H_n(C) \to H_n(D) \).
-      </p>
-
-      <h2>Remark</h2>
-      <p>
-        Let \( P = (\{P_n\}, d_{P,n})= C \times_A D \) where \( d_{P,n} = (d_{C,n}(c), d_{D,n}(d)) \). \( P \) is a pullback over \( C \) and \( D \):
-      </p>
-      <div class="remark-diagram">
-        <!-- Approximate TikZ diagram as SVG placeholder -->
-        <svg width="200" height="150">
-          <line x1="0" y1="120" x2="200" y2="120" stroke="#111111" stroke-width="1"/>
-          <line x1="100" y1="0" x2="100" y2="120" stroke="#111111" stroke-width="1"/>
-          <circle cx="100" cy="20" r="5" fill="#111111"/>
-          <circle cx="50" cy="120" r="5" fill="#111111"/>
-          <circle cx="150" cy="120" r="5" fill="#111111"/>
-          <text x="102" y="25" font-size="12px">P</text>
-          <text x="52" y="135" font-size="12px">C</text>
-          <text x="152" y="135" font-size="12px">D</text>
-          <text x="105" y="75" font-size="12px">A</text>
-        </svg>
-      </div>
-
-      <p class="footnote">
-        Image reference: <a href="https://praguemorning.cz/when-depeche-mode-visited-prague-in-1988/" target="_blank">https://praguemorning.cz/when-depeche-mode-visited-prague-in-1988/</a>
-      </p>
-
-    </div>
-
+    <!-- Add more posts here as needed -->
   </div>
 
 </div>
+
+<script>
+document.querySelectorAll('.post-link').forEach(link => {
+  link.addEventListener('click', async () => {
+    const postId = 'post-' + link.dataset.post.split('/').pop().replace('.html','');
+    const container = document.getElementById(postId);
+
+    // Toggle visibility
+    if (container.style.display === 'block') {
+      container.style.display = 'none';
+    } else {
+      container.style.display = 'block';
+      // Load content if empty
+      if (!container.innerHTML.trim()) {
+        const response = await fetch(link.dataset.post);
+        const html = await response.text();
+        container.innerHTML = html;
+        MathJax.typesetPromise(); // render LaTeX
+      }
+    }
+  });
+});
+</script>
 
 </body>
 </html>
