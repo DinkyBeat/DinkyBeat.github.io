@@ -26,6 +26,9 @@ body {
   max-width: 1000px;
   margin: 0 auto;
   padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* ===== Navigation ===== */
@@ -75,23 +78,27 @@ nav a:hover {
 }
 
 .hero-text h1 {
-  font-size: 42px;
-  font-weight: 500;
+  font-size: 48px;
+  font-weight: 600;
   margin-bottom: 20px;
   color: #111111;
   cursor: pointer;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
+  background: linear-gradient(90deg, #111111 0%, #555555 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .hero-text h1:hover {
-  color: #000000;
+  background: linear-gradient(90deg, #000000 0%, #777777 100%);
 }
 
 .hero-text p {
   font-size: 18px;
   color: #444444;
   max-width: 600px;
+  margin-top: 10px;
 }
 
 /* RHS image placeholder */
@@ -105,8 +112,14 @@ nav a:hover {
 
 .hero-image img {
   max-width: 100%;
-  border: 1px solid #e5e5e5;
   border-radius: 4px;
+  filter: grayscale(80%);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.hero-image img:hover {
+  filter: grayscale(0%);
+  transform: scale(1.03);
 }
 
 /* ===== Section Styling ===== */
@@ -118,25 +131,45 @@ nav a:hover {
   font-size: 16px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: #777777;
+  position: relative;
+  display: inline-block;
+}
+
+.section h2::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background-color: #e5e5e5;
+  width: 100%;
+  margin-top: 4px;
 }
 
 .section p {
   color: #333333;
   max-width: 650px;
+  margin-top: 15px;
 }
 
-/* ===== Divider ===== */
+/* Remove bounding box for Notes */
+.section .card {
+  border: none;
+  padding: 0;
+  margin: 0;
+  transition: none;
+}
+
+/* Divider */
 .divider {
   height: 1px;
   background-color: #e5e5e5;
   margin: 60px 0;
 }
 
-/* ===== Footer ===== */
+/* Footer */
 footer {
-  margin-top: 100px;
+  margin-top: auto;
   padding-top: 40px;
   border-top: 1px solid #e5e5e5;
   font-size: 14px;
@@ -156,16 +189,17 @@ footer a:hover {
   color: #000000;
 }
 
-/* ===== Subtle Hover Blocks (for future projects/blog cards) ===== */
-.card {
-  border: 1px solid #eeeeee;
-  padding: 25px;
-  margin-bottom: 20px;
+/* ===== Minimal hover links in sections ===== */
+.section p a {
+  color: #111111;
+  text-decoration: none;
+  border-bottom: 1px solid #e5e5e5;
   transition: all 0.2s ease;
 }
 
-.card:hover {
-  border-color: #000000;
+.section p a:hover {
+  border-bottom-color: #000000;
+  color: #000000;
 }
 </style>
 </head>
@@ -189,10 +223,9 @@ footer a:hover {
   <!-- Hero -->
   <div class="hero-container">
     <div class="hero-text">
-      <a href="/blog/index.html" style="text-decoration:none;"><h1>Check out my blog</h1></a>
+      <a href="/blog/index.html" style="text-decoration:none;"><h1>Check out my blog →</h1></a>
       <p>
-        This site serves as a record of my learning and intellectual development.
-        I share notes, essays, and explorations in mathematics and beyond.
+        A minimalist record of my learning and intellectual explorations in mathematics, notes, and reflections.
       </p>
     </div>
     <div class="hero-image">
@@ -202,36 +235,33 @@ footer a:hover {
 
   <div class="divider"></div>
 
-  <!-- About Preview -->
+  <!-- About -->
   <div class="section">
     <h2>About</h2>
     <p>
-      My interests comprise pure mathematics and its applications. Specifically, I'm working on algebra, algebraic geometry, and category theory, exploring the foundations and connections between abstract structures.
+      I focus on pure mathematics, especially algebra, algebraic geometry, and category theory. 
+      This site is a place to explore ideas, share notes, and track intellectual progress.
     </p>
   </div>
 
-  <!-- Notes Preview -->
+  <!-- Notes -->
   <div class="section">
     <h2>Notes</h2>
-    <div class="card">
-      <p>
-        I usually take notes by hand, but if I TeX them, I'll put them up here. 
-        Just something to keep myself accountable and share interesting observations.
-      </p>
-    </div>
+    <p>
+      Handwritten or TeX notes will appear here. Ideas, observations, and reflections—always minimalist, always neat.
+    </p>
   </div>
 
-  <!-- Contact Preview -->
+  <!-- Contact -->
   <div class="section">
     <h2>Contact</h2>
-    <p>
-      Email: firstInitial followed by lastName at gmail dot com
-    </p>
+    <p>Email: firstInitial followed by lastName at gmail dot com</p>
   </div>
 
   <!-- Footer -->
   <footer>
     <div>© 2026 Vasudevan Govardhanen</div>
+    <div><a href="/blog/index.html">Blog</a></div>
   </footer>
 
 </div>
