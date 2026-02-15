@@ -16,19 +16,29 @@ window.MathJax = {
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
 <style>
+/* ===== Base ===== */
 body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; background:#fff; color:#111; margin:0; }
 .container { display:flex; min-height:100vh; }
-.sidebar { width:220px; background:#f8f8f8; border-right:1px solid #e5e5e5; padding:40px 20px; }
-.sidebar h2 { font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#777; margin-bottom:20px; }
-.sidebar ul { list-style:none; display:flex; flex-direction:column; gap:15px; }
-.sidebar a { text-decoration:none; color:#111; font-size:14px; transition:color 0.2s ease; }
+
+/* ===== Sidebar ===== */
+.sidebar { width:220px; background:#f8f8f8; border-right:1px solid #e5e5e5; padding:20px 15px; transition:width 0.3s ease; overflow:hidden; }
+.sidebar.collapsed { width:50px; }
+.sidebar h2 { font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#777; margin-bottom:20px; cursor:pointer; }
+.sidebar ul { list-style:none; display:flex; flex-direction:column; gap:12px; padding-left:0; }
+.sidebar a { text-decoration:none; color:#111; font-size:13px; transition:color 0.2s ease; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sidebar a:hover { color:#555; }
-.main { flex:1; padding:60px 40px; display:flex; flex-direction:column; gap:20px; }
-.post-link { cursor:pointer; color:#111; text-decoration:none; border-left:3px solid transparent; padding:5px 10px; display:block; transition:all 0.2s ease; }
+
+/* ===== Main ===== */
+.main { flex:1; padding:40px 30px; display:flex; flex-direction:column; gap:20px; }
+.main h1 { font-size:32px; margin-bottom:5px; }
+.main h4 { font-size:12px; color:#555; margin-top:2px; font-weight:normal; }
+
+/* ===== Blog posts ===== */
+.post-link { cursor:pointer; color:#111; text-decoration:none; border-left:3px solid transparent; padding:5px 10px; display:block; transition:all 0.2s ease; font-size:14px; }
 .post-link:hover { border-left:3px solid #111; color:#555; }
-.post-content { display:none; padding:20px 15px; border-left:3px solid #111; background:#f9f9f9; margin-bottom:20px; }
-.post-content h1 { font-size:28px; margin-bottom:10px; }
-.post-content .meta { font-size:12px; color:#777; margin-bottom:15px; }
+.post-content { display:none; padding:15px 20px; border-left:3px solid #111; background:#f9f9f9; margin-bottom:20px; }
+.post-content h1 { font-size:26px; margin-bottom:10px; }
+.post-content .meta { font-size:11px; color:#777; margin-bottom:15px; }
 </style>
 </head>
 
@@ -36,43 +46,51 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, 
 
 <div class="container">
 
-  <div class="sidebar">
-    <h2>Navigation</h2>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <h2 id="toggleSidebar">☰</h2>
     <ul>
-      <li><a href="../index.html">Home</a></li>
-      <li><a href="../index.html#about">About</a></li>
-      <li><a href="../index.html#notes">Notes</a></li>
-      <li><a href="#">Blog</a></li>
-      <li><a href="../index.html#contact">Contact</a></li>
+      <li><a href="../index.html" title="Home">Home</a></li>
+      <li><a href="../index.html#about" title="About">About</a></li>
+      <li><a href="../index.html#notes" title="Notes">Notes</a></li>
+      <li><a href="#" title="Blog">Blog</a></li>
+      <li><a href="../index.html#contact" title="Contact">Contact</a></li>
     </ul>
   </div>
 
+  <!-- Main content -->
   <div class="main">
     <h1>Vasublog</h1>
-    <h4>(everything is presented in a drop-down fashion. if you'd like a pdf please contact me)</h3>
+    <h4>(everything is presented in a drop-down fashion. if you'd like a pdf please contact me)</h4>
     <h4>(to reference a post, please cite the parenthetical code adjacent to the title)</h4>
 
     <!-- Post links -->
     <a class="post-link" data-post="posts/homological-algebra.html">(nha) Note on Homological Algebra [June 2024]</a>
     <div class="post-content" id="post-homological-algebra"></div>
 
-    <!-- Add more posts here as needed -->
+    <!-- More posts can be added dynamically the same way -->
   </div>
 
 </div>
 
 <script>
+// ===== Sidebar toggle =====
+const sidebar = document.getElementById('sidebar');
+const toggle = document.getElementById('toggleSidebar');
+toggle.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+});
+
+// ===== Blog post collapse/expand =====
 document.querySelectorAll('.post-link').forEach(link => {
   link.addEventListener('click', async () => {
     const postId = 'post-' + link.dataset.post.split('/').pop().replace('.html','');
     const container = document.getElementById(postId);
 
-    // Toggle visibility
     if (container.style.display === 'block') {
       container.style.display = 'none';
     } else {
       container.style.display = 'block';
-      // Load content if empty
       if (!container.innerHTML.trim()) {
         const response = await fetch(link.dataset.post);
         const html = await response.text();
