@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vasudevan Govardhanen – Blog</title>
 
+<!-- Load MathJax for rendering LaTeX -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+ src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+
 <style>
 /* ===== Global Reset ===== */
 * {
@@ -23,117 +29,124 @@ body {
 
 /* ===== Layout ===== */
 .container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 60px 20px;
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
-/* ===== Navigation ===== */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 60px;
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 220px;
+  background-color: #f8f8f8;
+  border-right: 1px solid #e5e5e5;
+  padding: 40px 20px;
+  flex-shrink: 0;
 }
 
-nav .logo {
-  font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 1px;
+.sidebar h2 {
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #777777;
+  margin-bottom: 20px;
 }
 
-nav ul {
+.sidebar ul {
   list-style: none;
   display: flex;
-  gap: 25px;
+  flex-direction: column;
+  gap: 15px;
 }
 
-nav a {
+.sidebar a {
   text-decoration: none;
-  color: #555555;
+  color: #111111;
   font-size: 14px;
   transition: color 0.2s ease;
 }
 
-nav a:hover {
-  color: #000000;
+.sidebar a:hover {
+  color: #555555;
 }
 
-/* ===== Hero Section ===== */
-.hero {
-  margin-bottom: 60px;
+/* ===== Main Content ===== */
+.main {
+  flex: 1;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
 }
 
-.hero h1 {
-  font-size: 42px;
+/* Blog post styling */
+.blog-post {
+  max-width: 800px;
+}
+
+.blog-post h1 {
+  font-size: 36px;
   font-weight: 600;
+  margin-bottom: 15px;
   color: #111111;
+}
+
+.blog-post .meta {
+  font-size: 12px;
+  color: #777777;
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+}
+
+.blog-post h2, .blog-post h3 {
+  font-weight: 500;
+  color: #111111;
+  margin-top: 25px;
   margin-bottom: 10px;
 }
 
-.hero p {
-  color: #444444;
-  font-size: 16px;
+.blog-post p {
+  margin-bottom: 15px;
+  color: #333333;
 }
 
-/* ===== Blog Posts List ===== */
-.blog-list {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
+.blog-post pre {
+  background-color: #f5f5f5;
+  padding: 15px;
+  overflow-x: auto;
+  border-left: 3px solid #111111;
+  margin-bottom: 15px;
 }
 
-.blog-post {
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e5e5e5;
-  transition: all 0.2s ease;
-}
-
-.blog-post:hover {
-  transform: translateY(-2px);
-}
-
-.blog-post a {
-  text-decoration: none;
-  color: #111111;
-  font-size: 20px;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.blog-post a:hover {
+.blog-post blockquote {
+  border-left: 3px solid #777777;
+  margin-left: 0;
+  padding-left: 15px;
   color: #555555;
+  font-style: italic;
 }
 
-.blog-post .date {
-  color: #777777;
+.blog-post .remark-diagram {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.blog-post svg {
+  max-width: 100%;
+}
+
+/* Footnotes */
+.footnote {
   font-size: 12px;
-  margin-top: 4px;
-  letter-spacing: 1px;
-}
-
-/* Footer */
-footer {
-  margin-top: auto;
-  padding-top: 40px;
-  border-top: 1px solid #e5e5e5;
-  font-size: 14px;
   color: #777777;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  margin-top: 10px;
 }
 
-footer a {
+.footnote a {
   text-decoration: none;
   color: #555555;
-  transition: color 0.2s ease;
 }
 
-footer a:hover {
+.footnote a:hover {
   color: #000000;
 }
 </style>
@@ -143,51 +156,81 @@ footer a:hover {
 
 <div class="container">
 
-  <!-- Navigation -->
-  <nav>
-    <div class="logo">VASUDEVAN GOVARDHANEN</div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Navigation</h2>
     <ul>
       <li><a href="../index.html">Home</a></li>
       <li><a href="../index.html#about">About</a></li>
       <li><a href="../index.html#notes">Notes</a></li>
+      <li><a href="#">Blog</a></li>
       <li><a href="../index.html#contact">Contact</a></li>
     </ul>
-  </nav>
-
-  <!-- Hero Section -->
-  <div class="hero">
-    <h1>Blog</h1>
-    <p>Record of my learning, thoughts, and notes. Minimalist, focused, and technical.</p>
   </div>
 
-  <!-- Blog Posts -->
-  <div class="blog-list">
-    <!-- Example Post 1 -->
+  <!-- Main content -->
+  <div class="main">
+
+    <!-- Blog post -->
     <div class="blog-post">
-      <a href="#">Exploring Algebraic Geometry Foundations</a>
-      <div class="date">Feb 15, 2026</div>
+      <h1>Note on Homological Algebra</h1>
+      <div class="meta">June 2024 – Vasudevan Govardhanen</div>
+
+      <p>Let us formalize some foundational lemmas in homological algebra.</p>
+
+      <h2>Lemma 1</h2>
+      <p>
+        Let \( u: (C, d_C) \to (D, d_D) \) be a morphism of chain complexes with a family of \( R \)-module homomorphisms \( (u_i)_{i\in I} \). Then, \( u \) maps cycles to cycles and boundaries to boundaries, i.e. \( H_n(C) \to H_n(D) \).
+      </p>
+
+      <h3>Proof</h3>
+      <p>
+        We must show that \( u \) induces the maps 
+        <strong>(1)</strong> \( \ker d_{n,C} \to \ker d_{n,D} \) and 
+        <strong>(2)</strong> \( \Ima {d_{n+1, C}} \to \Ima {d_{n+1, D}} \). 
+      </p>
+      <p>
+        For <strong>(1)</strong>, observe that \( u \) contains a set of \( R \)-module homomorphisms, \( u_n: C_n \to D_n \) mapping the zero elements \( 0_C \to 0_D \). If \( k \in \ker d_{n,C} \), then \( u(k) \in \ker d_{n,D} \) since \( d_{n,D}(u(k)) = u_{n-1}(d_{n,C}(k)) = 0 \).  
+      </p>
+      <p>
+        For <strong>(2)</strong>, if \( j \in \Ima {d_{n+1,C}} \), there exists \( j^{-1} \in C_n \) with \( d(j^{-1}) = j \). By commutativity, \( u_n(j) = d_{n+1,D}(u_{n+1}(j)) \in \Ima {d_{n+1,D}} \).
+      </p>
+
+      <h2>Lemma 2</h2>
+      <p>
+        Each \( H_n \) is a functor \( \mathbf{Ch(mod R)} \to \mathbf{mod R} \).
+      </p>
+      <h3>Proof</h3>
+      <p>
+        For any object \( \{C_n\} \) in \( \mathbf{Ch(mod R)} \), \( H_n({C_n}) \) is a right \( R \)-module as a quotient module. By Lemma 1, any morphism \( u_{C,D}: \{C\} \to \{D\} \) is mapped to a well-defined map \( H_n(u_{C,D}): H_n(C) \to H_n(D) \).
+      </p>
+
+      <h2>Remark</h2>
+      <p>
+        Let \( P = (\{P_n\}, d_{P,n})= C \times_A D \) where \( d_{P,n} = (d_{C,n}(c), d_{D,n}(d)) \). \( P \) is a pullback over \( C \) and \( D \):
+      </p>
+      <div class="remark-diagram">
+        <!-- Approximate TikZ diagram as SVG placeholder -->
+        <svg width="200" height="150">
+          <line x1="0" y1="120" x2="200" y2="120" stroke="#111111" stroke-width="1"/>
+          <line x1="100" y1="0" x2="100" y2="120" stroke="#111111" stroke-width="1"/>
+          <circle cx="100" cy="20" r="5" fill="#111111"/>
+          <circle cx="50" cy="120" r="5" fill="#111111"/>
+          <circle cx="150" cy="120" r="5" fill="#111111"/>
+          <text x="102" y="25" font-size="12px">P</text>
+          <text x="52" y="135" font-size="12px">C</text>
+          <text x="152" y="135" font-size="12px">D</text>
+          <text x="105" y="75" font-size="12px">A</text>
+        </svg>
+      </div>
+
+      <p class="footnote">
+        Image reference: <a href="https://praguemorning.cz/when-depeche-mode-visited-prague-in-1988/" target="_blank">https://praguemorning.cz/when-depeche-mode-visited-prague-in-1988/</a>
+      </p>
+
     </div>
 
-    <!-- Example Post 2 -->
-    <div class="blog-post">
-      <a href="#">Notes on Dynamical Systems</a>
-      <div class="date">Feb 10, 2026</div>
-    </div>
-
-    <!-- Example Post 3 -->
-    <div class="blog-post">
-      <a href="#">Minimalist Approaches to Learning Math</a>
-      <div class="date">Feb 5, 2026</div>
-    </div>
-
-    <!-- You can add more posts here -->
   </div>
-
-  <!-- Footer -->
-  <footer>
-    <div>© 2026 Vasudevan Govardhanen</div>
-    <div><a href="../index.html">Home</a></div>
-  </footer>
 
 </div>
 
