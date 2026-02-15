@@ -21,21 +21,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, 
 .container { display:flex; min-height:100vh; }
 
 /* ===== Sidebar ===== */
-.sidebar { width:220px; background:#f8f8f8; border-right:1px solid #e5e5e5; padding:20px 15px; transition:width 0.3s ease; overflow:hidden; }
-.sidebar.collapsed { width:50px; }
+.sidebar { width:50px; background:#f8f8f8; border-right:1px solid #e5e5e5; padding:20px 10px; overflow:hidden; }
 .sidebar h2 { font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#777; margin-bottom:20px; cursor:pointer; }
-.sidebar ul { list-style:none; display:flex; flex-direction:column; gap:12px; padding-left:0; }
+.sidebar ul { list-style:none; display:flex; flex-direction:column; gap:10px; padding-left:0; }
 .sidebar a { text-decoration:none; color:#111; font-size:13px; transition:color 0.2s ease; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sidebar a:hover { color:#555; }
 
 /* ===== Main ===== */
-.main { flex:1; padding:40px 30px; display:flex; flex-direction:column; gap:20px; }
-.main h1 { font-size:32px; margin-bottom:5px; }
-.main h4 { font-size:12px; color:#555; margin-top:2px; font-weight:normal; }
+.main { flex:1; padding:40px 30px; display:flex; flex-direction:column; gap:10px; }
+.main h1 { font-size:32px; margin-bottom:2px; }
+.main h4 { font-size:12px; color:#555; margin:0; font-weight:normal; line-height:1.2; }
 
 /* ===== Blog posts ===== */
-.post-link { cursor:pointer; color:#111; text-decoration:none; border-left:3px solid transparent; padding:5px 10px; display:block; transition:all 0.2s ease; font-size:14px; }
+.post-wrapper { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.post-link { cursor:pointer; color:#111; text-decoration:none; border-left:3px solid transparent; padding:5px 10px; flex:1; display:block; transition:all 0.2s ease; font-size:14px; }
 .post-link:hover { border-left:3px solid #111; color:#555; }
+.open-new { font-size:12px; color:#111; text-decoration:none; transition:color 0.2s ease; }
+.open-new:hover { color:#555; }
 .post-content { display:none; padding:15px 20px; border-left:3px solid #111; background:#f9f9f9; margin-bottom:20px; }
 .post-content h1 { font-size:26px; margin-bottom:10px; }
 .post-content .meta { font-size:11px; color:#777; margin-bottom:15px; }
@@ -47,8 +49,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, 
 <div class="container">
 
   <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <h2 id="toggleSidebar">☰</h2>
+  <div class="sidebar">
+    <h2>☰</h2>
     <ul>
       <li><a href="../index.html" title="Home">Home</a></li>
       <li><a href="../index.html#about" title="About">About</a></li>
@@ -65,22 +67,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, 
     <h4>(to reference a post, please cite the parenthetical code adjacent to the title)</h4>
 
     <!-- Post links -->
-    <a class="post-link" data-post="posts/homological-algebra.html">(nha) Note on Homological Algebra [June 2024]</a>
+    <div class="post-wrapper">
+      <span class="post-link" data-post="posts/homological-algebra.html">(nha) Note on Homological Algebra [June 2024]</span>
+      <a class="open-new" href="posts/homological-algebra.html" target="_blank" title="Open in new window">⧉</a>
+    </div>
     <div class="post-content" id="post-homological-algebra"></div>
 
-    <!-- More posts can be added dynamically the same way -->
+    <!-- Add more posts below the same way -->
   </div>
 
 </div>
 
 <script>
-// ===== Sidebar toggle =====
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('toggleSidebar');
-toggle.addEventListener('click', () => {
-  sidebar.classList.toggle('collapsed');
-});
-
 // ===== Blog post collapse/expand =====
 document.querySelectorAll('.post-link').forEach(link => {
   link.addEventListener('click', async () => {
