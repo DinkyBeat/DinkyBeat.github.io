@@ -23,7 +23,7 @@ body {
 
 /* ===== Layout ===== */
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 60px 20px;
 }
@@ -60,20 +60,53 @@ nav a:hover {
 }
 
 /* ===== Hero Section ===== */
-.hero {
+.hero-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 100px;
+  flex-wrap: wrap;
+  gap: 40px;
 }
 
-.hero h1 {
+.hero-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.hero-text h1 {
   font-size: 42px;
   font-weight: 500;
   margin-bottom: 20px;
+  color: #111111;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.hero p {
+.hero-text h1:hover {
+  color: #000000;
+}
+
+.hero-text p {
   font-size: 18px;
   color: #444444;
   max-width: 600px;
+}
+
+/* RHS image placeholder */
+.hero-image {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image img {
+  max-width: 100%;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
 }
 
 /* ===== Section Styling ===== */
@@ -148,19 +181,23 @@ footer a:hover {
       <li><a href="#">About</a></li>
       <li><a href="#">Projects</a></li>
       <li><a href="#">Notes</a></li>
-      <li><a href="#">Blog</a></li>
+      <li><a href="/blog/index.html">Blog</a></li>
       <li><a href="#">Contact</a></li>
     </ul>
   </nav>
 
   <!-- Hero -->
-  <div class="hero">
-    <h1>Student of mathematics.</h1>
-    <p>
-      I am currently a high school senior exploring pure mathematics,
-      dynamical systems, and theoretical computer science.
-      This site serves as a record of my learning and intellectual development.
-    </p>
+  <div class="hero-container">
+    <div class="hero-text">
+      <a href="/blog/index.html" style="text-decoration:none;"><h1>Check out my blog</h1></a>
+      <p>
+        This site serves as a record of my learning and intellectual development.
+        I share notes, essays, and explorations in mathematics and beyond.
+      </p>
+    </div>
+    <div class="hero-image">
+      <img src="images/placeholder.png" alt="Minimalist portrait placeholder">
+    </div>
   </div>
 
   <div class="divider"></div>
@@ -169,26 +206,26 @@ footer a:hover {
   <div class="section">
     <h2>About</h2>
     <p>
-      My interests comprise the totality pure mathematics and its interesting applications, though not a prerequisite. Spefically, 
-      I'm interested in algebra (with algebraic geometry being a pillar I'm working towards) and category theory.
+      My interests comprise pure mathematics and its applications. Specifically, I'm working on algebra, algebraic geometry, and category theory, exploring the foundations and connections between abstract structures.
     </p>
   </div>
-
 
   <!-- Notes Preview -->
   <div class="section">
     <h2>Notes</h2>
     <div class="card">
-      <p>I usually take notes by hand, but if I TeX them, I'll put them up here. Just something to keep my accountable or to
-        share the, on occasion, nice notes I hope to take.
+      <p>
+        I usually take notes by hand, but if I TeX them, I'll put them up here. 
+        Just something to keep myself accountable and share interesting observations.
       </p>
     </div>
   </div>
+
   <!-- Contact Preview -->
   <div class="section">
     <h2>Contact</h2>
     <p>
-      firstInitial followed by lastName at gmail dot com
+      Email: firstInitial followed by lastName at gmail dot com
     </p>
   </div>
 
