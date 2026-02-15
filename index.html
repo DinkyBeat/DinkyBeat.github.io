@@ -78,20 +78,17 @@ nav a:hover {
 }
 
 .hero-text h1 {
-  font-size: 48px;
+  font-size: 36px; /* smaller so fits on one line */
   font-weight: 600;
   margin-bottom: 20px;
   color: #111111;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.3s ease;
-  background: linear-gradient(90deg, #111111 0%, #555555 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  transition: color 0.3s ease;
 }
 
 .hero-text h1:hover {
-  background: linear-gradient(90deg, #000000 0%, #777777 100%);
+  color: #555555; /* just a subtle color change */
 }
 
 .hero-text p {
@@ -189,7 +186,7 @@ footer a:hover {
   color: #000000;
 }
 
-/* ===== Minimal hover links in sections ===== */
+/* Minimal hover links in sections */
 .section p a {
   color: #111111;
   text-decoration: none;
