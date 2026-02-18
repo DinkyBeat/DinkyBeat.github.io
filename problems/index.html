@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Problems I am interested in (2026)</title>
 
-<!-- MathJax for LaTeX rendering -->
+<!-- MathJax -->
 <script>
 window.MathJax = {
   tex: {
@@ -18,176 +18,169 @@ window.MathJax = {
 <style>
 body {
   font-family: serif;
-  margin: 40px;
-  max-width: 900px;
+  background: white;
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+.container {
+  max-width: 850px;
+  width: 100%;
+}
+
 h1 {
+  text-align: center;
   font-weight: normal;
+  margin-bottom: 0.3em;
 }
+
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 2.5em;
+  color: #444;
+}
+
 .problem {
-  margin-bottom: 1.6em;
+  border: 1px solid #ccc;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.prlabel {
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+
+.problem:nth-child(odd) .prlabel {
+  background: #e3f0ff;
+  color: #1a4fa3;
+}
+
+.problem:nth-child(even) .prlabel {
+  background: #f3e6ff;
+  color: #5a2ca0;
 }
 </style>
 </head>
 
 <body>
 
+<div class="container">
+
 <h1>Problems I am interested in (2026)</h1>
 
-<div class="problem">
-<b>Pr1 (DeterministicFactorization).</b>
-Let $\mathbb{F}_q$ be a finite field and $f(x)\in\mathbb{F}_q[x]$ a nonconstant polynomial.
-Randomized algorithms of Berlekamp and Cantor--Zassenhaus factor $f(x)$ in time polynomial in $\deg f$ and $\log q$.
-It is unknown whether there exists a <em>deterministic</em> algorithm that factors arbitrary polynomials in $\mathbb{F}_q[x]$ in polynomial time without relying on unproven hypotheses, and even restricted structural families remain poorly understood.
+<div class="subtitle">
+Exploratory questions in algebra, combinatorics, and geometry that remain genuinely unresolved.
 </div>
 
-<div class="problem">
-<b>Pr2 (StanleyDepth).</b>
-For a monomial ideal $I\subset S=k[x_1,\dots,x_n]$, one defines the combinatorial invariant $\operatorname{sdepth}(I)$ (Stanley depth) via Stanley decompositions, while $\operatorname{depth}(I)$ is the homological depth.
-Although these invariants arise from very different constructions, no general inequality relating them is known in full generality, and whether
+<div class="problem"><span class="prlabel">Pr1</span><b>(DeterministicFactorization).</b>
+Let $\mathbb{F}_q$ be a finite field and $f(x)\in\mathbb{F}_q[x]$ nonconstant.  
+Does there exist a deterministic polynomial-time algorithm for factoring arbitrary polynomials in $\mathbb{F}_q[x]$?
+</div>
+
+<div class="problem"><span class="prlabel">Pr2</span><b>(StanleyDepth).</b>
+For a monomial ideal $I\subset k[x_1,\dots,x_n]$, is it always true that
 \[
-\operatorname{sdepth}(I)\ge \operatorname{depth}(I)
+\operatorname{sdepth}(I)\ge \operatorname{depth}(I)?
 \]
-holds for all monomial ideals remains unresolved.
 </div>
 
-<div class="problem">
-<b>Pr3 (ReflexiveUnimodality).</b>
-Let $P\subset\mathbb{R}^d$ be a reflexive lattice polytope and write its Ehrhart series as
+<div class="problem"><span class="prlabel">Pr3</span><b>(ReflexiveUnimodality).</b>
+For a reflexive lattice polytope $P\subset\mathbb{R}^d$ with
 \[
-\sum_{m\ge0} |mP\cap\mathbb{Z}^d|\,t^m=\frac{h^*(t)}{(1-t)^{d+1}},
+\sum_{m\ge0} |mP\cap\mathbb{Z}^d|t^m=\frac{h^*(t)}{(1-t)^{d+1}},
 \]
-where $h^*(t)=h_0^*+h_1^*t+\cdots+h_d^*t^d$.
-The coefficients form a symmetric vector, but it is unknown whether the sequence $(h_i^*)$ must always be unimodal.
+must the symmetric sequence $(h_i^*)$ always be unimodal?
 </div>
 
-<div class="problem">
-<b>Pr4 (IDPUnimodality).</b>
-A lattice polytope $P$ has the integer decomposition property (IDP) if every lattice point of $mP$ decomposes as a sum of $m$ lattice points of $P$.
-The associated semigroup algebra is normal, yet it is unknown whether IDP implies unimodality of the Ehrhart $h^*$-vector or other strong positivity properties.
+<div class="problem"><span class="prlabel">Pr4</span><b>(IDPUnimodality).</b>
+Does the integer decomposition property imply unimodality or stronger positivity properties for the Ehrhart $h^*$-vector?
 </div>
 
-<div class="problem">
-<b>Pr5 (WilfSemigroup).</b>
-Let $S=\langle a_1,\dots,a_e\rangle\subset\mathbb{N}$ be a numerical semigroup with Frobenius number $F$ and genus $g=|\mathbb{N}\setminus S|$.
-Wilf's conjecture asserts that
+<div class="problem"><span class="prlabel">Pr5</span><b>(WilfSemigroup).</b>
+For a numerical semigroup $S=\langle a_1,\dots,a_e\rangle$ with Frobenius number $F$ and genus $g$, does
 \[
-F+1\le e\,g.
+F+1\le e\,g
 \]
-Despite verification in many cases, no general proof or counterexample is known.
+always hold?
 </div>
 
-<div class="problem">
-<b>Pr6 (CasasAlvero).</b>
-Let $f(x)\in k[x]$ be a polynomial of degree $n$ over a field of characteristic $0$.
-If $\gcd(f,f^{(i)})\neq1$ for every derivative $1\le i\le n-1$, must $f(x)$ be a pure power $(x-a)^n$?
-This deceptively elementary condition defines a highly constrained algebraic locus whose global structure is not understood.
+<div class="problem"><span class="prlabel">Pr6</span><b>(CasasAlvero).</b>
+If a degree $n$ polynomial $f(x)$ over characteristic $0$ satisfies $\gcd(f,f^{(i)})\neq1$ for all $1\le i\le n-1$, must $f(x)=(x-a)^n$?
 </div>
 
-<div class="problem">
-<b>Pr7 (ZariskiCancellation).</b>
-Let $k$ be a field and $A$ a finitely generated $k$-algebra.
-If
-\[
-A[t]\cong k[x_1,\dots,x_{n+1}]
-\]
-as $k$-algebras, must $A\cong k[x_1,\dots,x_n]$?
-This is the Zariski Cancellation Problem, solved in low dimensions but open or subtle in many geometric settings.
+<div class="problem"><span class="prlabel">Pr7</span><b>(ZariskiCancellation).</b>
+If $A[t]\cong k[x_1,\dots,x_{n+1}]$ as $k$-algebras, must $A\cong k[x_1,\dots,x_n]$?
 </div>
 
-<div class="problem">
-<b>Pr8 (RationalVsUnirational).</b>
-A projective variety $X$ over $k$ is unirational if there exists a dominant rational map $\mathbb{P}^n\dashrightarrow X$, and rational if it is birational to $\mathbb{P}^n$.
-Although rational $\Rightarrow$ unirational, the converse is poorly understood in higher dimensions, and explicit separating examples remain difficult to construct.
+<div class="problem"><span class="prlabel">Pr8</span><b>(RationalVsUnirational).</b>
+In higher dimensions, when does unirationality imply rationality for projective varieties?
 </div>
 
-<div class="problem">
-<b>Pr9 (NagataInterpolation).</b>
-Given general points $p_1,\dots,p_r\in\mathbb{P}^2$ with multiplicities $m_i$, determine the minimal degree $d$ for which there exists a plane curve of degree $d$ vanishing to order $m_i$ at each $p_i$.
-Nagata predicted precise asymptotic bounds, but the conjecture is open except in special cases.
+<div class="problem"><span class="prlabel">Pr9</span><b>(NagataInterpolation).</b>
+For general points in $\mathbb{P}^2$ with multiplicities $m_i$, what is the minimal degree $d$ of a curve vanishing to order $m_i$ at each point?
 </div>
 
-<div class="problem">
-<b>Pr10 (GroupRingTorsion).</b>
-Let $G$ be a finite group and consider the unit group of the integral group ring $\mathbb{Z}[G]$.
-The Zassenhaus conjecture predicts that every torsion unit is conjugate in $\mathbb{Q}[G]$ to an element of $G$, yet this remains unresolved in general.
+<div class="problem"><span class="prlabel">Pr10</span><b>(GroupRingTorsion).</b>
+Is every torsion unit in $\mathbb{Z}[G]$ conjugate in $\mathbb{Q}[G]$ to an element of $G$?
 </div>
 
-<div class="problem">
-<b>Pr11 (GenericInitialIdeals).</b>
-For a homogeneous ideal $I\subset k[x_1,\dots,x_n]$, the generic initial ideal $\mathrm{gin}(I)$ encodes asymptotic behavior under coordinate changes.
-Even for ideals generated by two general forms, there is no closed description of $\mathrm{gin}(I)$ or its Betti numbers.
+<div class="problem"><span class="prlabel">Pr11</span><b>(GenericInitialIdeals).</b>
+Can one describe $\mathrm{gin}(I)$ or its Betti numbers explicitly for ideals generated by general forms?
 </div>
 
-<div class="problem">
-<b>Pr12 (CellularResolutions).</b>
-Many monomial ideals admit minimal free resolutions supported on CW-complexes.
-It is unknown which classes of ideals always admit such <em>cellular resolutions</em>, and no intrinsic characterization of this property is known.
+<div class="problem"><span class="prlabel">Pr12</span><b>(CellularResolutions).</b>
+Which monomial ideals admit minimal free resolutions supported on CW-complexes?
 </div>
 
-<div class="problem">
-<b>Pr13 (gConjectureSpheres).</b>
-The $g$-conjecture predicts necessary and sufficient conditions for a sequence to occur as the $h$-vector of a simplicial sphere.
-While proven for polytopes, the general topological case remains open.
+<div class="problem"><span class="prlabel">Pr13</span><b>(gConjectureSpheres).</b>
+Which sequences occur as the $h$-vector of a simplicial sphere?
 </div>
 
-<div class="problem">
-<b>Pr14 (PermutationBinomials).</b>
-A polynomial $f(x)\in\mathbb{F}_q[x]$ is a permutation polynomial if it induces a bijection of $\mathbb{F}_q$.
-Determining when sparse polynomials such as $x^a+cx^b$ have this property is known only in scattered families.
+<div class="problem"><span class="prlabel">Pr14</span><b>(PermutationBinomials).</b>
+When does a sparse binomial $x^a+cx^b\in\mathbb{F}_q[x]$ define a permutation of $\mathbb{F}_q$?
 </div>
 
-<div class="problem">
-<b>Pr15 (SparsePermutationPolynomials).</b>
-For trinomials and quadrinomials over finite fields, no classification exists describing when they define permutations.
-Their behavior appears governed by subtle arithmetic relations among exponents.
+<div class="problem"><span class="prlabel">Pr15</span><b>(SparsePermutationPolynomials).</b>
+Is there a structural classification for permutation trinomials or quadrinomials over finite fields?
 </div>
 
-<div class="problem">
-<b>Pr16 (AlmostCompleteIntersectionHilbert).</b>
-If $I=(f_1,\dots,f_{c+1})$ in a polynomial ring has codimension $c$, then $I$ is an almost complete intersection.
-The possible Hilbert functions and graded Betti tables of such ideals lack a structural classification.
+<div class="problem"><span class="prlabel">Pr16</span><b>(AlmostCompleteIntersectionHilbert).</b>
+What Hilbert functions and Betti tables occur for almost complete intersections?
 </div>
 
-<div class="problem">
-<b>Pr17 (SymbolicEquality).</b>
-For an ideal $I\subset R$, the symbolic power
-\[
-I^{(m)}=\bigcap_{\mathfrak{p}\in\mathrm{Min}(I)}(I^mR_{\mathfrak{p}}\cap R)
-\]
-often differs from the ordinary power $I^m$.
-Determining when equality holds is a central unresolved question in the theory of singularities and blowups.
+<div class="problem"><span class="prlabel">Pr17</span><b>(SymbolicEquality).</b>
+When does $I^{(m)}=I^m$ hold for an ideal $I$?
 </div>
 
-<div class="problem">
-<b>Pr18 (SymbolicContainment).</b>
-Given integers $m,r$, determining when the containment
+<div class="problem"><span class="prlabel">Pr18</span><b>(SymbolicContainment).</b>
+For which $m,r$ does
 \[
 I^{(m)}\subseteq I^r
 \]
-holds is known only through partial bounds (e.g.\ Ein--Lazarsfeld--Smith, Hochster--Huneke).
-Sharp criteria depending on the geometry of $\mathrm{Spec}(R/I)$ are unknown.
+hold?
 </div>
 
-<div class="problem">
-<b>Pr19 (RegularityAsymptotics).</b>
-For a homogeneous ideal $I$, the Castelnuovo--Mumford regularity satisfies
+<div class="problem"><span class="prlabel">Pr19</span><b>(RegularityAsymptotics).</b>
+Given $\mathrm{reg}(I^m)=am+b$ for $m\gg0$, how can one determine $a$ and $b$ from the generators of $I$?
+</div>
+
+<div class="problem"><span class="prlabel">Pr20</span><b>(ReesEquations).</b>
+For the Rees algebra
 \[
-\mathrm{reg}(I^m)=am+b
+\mathcal{R}(I)=\bigoplus_{m\ge0} I^m t^m,
 \]
-for $m\gg0$.
-While asymptotic linearity is known, there is no general method to determine $a$ or $b$ from the generators of $I$.
+what are its defining equations and homological properties?
 </div>
 
-<div class="problem">
-<b>Pr20 (ReesEquations).</b>
-The Rees algebra
-\[
-\mathcal{R}(I)=\bigoplus_{m\ge0} I^m t^m
-\]
-controls the blowup of $\mathrm{Spec}(R)$ along $V(I)$.
-Even for simple ideals, describing defining equations, depth, or Cohen--Macaulayness of $\mathcal{R}(I)$ is widely open.
 </div>
-
 </body>
 </html>
