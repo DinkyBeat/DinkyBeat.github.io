@@ -5,100 +5,368 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vasudevan Govardhanen – Blog</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,600&display=swap" rel="stylesheet">
+
 <!-- MathJax -->
 <script>
 window.MathJax = {
-  tex: {
-    macros: { Ima: "\\operatorname{im}" }
-  }
+  tex: { macros: { Ima: "\\operatorname{im}" } }
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
 <style>
-/* ===== Base ===== */
-body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; background:#fff; color:#111; margin:0; }
-.container { display:flex; min-height:100vh; }
+:root {
+  --bg:       #0b0b0a;
+  --surface:  #111110;
+  --text:     #f0ece2;
+  --dim:      #55554a;
+  --accent:   #e82010;
+  --border:   rgba(240,236,226,0.09);
+  --ease:     cubic-bezier(0.16,1,0.3,1);
+  --ff-disp:  'Bebas Neue', sans-serif;
+  --ff-sans:  'Space Grotesk', sans-serif;
+  --ff-serif: 'Cormorant Garamond', serif;
+}
 
-/* ===== Sidebar ===== */
-.sidebar { width:50px; background:#f8f8f8; border-right:1px solid #e5e5e5; padding:20px 10px; overflow:hidden; }
-.sidebar h2 { font-size:14px; letter-spacing:2px; text-transform:uppercase; color:#777; margin-bottom:20px; cursor:pointer; }
-.sidebar ul { list-style:none; display:flex; flex-direction:column; gap:10px; padding-left:0; }
-.sidebar a { text-decoration:none; color:#111; font-size:13px; transition:color 0.2s ease; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.sidebar a:hover { color:#555; }
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--ff-sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+html, a, button { cursor: none; }
+@media (hover:none) {
+  html, a, button { cursor:auto; }
+  .c-dot, .c-ring { display:none !important; }
+}
 
-/* ===== Main ===== */
-.main { flex:1; padding:40px 30px; display:flex; flex-direction:column; gap:10px; }
-.main h1 { font-size:32px; margin-bottom:2px; }
-.main h4 { font-size:12px; color:#555; margin:0; font-weight:normal; line-height:1.2; }
+/* ── Cursor ── */
+.c-dot {
+  position:fixed; top:0; left:0;
+  width:8px; height:8px; background:var(--accent);
+  border-radius:50%; pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  transition: width .2s var(--ease), height .2s var(--ease), background .2s;
+  will-change: left, top;
+}
+.c-ring {
+  position:fixed; top:0; left:0;
+  width:46px; height:46px;
+  border:1.5px solid rgba(240,236,226,0.28);
+  border-radius:50%; pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%);
+  transition: width .4s var(--ease), height .4s var(--ease), border-color .3s;
+  will-change: left, top;
+}
+.c-dot.on  { width:12px; height:12px; background:#f5c800; }
+.c-ring.on { width:80px; height:80px; border-color:var(--accent); }
 
-/* ===== Blog posts ===== */
-.post-wrapper { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
-.post-link { cursor:pointer; color:#111; text-decoration:none; border-left:3px solid transparent; padding:5px 10px; flex:1; display:block; transition:all 0.2s ease; font-size:14px; }
-.post-link:hover { border-left:3px solid #111; color:#555; }
-.open-new { font-size:12px; color:#111; text-decoration:none; transition:color 0.2s ease; }
-.open-new:hover { color:#555; }
-.post-content { display:none; padding:15px 20px; border-left:3px solid #111; background:#f9f9f9; margin-bottom:20px; }
-.post-content h1 { font-size:26px; margin-bottom:10px; }
-.post-content .meta { font-size:11px; color:#777; margin-bottom:15px; }
+/* ── Noise ── */
+.noise {
+  position:fixed; inset:0; pointer-events:none; z-index:9000; opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+}
+
+/* ── Scroll bar ── */
+.scroll-bar {
+  position:fixed; top:0; left:0;
+  height:2px; width:100%;
+  background:var(--accent);
+  transform-origin:left; transform:scaleX(0); z-index:9997;
+}
+
+/* ── Layout ── */
+.layout { display:flex; min-height:100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width:52px;
+  background: var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:20px 0;
+  position:sticky; top:0; height:100vh;
+  overflow:hidden;
+  transition: width .4s var(--ease);
+  z-index:100;
+  flex-shrink:0;
+}
+.sidebar:hover { width:190px; }
+
+.sidebar-toggle {
+  font-family: var(--ff-disp);
+  font-size:18px; letter-spacing:2px;
+  color:var(--dim); text-align:center;
+  padding:16px 0 24px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:20px;
+  flex-shrink:0;
+}
+
+.sidebar-links { list-style:none; }
+.sidebar-links li + li { border-top:1px solid var(--border); }
+.sidebar-links a {
+  display:block; padding:12px 18px;
+  text-decoration:none; color:var(--dim);
+  font-size:11px; font-weight:500;
+  letter-spacing:2px; text-transform:uppercase;
+  white-space:nowrap; overflow:hidden;
+  transition: color .25s, background .25s;
+}
+.sidebar-links a:hover { color:var(--text); background:rgba(240,236,226,0.04); }
+.sidebar-links a.active { color:var(--accent); }
+
+/* ── Main ── */
+.main {
+  flex:1; padding:0; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* ── Top bar ── */
+.topbar {
+  padding:28px 52px 24px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-end; gap:20px;
+  opacity:0; animation:fadeUp .8s var(--ease) .2s forwards;
+}
+.topbar-title {
+  font-family: var(--ff-disp);
+  font-size: clamp(52px,8vw,96px);
+  line-height:0.88; letter-spacing:-1px;
+}
+.topbar-sub {
+  font-family: var(--ff-serif);
+  font-style:italic; font-size:13px;
+  color:var(--dim); line-height:1.7;
+  padding-bottom:6px; max-width:380px;
+}
+
+/* ── Post list ── */
+.post-list { padding:0 52px 80px; flex:1; }
+
+.post-row {
+  border-bottom:1px solid var(--border);
+  opacity:0; transform:translateY(22px);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
+}
+.post-row.visible { opacity:1; transform:translateY(0); }
+
+.post-trigger {
+  display:grid;
+  grid-template-columns: 56px 1fr auto auto;
+  align-items:center;
+  padding:20px 0;
+  cursor:none;
+  position:relative; overflow:hidden;
+  transition: padding-left .4s var(--ease);
+}
+.post-trigger::before {
+  content:''; position:absolute; inset:0;
+  background:var(--accent);
+  transform:translateX(-102%);
+  transition:transform .48s var(--ease);
+  opacity:.08;
+}
+.post-trigger:hover::before { transform:translateX(0); }
+.post-trigger:hover { padding-left:14px; }
+
+.post-idx {
+  font-family: var(--ff-disp);
+  font-size:11px; letter-spacing:3px; color:var(--accent);
+  align-self:start; padding-top:5px;
+}
+.post-title-wrap { min-width:0; }
+.post-title {
+  font-family: var(--ff-disp);
+  font-size: clamp(32px,5vw,64px);
+  line-height:1; letter-spacing:-.5px;
+}
+.post-date {
+  font-size:10px; font-weight:400;
+  letter-spacing:2px; text-transform:uppercase;
+  color:var(--dim); margin-top:4px;
+  transition:color .3s;
+}
+.post-trigger:hover .post-date { color:var(--text); }
+.post-code {
+  font-family: var(--ff-disp);
+  font-size:11px; letter-spacing:2px; color:var(--dim);
+  margin-right:24px; align-self:start; padding-top:6px;
+}
+.post-actions { display:flex; align-items:center; gap:16px; }
+.post-expand {
+  font-size:20px; color:var(--accent);
+  opacity:0; transform:translateX(-12px);
+  transition: opacity .3s, transform .38s var(--ease);
+}
+.post-trigger:hover .post-expand { opacity:1; transform:translateX(0); }
+.post-open {
+  font-size:13px; color:var(--dim);
+  text-decoration:none;
+  transition:color .2s;
+}
+.post-open:hover { color:var(--text); }
+
+/* ── Post content (expanded) ── */
+.post-body {
+  display:none;
+  padding:28px 32px 36px;
+  border-left:3px solid var(--accent);
+  margin:0 0 0 56px;
+  background:rgba(240,236,226,0.03);
+}
+.post-body.open { display:block; }
+
+/* Prose styles for injected HTML */
+.post-body h1 { font-family:var(--ff-disp); font-size:clamp(28px,4vw,48px); margin-bottom:12px; }
+.post-body h2 { font-family:var(--ff-disp); font-size:clamp(22px,3vw,36px); margin:28px 0 10px; color:var(--accent); letter-spacing:.5px; }
+.post-body h3 { font-family:var(--ff-sans); font-size:15px; font-weight:600; margin:20px 0 8px; letter-spacing:1px; text-transform:uppercase; color:var(--dim); }
+.post-body p  { font-family:var(--ff-serif); font-size:18px; line-height:1.85; margin-bottom:16px; color:#ddd9cf; }
+.post-body .meta { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--dim); margin-bottom:20px; }
+.post-body strong { color:var(--text); }
+
+/* ── Keyframes ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+
+/* ── Responsive ── */
+@media (max-width:768px) {
+  .topbar { padding:24px 20px 20px; }
+  .post-list { padding:0 20px 60px; }
+  .post-trigger { grid-template-columns:40px 1fr auto; }
+  .post-code { display:none; }
+  .post-body { margin-left:40px; }
+}
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="c-dot"  id="cDot"></div>
+<div class="c-ring" id="cRing"></div>
+<div class="noise"  aria-hidden="true"></div>
+<div class="scroll-bar" id="scrollBar"></div>
+
+<div class="layout">
 
   <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>☰</h2>
-    <ul>
-      <li><a href="../index.html" title="Home">Home</a></li>
-      <li><a href="../index.html#about" title="About">About</a></li>
-      <li><a href="../index.html#notes" title="Notes">Notes</a></li>
-      <li><a href="#" title="Blog">Blog</a></li>
-      <li><a href="../index.html#contact" title="Contact">Contact</a></li>
+  <aside class="sidebar">
+    <div class="sidebar-toggle">☰</div>
+    <ul class="sidebar-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../about/">About</a></li>
+      <li><a href="../notes/">Notes</a></li>
+      <li><a href="#" class="active">Blog</a></li>
+      <li><a href="../contact/">Contact</a></li>
     </ul>
-  </div>
+  </aside>
 
-  <!-- Main content -->
+  <!-- Main -->
   <div class="main">
-    <h1>Vasublog</h1>
-    <h4>(everything is presented in a drop-down fashion. if you'd like a pdf please contact me)</h4>
-    <h4>(to reference a post, please cite the parenthetical code adjacent to the title)</h4>
 
-    <!-- Post links -->
-    <div class="post-wrapper">
-      <span class="post-link" data-post="posts/homological-algebra.html">(nha) Note on Homological Algebra [June 2024]</span>
-      <a class="open-new" href="posts/homological-algebra.html" target="_blank" title="Open in new window">⧉</a>
+    <div class="topbar">
+      <h1 class="topbar-title">VASUBLOG</h1>
+      <div class="topbar-sub">
+        Drop-down posts — cite the parenthetical code when referencing.<br>
+        Contact for PDF versions.
+      </div>
     </div>
-    <div class="post-content" id="post-homological-algebra"></div>
 
-    <!-- Add more posts below the same way -->
+    <div class="post-list">
+
+      <!-- Post entry -->
+      <div class="post-row" id="row-nha">
+        <div class="post-trigger" data-src="posts/homological-algebra.html" data-target="body-nha">
+          <span class="post-idx">01</span>
+          <div class="post-title-wrap">
+            <div class="post-title">HOMOLOGICAL ALGEBRA</div>
+            <div class="post-date">June 2024</div>
+          </div>
+          <span class="post-code">(nha)</span>
+          <div class="post-actions">
+            <span class="post-expand">↓</span>
+            <a class="post-open" href="posts/homological-algebra.html" target="_blank" title="Open in new tab">⧉</a>
+          </div>
+        </div>
+        <div class="post-body" id="body-nha"></div>
+      </div>
+
+      <!-- Add new posts here following the same pattern -->
+
+    </div>
   </div>
-
 </div>
 
 <script>
-// ===== Blog post collapse/expand =====
-document.querySelectorAll('.post-link').forEach(link => {
-  link.addEventListener('click', async () => {
-    const postId = 'post-' + link.dataset.post.split('/').pop().replace('.html','');
-    const container = document.getElementById(postId);
+/* ── Cursor ── */
+const cDot  = document.getElementById('cDot');
+const cRing = document.getElementById('cRing');
+let mx = innerWidth/2, my = innerHeight/2;
+let dx = mx, dy = my, rx = mx, ry = my;
 
-    if (container.style.display === 'block') {
-      container.style.display = 'none';
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tick() {
+  dx += (mx-dx)*.45; dy += (my-dy)*.45;
+  rx += (mx-rx)*.1;  ry += (my-ry)*.1;
+  cDot.style.left  = dx+'px'; cDot.style.top  = dy+'px';
+  cRing.style.left = rx+'px'; cRing.style.top = ry+'px';
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => { cDot.classList.add('on');  cRing.classList.add('on');  });
+  el.addEventListener('mouseleave', () => { cDot.classList.remove('on'); cRing.classList.remove('on'); });
+});
+
+/* ── Scroll bar ── */
+const scrollBar = document.getElementById('scrollBar');
+window.addEventListener('scroll', () => {
+  const p = scrollY / (document.documentElement.scrollHeight - innerHeight);
+  scrollBar.style.transform = `scaleX(${p})`;
+}, { passive: true });
+
+/* ── Intersection observer ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.06 });
+document.querySelectorAll('.post-row').forEach((el, i) => {
+  el.style.transitionDelay = `${i * 0.08}s`;
+  io.observe(el);
+});
+
+/* ── Post expand / collapse ── */
+document.querySelectorAll('.post-trigger').forEach(trigger => {
+  trigger.addEventListener('click', async e => {
+    // Don't fire when clicking the ⧉ open link
+    if (e.target.closest('.post-open')) return;
+
+    const src    = trigger.dataset.src;
+    const target = trigger.dataset.target;
+    const body   = document.getElementById(target);
+    const expand = trigger.querySelector('.post-expand');
+
+    if (body.classList.contains('open')) {
+      body.classList.remove('open');
+      expand.textContent = '↓';
     } else {
-      container.style.display = 'block';
-      if (!container.innerHTML.trim()) {
-        const response = await fetch(link.dataset.post);
-        const html = await response.text();
-        container.innerHTML = html;
-        MathJax.typesetPromise(); // render LaTeX
+      body.classList.add('open');
+      expand.textContent = '↑';
+      if (!body.innerHTML.trim()) {
+        const res  = await fetch(src);
+        const html = await res.text();
+        body.innerHTML = html;
+        if (window.MathJax) MathJax.typesetPromise([body]);
       }
     }
   });
 });
 </script>
-
 </body>
 </html>

@@ -2,185 +2,403 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open-ended Series</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,600&display=swap" rel="stylesheet">
 
 <!-- MathJax -->
 <script>
 window.MathJax = {
   tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['\\[', '\\]']]
+    inlineMath:  [['$','$'],['\\(','\\)']],
+    displayMath: [['\\[','\\]']]
   }
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
 <style>
+:root {
+  --bg:       #0b0b0a;
+  --surface:  #111110;
+  --text:     #f0ece2;
+  --dim:      #55554a;
+  --accent:   #e82010;
+  --accent2:  #1438d4;
+  --border:   rgba(240,236,226,0.09);
+  --ease:     cubic-bezier(0.16,1,0.3,1);
+  --ff-disp:  'Bebas Neue', sans-serif;
+  --ff-sans:  'Space Grotesk', sans-serif;
+  --ff-serif: 'Cormorant Garamond', serif;
+}
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
 body {
-  font-family: serif;
-  background: white;
-  margin: 0;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: var(--ff-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+html, a, button { cursor:none; }
+@media (hover:none) {
+  html, a, button { cursor:auto; }
+  .c-dot, .c-ring { display:none !important; }
 }
 
-.container {
-  max-width: 850px;
-  width: 100%;
+/* ── Cursor ── */
+.c-dot {
+  position:fixed; top:0; left:0;
+  width:8px; height:8px; background:var(--accent);
+  border-radius:50%; pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width .2s var(--ease),height .2s var(--ease),background .2s;
+  will-change:left,top;
+}
+.c-ring {
+  position:fixed; top:0; left:0;
+  width:46px; height:46px;
+  border:1.5px solid rgba(240,236,226,0.28);
+  border-radius:50%; pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:width .4s var(--ease),height .4s var(--ease),border-color .3s;
+  will-change:left,top;
+}
+.c-dot.on  { width:12px; height:12px; background:#f5c800; }
+.c-ring.on { width:80px; height:80px; border-color:var(--accent); }
+
+/* ── Noise ── */
+.noise {
+  position:fixed; inset:0; pointer-events:none; z-index:9000; opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
 }
 
-h1 {
-  text-align: center;
-  font-weight: normal;
-  margin-bottom: 0.3em;
+/* ── Scroll bar ── */
+.scroll-bar {
+  position:fixed; top:0; left:0;
+  height:2px; width:100%;
+  background:var(--accent);
+  transform-origin:left; transform:scaleX(0); z-index:9997;
 }
 
-.subtitle {
-  text-align: center;
-  font-style: italic;
-  margin-bottom: 2.5em;
-  color: #444;
+/* ── Nav ── */
+.nav {
+  position:sticky; top:0; z-index:200;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:22px 56px;
+  background: rgba(11,11,10,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo {
+  font-family:var(--ff-disp);
+  font-size:13px; letter-spacing:4px;
+  color:var(--text); text-decoration:none;
+}
+.nav-back {
+  font-size:10px; font-weight:500;
+  letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--dim); text-decoration:none;
+  display:flex; align-items:center; gap:10px;
+  transition:color .3s;
+}
+.nav-back:hover { color:var(--text); }
+.nav-back-bar {
+  width:28px; height:1px; background:var(--dim);
+  transition: width .4s var(--ease), background .3s;
+}
+.nav-back:hover .nav-back-bar { width:46px; background:var(--text); }
+
+/* ── Header ── */
+.page-header {
+  padding:80px 56px 56px;
+  border-bottom:1px solid var(--border);
+  position:relative; overflow:hidden;
+}
+.page-header::before {
+  content:''; position:absolute;
+  top:-40%; right:-5%;
+  width:400px; height:400px;
+  background:radial-gradient(ellipse,rgba(232,32,16,0.05) 0%,transparent 65%);
+  pointer-events:none;
+  animation:breathe 10s ease-in-out infinite;
+}
+.page-eyebrow {
+  font-family:var(--ff-disp);
+  font-size:11px; letter-spacing:6px; color:var(--accent);
+  margin-bottom:16px;
+  opacity:0; animation:fadeUp .7s var(--ease) .1s forwards;
+}
+.page-title {
+  font-family:var(--ff-disp);
+  font-size:clamp(64px,10vw,140px);
+  line-height:.88; letter-spacing:-1px;
+  opacity:0; animation:revealUp .9s var(--ease) .2s forwards;
+}
+.page-sub {
+  font-family:var(--ff-serif);
+  font-style:italic; font-size:16px;
+  color:var(--dim); margin-top:20px; line-height:1.7;
+  opacity:0; animation:fadeUp .7s var(--ease) .5s forwards;
+}
+
+/* ── Problem grid ── */
+.problems {
+  padding:60px 56px 100px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(340px,1fr));
+  gap:1px;
+  background:var(--border);
 }
 
 .problem {
-  border: 1px solid #ccc;
-  padding: 18px 22px;
-  margin-bottom: 28px;
-  border-radius: 6px;
-  background: #fafafa;
+  background:var(--bg);
+  padding:28px 30px;
+  position:relative; overflow:hidden;
+  opacity:0; transform:translateY(20px);
+  transition:
+    opacity .5s var(--ease),
+    transform .5s var(--ease),
+    background .3s;
 }
+.problem.visible { opacity:1; transform:translateY(0); }
+.problem:hover { background:var(--surface); }
 
-.prlabel {
-  font-weight: bold;
-  padding: 3px 8px;
-  border-radius: 4px;
-  margin-right: 6px;
+/* accent line on left */
+.problem::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0; width:2px;
+  background:var(--accent);
+  transform:scaleY(0); transform-origin:bottom;
+  transition:transform .4s var(--ease);
 }
+.problem:hover::before { transform:scaleY(1); }
 
-.problem:nth-child(odd) .prlabel {
-  background: #e3f0ff;
-  color: #1a4fa3;
+/* alternating label colors */
+.problem:nth-child(odd)  .pr-label { background:rgba(232,32,16,0.12);  color:var(--accent); }
+.problem:nth-child(even) .pr-label { background:rgba(20,56,212,0.14);  color:#6a8bff; }
+
+.pr-label {
+  font-family:var(--ff-disp);
+  font-size:11px; letter-spacing:3px;
+  padding:3px 9px; border-radius:3px;
+  display:inline-block; margin-bottom:12px;
 }
+.pr-name {
+  font-family:var(--ff-disp);
+  font-size:20px; letter-spacing:.5px;
+  margin-bottom:14px; color:var(--text);
+}
+.pr-body {
+  font-family:var(--ff-serif);
+  font-size:16px; line-height:1.85;
+  color:rgba(240,236,226,0.7);
+}
+.pr-body b { color:var(--text); font-style:normal; }
 
-.problem:nth-child(even) .prlabel {
-  background: #f3e6ff;
-  color: #5a2ca0;
+/* MathJax display override */
+mjx-container[display="true"] { overflow-x:auto; }
+
+/* ── Keyframes ── */
+@keyframes fadeUp   { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes revealUp { from{opacity:0;transform:translateY(108%)} to{opacity:1;transform:translateY(0)} }
+@keyframes breathe  { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.1);opacity:1} }
+
+/* ── Responsive ── */
+@media (max-width:768px) {
+  .nav { padding:18px 24px; }
+  .page-header { padding:56px 24px 40px; }
+  .problems { padding:40px 24px 80px; grid-template-columns:1fr; }
 }
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="c-dot"  id="cDot"></div>
+<div class="c-ring" id="cRing"></div>
+<div class="noise"  aria-hidden="true"></div>
+<div class="scroll-bar" id="scrollBar"></div>
 
-<h1>Problems I am interested in (2026)</h1>
+<!-- Nav -->
+<nav class="nav">
+  <a href="/" class="nav-logo">VASUDEVAN GOVARDHANEN</a>
+  <a href="/" class="nav-back">
+    <span class="nav-back-bar"></span>
+    <span>Home</span>
+  </a>
+</nav>
 
-<div class="subtitle">
-Questions I've seen online; this page serves a place to keep record.
+<!-- Header -->
+<header class="page-header">
+  <p class="page-eyebrow">OPEN-ENDED SERIES · 2026</p>
+  <h1 class="page-title">PROBLEMS</h1>
+  <p class="page-sub">Questions I've seen online; this page serves a place to keep record.</p>
+</header>
+
+<!-- Problems -->
+<div class="problems" id="problemGrid">
+
+  <div class="problem">
+    <span class="pr-label">Pr1</span>
+    <div class="pr-name">DeterministicFactorization</div>
+    <div class="pr-body">Let $\mathbb{F}_q$ be a finite field and $f(x)\in\mathbb{F}_q[x]$ nonconstant. Does there exist a deterministic polynomial-time algorithm for factoring arbitrary polynomials in $\mathbb{F}_q[x]$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr2</span>
+    <div class="pr-name">StanleyDepth</div>
+    <div class="pr-body">For a monomial ideal $I\subset k[x_1,\dots,x_n]$, is it always true that \[\operatorname{sdepth}(I)\ge \operatorname{depth}(I)?\]</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr3</span>
+    <div class="pr-name">ReflexiveUnimodality</div>
+    <div class="pr-body">For a reflexive lattice polytope $P\subset\mathbb{R}^d$ with \[\sum_{m\ge0} |mP\cap\mathbb{Z}^d|t^m=\frac{h^*(t)}{(1-t)^{d+1}},\] must the symmetric sequence $(h_i^*)$ always be unimodal?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr4</span>
+    <div class="pr-name">IDPUnimodality</div>
+    <div class="pr-body">Does the integer decomposition property imply unimodality or stronger positivity properties for the Ehrhart $h^*$-vector?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr5</span>
+    <div class="pr-name">WilfSemigroup</div>
+    <div class="pr-body">For a numerical semigroup $S=\langle a_1,\dots,a_e\rangle$ with Frobenius number $F$ and genus $g$, does \[F+1\le e\,g\] always hold?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr6</span>
+    <div class="pr-name">CasasAlvero</div>
+    <div class="pr-body">If a degree $n$ polynomial $f(x)$ over characteristic $0$ satisfies $\gcd(f,f^{(i)})\neq1$ for all $1\le i\le n-1$, must $f(x)=(x-a)^n$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr7</span>
+    <div class="pr-name">ZariskiCancellation</div>
+    <div class="pr-body">If $A[t]\cong k[x_1,\dots,x_{n+1}]$ as $k$-algebras, must $A\cong k[x_1,\dots,x_n]$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr8</span>
+    <div class="pr-name">RationalVsUnirational</div>
+    <div class="pr-body">In higher dimensions, when does unirationality imply rationality for projective varieties?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr9</span>
+    <div class="pr-name">NagataInterpolation</div>
+    <div class="pr-body">For general points in $\mathbb{P}^2$ with multiplicities $m_i$, what is the minimal degree $d$ of a curve vanishing to order $m_i$ at each point?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr10</span>
+    <div class="pr-name">GroupRingTorsion</div>
+    <div class="pr-body">Is every torsion unit in $\mathbb{Z}[G]$ conjugate in $\mathbb{Q}[G]$ to an element of $G$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr11</span>
+    <div class="pr-name">GenericInitialIdeals</div>
+    <div class="pr-body">Can one describe $\mathrm{gin}(I)$ or its Betti numbers explicitly for ideals generated by general forms?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr12</span>
+    <div class="pr-name">CellularResolutions</div>
+    <div class="pr-body">Which monomial ideals admit minimal free resolutions supported on CW-complexes?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr13</span>
+    <div class="pr-name">gConjectureSpheres</div>
+    <div class="pr-body">Which sequences occur as the $h$-vector of a simplicial sphere?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr14</span>
+    <div class="pr-name">PermutationBinomials</div>
+    <div class="pr-body">When does a sparse binomial $x^a+cx^b\in\mathbb{F}_q[x]$ define a permutation of $\mathbb{F}_q$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr15</span>
+    <div class="pr-name">SparsePermutationPolynomials</div>
+    <div class="pr-body">Is there a structural classification for permutation trinomials or quadrinomials over finite fields?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr16</span>
+    <div class="pr-name">AlmostCompleteIntersectionHilbert</div>
+    <div class="pr-body">What Hilbert functions and Betti tables occur for almost complete intersections?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr17</span>
+    <div class="pr-name">SymbolicEquality</div>
+    <div class="pr-body">When does $I^{(m)}=I^m$ hold for an ideal $I$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr18</span>
+    <div class="pr-name">SymbolicContainment</div>
+    <div class="pr-body">For which $m,r$ does $I^{(m)}\subseteq I^r$ hold?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr19</span>
+    <div class="pr-name">RegularityAsymptotics</div>
+    <div class="pr-body">Given $\mathrm{reg}(I^m)=am+b$ for $m\gg0$, how can one determine $a$ and $b$ from the generators of $I$?</div>
+  </div>
+
+  <div class="problem">
+    <span class="pr-label">Pr20</span>
+    <div class="pr-name">ReesEquations</div>
+    <div class="pr-body">For the Rees algebra $\mathcal{R}(I)=\bigoplus_{m\ge0} I^m t^m$, what are its defining equations and homological properties?</div>
+  </div>
+
 </div>
 
-<div class="problem"><span class="prlabel">Pr1</span><b>(DeterministicFactorization).</b>
-Let $\mathbb{F}_q$ be a finite field and $f(x)\in\mathbb{F}_q[x]$ nonconstant.  
-Does there exist a deterministic polynomial-time algorithm for factoring arbitrary polynomials in $\mathbb{F}_q[x]$?
-</div>
+<script>
+/* ── Cursor ── */
+const cDot  = document.getElementById('cDot');
+const cRing = document.getElementById('cRing');
+let mx = innerWidth/2, my = innerHeight/2;
+let dx = mx, dy = my, rx = mx, ry = my;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tick() {
+  dx += (mx-dx)*.45; dy += (my-dy)*.45;
+  rx += (mx-rx)*.1;  ry += (my-ry)*.1;
+  cDot.style.left  = dx+'px'; cDot.style.top  = dy+'px';
+  cRing.style.left = rx+'px'; cRing.style.top = ry+'px';
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => { cDot.classList.add('on');  cRing.classList.add('on');  });
+  el.addEventListener('mouseleave', () => { cDot.classList.remove('on'); cRing.classList.remove('on'); });
+});
 
-<div class="problem"><span class="prlabel">Pr2</span><b>(StanleyDepth).</b>
-For a monomial ideal $I\subset k[x_1,\dots,x_n]$, is it always true that
-\[
-\operatorname{sdepth}(I)\ge \operatorname{depth}(I)?
-\]
-</div>
+/* ── Scroll bar ── */
+const scrollBar = document.getElementById('scrollBar');
+window.addEventListener('scroll', () => {
+  const p = scrollY / (document.documentElement.scrollHeight - innerHeight);
+  scrollBar.style.transform = `scaleX(${p})`;
+}, { passive: true });
 
-<div class="problem"><span class="prlabel">Pr3</span><b>(ReflexiveUnimodality).</b>
-For a reflexive lattice polytope $P\subset\mathbb{R}^d$ with
-\[
-\sum_{m\ge0} |mP\cap\mathbb{Z}^d|t^m=\frac{h^*(t)}{(1-t)^{d+1}},
-\]
-must the symmetric sequence $(h_i^*)$ always be unimodal?
-</div>
+/* ── Staggered reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.06, rootMargin:'0px 0px -20px 0px' });
 
-<div class="problem"><span class="prlabel">Pr4</span><b>(IDPUnimodality).</b>
-Does the integer decomposition property imply unimodality or stronger positivity properties for the Ehrhart $h^*$-vector?
-</div>
-
-<div class="problem"><span class="prlabel">Pr5</span><b>(WilfSemigroup).</b>
-For a numerical semigroup $S=\langle a_1,\dots,a_e\rangle$ with Frobenius number $F$ and genus $g$, does
-\[
-F+1\le e\,g
-\]
-always hold?
-</div>
-
-<div class="problem"><span class="prlabel">Pr6</span><b>(CasasAlvero).</b>
-If a degree $n$ polynomial $f(x)$ over characteristic $0$ satisfies $\gcd(f,f^{(i)})\neq1$ for all $1\le i\le n-1$, must $f(x)=(x-a)^n$?
-</div>
-
-<div class="problem"><span class="prlabel">Pr7</span><b>(ZariskiCancellation).</b>
-If $A[t]\cong k[x_1,\dots,x_{n+1}]$ as $k$-algebras, must $A\cong k[x_1,\dots,x_n]$?
-</div>
-
-<div class="problem"><span class="prlabel">Pr8</span><b>(RationalVsUnirational).</b>
-In higher dimensions, when does unirationality imply rationality for projective varieties?
-</div>
-
-<div class="problem"><span class="prlabel">Pr9</span><b>(NagataInterpolation).</b>
-For general points in $\mathbb{P}^2$ with multiplicities $m_i$, what is the minimal degree $d$ of a curve vanishing to order $m_i$ at each point?
-</div>
-
-<div class="problem"><span class="prlabel">Pr10</span><b>(GroupRingTorsion).</b>
-Is every torsion unit in $\mathbb{Z}[G]$ conjugate in $\mathbb{Q}[G]$ to an element of $G$?
-</div>
-
-<div class="problem"><span class="prlabel">Pr11</span><b>(GenericInitialIdeals).</b>
-Can one describe $\mathrm{gin}(I)$ or its Betti numbers explicitly for ideals generated by general forms?
-</div>
-
-<div class="problem"><span class="prlabel">Pr12</span><b>(CellularResolutions).</b>
-Which monomial ideals admit minimal free resolutions supported on CW-complexes?
-</div>
-
-<div class="problem"><span class="prlabel">Pr13</span><b>(gConjectureSpheres).</b>
-Which sequences occur as the $h$-vector of a simplicial sphere?
-</div>
-
-<div class="problem"><span class="prlabel">Pr14</span><b>(PermutationBinomials).</b>
-When does a sparse binomial $x^a+cx^b\in\mathbb{F}_q[x]$ define a permutation of $\mathbb{F}_q$?
-</div>
-
-<div class="problem"><span class="prlabel">Pr15</span><b>(SparsePermutationPolynomials).</b>
-Is there a structural classification for permutation trinomials or quadrinomials over finite fields?
-</div>
-
-<div class="problem"><span class="prlabel">Pr16</span><b>(AlmostCompleteIntersectionHilbert).</b>
-What Hilbert functions and Betti tables occur for almost complete intersections?
-</div>
-
-<div class="problem"><span class="prlabel">Pr17</span><b>(SymbolicEquality).</b>
-When does $I^{(m)}=I^m$ hold for an ideal $I$?
-</div>
-
-<div class="problem"><span class="prlabel">Pr18</span><b>(SymbolicContainment).</b>
-For which $m,r$ does
-\[
-I^{(m)}\subseteq I^r
-\]
-hold?
-</div>
-
-<div class="problem"><span class="prlabel">Pr19</span><b>(RegularityAsymptotics).</b>
-Given $\mathrm{reg}(I^m)=am+b$ for $m\gg0$, how can one determine $a$ and $b$ from the generators of $I$?
-</div>
-
-<div class="problem"><span class="prlabel">Pr20</span><b>(ReesEquations).</b>
-For the Rees algebra
-\[
-\mathcal{R}(I)=\bigoplus_{m\ge0} I^m t^m,
-\]
-what are its defining equations and homological properties?
-</div>
-
-</div>
+document.querySelectorAll('.problem').forEach((el, i) => {
+  el.style.transitionDelay = `${(i % 4) * 0.06}s`;
+  io.observe(el);
+});
+</script>
 </body>
 </html>
