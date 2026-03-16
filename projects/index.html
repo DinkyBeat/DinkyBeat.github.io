@@ -4,636 +4,329 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Projects — Vasudevan Govardhanen</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
 
 <style>
-:root {
-  --bg:       #0b0b0a;
-  --surface:  #111110;
-  --text:     #f0ece2;
-  --dim:      #55554a;
-  --accent:   #e82010;
-  --accent2:  #f5c800;
-  --border:   rgba(240,236,226,0.09);
-  --ease:     cubic-bezier(0.16,1,0.3,1);
-  --ff-disp:  'Bebas Neue', sans-serif;
-  --ff-sans:  'Space Grotesk', sans-serif;
-  --ff-serif: 'Cormorant Garamond', serif;
-}
+/* ── Projects page ─────────────────────────────── */
 
-*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body {
-  font-family: var(--ff-sans);
-  background: var(--bg);
-  color: var(--text);
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-html, a, button { cursor:none; }
-@media (hover:none) {
-  html, a, button { cursor:auto; }
-  .c-dot, .c-ring { display:none !important; }
-}
-
-/* ── Cursor ── */
-.c-dot {
-  position:fixed; top:0; left:0;
-  width:8px; height:8px; background:var(--accent);
-  border-radius:50%; pointer-events:none; z-index:9999;
-  transform:translate(-50%,-50%);
-  transition:width .2s var(--ease),height .2s var(--ease),background .2s;
-  will-change:left,top;
-}
-.c-ring {
-  position:fixed; top:0; left:0;
-  width:46px; height:46px;
-  border:1.5px solid rgba(240,236,226,0.28);
-  border-radius:50%; pointer-events:none; z-index:9998;
-  transform:translate(-50%,-50%);
-  transition:width .4s var(--ease),height .4s var(--ease),border-color .3s;
-  will-change:left,top;
-}
-.c-dot.on  { width:12px; height:12px; background:var(--accent2); }
-.c-ring.on { width:80px; height:80px; border-color:var(--accent); }
-
-/* ── Noise ── */
-.noise {
-  position:fixed; inset:0; pointer-events:none; z-index:9000; opacity:.028;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:180px 180px;
-}
-
-/* ── Scroll bar ── */
-.scroll-bar {
-  position:fixed; top:0; left:0;
-  height:2px; width:100%;
-  background:var(--accent);
-  transform-origin:left; transform:scaleX(0); z-index:9997;
-}
-
-/* ── Nav ── */
-.nav {
-  position:sticky; top:0; z-index:200;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:22px 56px;
-  background:rgba(11,11,10,0.92);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo {
-  font-family:var(--ff-disp);
-  font-size:13px; letter-spacing:4px;
-  color:var(--text); text-decoration:none;
-}
-.nav-back {
-  font-size:10px; font-weight:500;
-  letter-spacing:2.5px; text-transform:uppercase;
-  color:var(--dim); text-decoration:none;
-  display:flex; align-items:center; gap:10px;
-  transition:color .3s;
-}
-.nav-back:hover { color:var(--text); }
-.nav-back-bar {
-  width:28px; height:1px; background:var(--dim);
-  transition:width .4s var(--ease), background .3s;
-}
-.nav-back:hover .nav-back-bar { width:46px; background:var(--text); }
-
-/* ── Page header ── */
-.page-header {
-  padding:80px 56px 64px;
-  border-bottom:1px solid var(--border);
-  position:relative; overflow:hidden;
-}
-.page-header::before {
-  content:''; position:absolute;
-  top:-30%; right:-5%;
-  width:500px; height:500px;
-  background:radial-gradient(ellipse,rgba(232,32,16,0.06) 0%,transparent 65%);
-  pointer-events:none;
-  animation:breathe 10s ease-in-out infinite;
-}
-/* floating background letters */
-.page-header::after {
-  content:'01';
-  position:absolute; right:56px; bottom:-20px;
-  font-family:var(--ff-disp);
-  font-size:240px; line-height:1;
-  color:rgba(240,236,226,0.025);
-  pointer-events:none; user-select:none;
-  letter-spacing:-4px;
-}
-.page-eyebrow {
-  font-family:var(--ff-disp);
-  font-size:11px; letter-spacing:6px; color:var(--accent);
-  margin-bottom:16px;
-  opacity:0; animation:fadeUp .7s var(--ease) .1s forwards;
-}
-.page-title {
-  font-family:var(--ff-disp);
-  font-size:clamp(64px,10vw,140px);
-  line-height:.88; letter-spacing:-1px;
-  opacity:0; animation:revealUp .9s var(--ease) .2s forwards;
-}
-.page-sub {
-  font-family:var(--ff-serif);
-  font-style:italic; font-size:16px;
-  color:var(--dim); margin-top:20px; line-height:1.7; max-width:520px;
-  opacity:0; animation:fadeUp .7s var(--ease) .5s forwards;
-}
-
-/* ── Project card ── */
+/* Project card — copy this whole block to add a new project */
 .project-card {
-  margin:60px 56px;
-  border:1px solid var(--border);
-  position:relative;
-  opacity:0; transform:translateY(30px);
-  transition:opacity .8s var(--ease), transform .8s var(--ease);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  transition: box-shadow 0.2s;
 }
-.project-card.visible { opacity:1; transform:translateY(0); }
+.project-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
 
-/* accent corner */
-.project-card::before {
-  content:''; position:absolute;
-  top:-1px; left:-1px;
-  width:80px; height:3px;
-  background:var(--accent);
+/* Card top bar */
+.card-top {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+}
+.card-top-left h2 {
+  font-family: var(--ff-head);
+  font-size: 26px; font-weight: 700;
+  margin-bottom: 4px;
+}
+.card-top-left .card-sub {
+  font-size: 13px; color: var(--muted);
+}
+.card-top-right {
+  display: flex; flex-wrap: wrap;
+  align-items: center; gap: 8px;
+  flex-shrink: 0;
 }
 
-/* ── Card top band ── */
-.card-header {
-  display:grid;
-  grid-template-columns:80px 1fr auto;
-  align-items:start;
-  padding:32px 36px;
-  border-bottom:1px solid var(--border);
-  gap:0;
-}
-.card-num {
-  font-family:var(--ff-disp);
-  font-size:11px; letter-spacing:4px;
-  color:var(--accent); padding-top:8px;
-}
-.card-title {
-  font-family:var(--ff-disp);
-  font-size:clamp(44px,6vw,80px);
-  line-height:.9; letter-spacing:-.5px;
-}
-.card-title-sub {
-  font-family:var(--ff-sans);
-  font-size:11px; font-weight:400;
-  letter-spacing:3px; text-transform:uppercase;
-  color:var(--dim); margin-top:10px;
-}
-.card-status {
-  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
-  padding-top:6px;
-}
-.status-badge {
-  font-family:var(--ff-disp);
-  font-size:10px; letter-spacing:3px;
-  padding:4px 10px; border-radius:2px;
-  background:rgba(232,32,16,0.12); color:var(--accent);
-}
-.card-links-top {
-  display:flex; gap:10px;
-}
-.card-link-btn {
-  font-size:10px; font-weight:500;
-  letter-spacing:2px; text-transform:uppercase;
-  color:var(--dim); text-decoration:none;
-  border:1px solid var(--border);
-  padding:6px 12px; border-radius:2px;
-  transition:color .25s, border-color .25s, background .25s;
-}
-.card-link-btn:hover { color:var(--text); border-color:rgba(240,236,226,0.3); background:rgba(240,236,226,0.04); }
-
-/* ── Card body ── */
+/* Card body — description + actions side by side */
 .card-body {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0;
+}
+.card-desc-area {
+  padding: 24px 28px;
+  border-right: 1px solid var(--border);
+}
+.card-desc-area p {
+  font-size: 15px; color: var(--muted);
+  line-height: 1.75; margin-bottom: 20px;
 }
 
-/* Left: description */
-.card-desc {
-  padding:36px;
-  border-right:1px solid var(--border);
+/* Metrics table */
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 20px;
 }
-.card-desc-label {
-  font-family:var(--ff-disp);
-  font-size:10px; letter-spacing:5px; color:var(--accent);
-  margin-bottom:16px;
+.metrics-table th {
+  text-align: left; font-weight: 600;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted);
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--border);
 }
-.card-desc-text {
-  font-family:var(--ff-serif);
-  font-style:italic; font-size:17px;
-  line-height:1.85; color:rgba(240,236,226,0.75);
-  margin-bottom:32px;
+.metrics-table td {
+  padding: 8px 12px 8px 0;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
 }
+.metrics-table td:last-child { color: var(--muted); font-size: 12px; }
 
-/* Metrics grid */
-.metrics-label {
-  font-family:var(--ff-disp);
-  font-size:10px; letter-spacing:5px; color:var(--dim);
-  margin-bottom:16px;
+/* Actions panel */
+.card-actions {
+  padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 10px;
+  min-width: 220px;
 }
-.metrics-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:1px;
-  background:var(--border);
-  border:1px solid var(--border);
+.card-actions .section-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
 }
-.metric-cell {
-  background:var(--bg);
-  padding:14px 16px;
-  transition:background .25s;
+.action-btn {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  text-decoration: none; color: var(--text);
+  transition: all 0.18s;
 }
-.metric-cell:hover { background:var(--surface); }
-.metric-name {
-  font-family:var(--ff-disp);
-  font-size:13px; letter-spacing:2px; color:var(--text);
-  margin-bottom:3px;
+.action-btn:hover { background: var(--surface); border-color: #bbb; }
+.action-btn.primary {
+  background: var(--accent); color: #fff;
+  border-color: var(--accent);
 }
-.metric-desc {
-  font-size:10px; font-weight:300;
-  letter-spacing:1px; color:var(--dim);
-}
+.action-btn.primary:hover { background: #e55a14; border-color: #e55a14; }
+.action-btn-left { display: flex; flex-direction: column; gap: 2px; }
+.action-btn-name { font-size: 13.5px; font-weight: 500; }
+.action-btn-sub  { font-size: 11px; color: inherit; opacity: 0.7; }
+.action-btn-arrow { font-size: 14px; }
 
-/* Tech stack */
-.stack-label {
-  font-family:var(--ff-disp);
-  font-size:10px; letter-spacing:5px; color:var(--dim);
-  margin-top:28px; margin-bottom:12px;
+/* ── Add project placeholder ────────────────────── */
+.add-project {
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  padding: 40px 28px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
 }
-.stack-tags {
-  display:flex; flex-wrap:wrap; gap:8px;
-}
-.stack-tag {
-  font-family:var(--ff-disp);
-  font-size:11px; letter-spacing:2px;
-  border:1px solid var(--border);
-  padding:4px 10px; border-radius:2px;
-  color:var(--dim);
-  transition:color .2s, border-color .2s;
-}
-.stack-tag:hover { color:var(--text); border-color:rgba(240,236,226,0.25); }
+.add-project strong { display: block; margin-bottom: 8px; color: var(--text); font-size: 16px; }
 
-/* Right: notebook panel */
-.card-notebook {
-  padding:36px;
-  display:flex; flex-direction:column; gap:20px;
-}
-.nb-label {
-  font-family:var(--ff-disp);
-  font-size:10px; letter-spacing:5px; color:var(--accent);
-  margin-bottom:4px;
-}
-.nb-title {
-  font-family:var(--ff-disp);
-  font-size:22px; letter-spacing:1px; margin-bottom:16px;
-}
-
-/* Launch buttons */
-.nb-actions { display:flex; flex-direction:column; gap:10px; }
-
-.nb-btn {
-  display:flex; align-items:center; justify-content:space-between;
-  text-decoration:none;
-  padding:14px 18px;
-  border:1px solid var(--border);
-  position:relative; overflow:hidden;
-  transition:border-color .3s;
-}
-.nb-btn::before {
-  content:''; position:absolute; inset:0;
-  background:var(--accent);
-  transform:translateX(-102%);
-  transition:transform .45s var(--ease);
-  opacity:.1;
-}
-.nb-btn:hover::before { transform:translateX(0); }
-.nb-btn:hover { border-color:rgba(232,32,16,0.4); }
-
-.nb-btn-primary { border-color:rgba(232,32,16,0.3); }
-
-.nb-btn-text {
-  display:flex; align-items:center; gap:12px;
-}
-.nb-btn-icon {
-  width:32px; height:32px;
-  border:1px solid var(--border);
-  border-radius:2px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px;
-  transition:border-color .3s;
-}
-.nb-btn:hover .nb-btn-icon { border-color:rgba(232,32,16,0.5); }
-.nb-btn-label {
-  font-family:var(--ff-disp);
-  font-size:15px; letter-spacing:2px;
-  color:var(--text);
-}
-.nb-btn-sub {
-  font-size:9px; font-weight:400;
-  letter-spacing:2px; text-transform:uppercase;
-  color:var(--dim);
-}
-.nb-btn-arrow {
-  font-size:16px; color:var(--accent);
-  opacity:0; transform:translateX(-10px);
-  transition:opacity .3s, transform .35s var(--ease);
-}
-.nb-btn:hover .nb-btn-arrow { opacity:1; transform:translateX(0); }
-
-/* Notebook iframe preview */
-.nb-preview-wrap {
-  position:relative;
-  border:1px solid var(--border);
-  overflow:hidden;
-  background:var(--surface);
-}
-.nb-preview-label {
-  font-family:var(--ff-disp);
-  font-size:9px; letter-spacing:4px; color:var(--dim);
-  padding:8px 12px;
-  border-bottom:1px solid var(--border);
-  background:var(--surface);
-  display:flex; align-items:center; gap:8px;
-}
-.nb-preview-dot {
-  width:6px; height:6px; border-radius:50%;
-  background:var(--accent); opacity:.6;
-}
-.nb-iframe {
-  width:100%; height:500px;
-  border:none; display:block;
-}
-/* overlay that blocks iframe interaction and shows open hint */
-.nb-iframe-overlay {
-  position:absolute; inset:0; top:29px;
-  display:flex; align-items:center; justify-content:center;
-  background:rgba(11,11,10,0.0);
-  transition:background .3s;
-  pointer-events:none;
-}
-.nb-preview-wrap:hover .nb-iframe-overlay {
-  background:rgba(11,11,10,0.55);
-  pointer-events:auto;
-}
-.nb-open-hint {
-  font-family:var(--ff-disp);
-  font-size:18px; letter-spacing:3px; color:var(--text);
-  opacity:0; transform:scale(.94);
-  transition:opacity .3s, transform .3s var(--ease);
-  display:flex; flex-direction:column; align-items:center; gap:8px;
-  cursor:none;
-}
-.nb-open-hint span:last-child {
-  font-size:10px; letter-spacing:4px; color:var(--dim);
-}
-.nb-preview-wrap:hover .nb-open-hint { opacity:1; transform:scale(1); }
-
-/* ── Footer ── */
-footer {
-  margin:0 56px;
-  padding:30px 0;
-  border-top:1px solid var(--border);
-  display:flex; justify-content:space-between; align-items:center;
-  font-size:10px; font-weight:400;
-  letter-spacing:2px; text-transform:uppercase; color:var(--dim);
-}
-footer a { color:var(--dim); text-decoration:none; transition:color .2s; }
-footer a:hover { color:var(--text); }
-
-/* ── Keyframes ── */
-@keyframes fadeUp   { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-@keyframes revealUp { from{opacity:0;transform:translateY(108%)} to{opacity:1;transform:translateY(0)} }
-@keyframes breathe  { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.1);opacity:1} }
-
-/* ── Responsive ── */
-@media (max-width:1000px) {
-  .card-body { grid-template-columns:1fr; }
-  .card-desc { border-right:none; border-bottom:1px solid var(--border); }
-}
-@media (max-width:768px) {
-  .nav { padding:18px 24px; }
-  .page-header { padding:56px 24px 40px; }
-  .page-header::after { display:none; }
-  .project-card { margin:40px 24px; }
-  .card-header { grid-template-columns:48px 1fr; gap:12px; }
-  .card-status { display:none; }
-  .card-desc, .card-notebook { padding:24px; }
-  footer { margin:0 24px; }
+@media (max-width: 768px) {
+  .card-body { grid-template-columns: 1fr; }
+  .card-desc-area { border-right: none; border-bottom: 1px solid var(--border); }
+  .card-actions { min-width: unset; }
+  .card-top { flex-direction: column; }
 }
 </style>
 </head>
 <body>
 
-<div class="c-dot"  id="cDot"></div>
-<div class="c-ring" id="cRing"></div>
-<div class="noise"  aria-hidden="true"></div>
-<div class="scroll-bar" id="scrollBar"></div>
+<div id="scrollBar"></div>
 
-<!-- Nav -->
-<nav class="nav">
-  <a href="/" class="nav-logo">VASUDEVAN GOVARDHANEN</a>
-  <a href="/" class="nav-back">
-    <span class="nav-back-bar"></span>
-    <span>Home</span>
-  </a>
+<!-- ── Navigation ──────────────────────────────── -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
+    <ul class="nav-links">
+      <li><a href="/about/">About</a></li>
+      <li><a href="/projects/">Projects</a></li>
+      <li><a href="/notes/">Notes</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/contact/">Contact</a></li>
+    </ul>
+  </div>
 </nav>
 
-<!-- Header -->
-<header class="page-header">
-  <p class="page-eyebrow">WORK IN PROGRESS</p>
-  <h1 class="page-title">PROJECTS</h1>
-  <p class="page-sub">Active research and engineering work.</p>
-</header>
+<!-- ── Content ─────────────────────────────────── -->
+<div class="page-wrap">
 
-<!-- ── NFL Analytics Project ── -->
-<div class="project-card" id="projectCard">
+  <header class="page-header">
+    <p class="eyebrow">Engineering &amp; Research</p>
+    <h1>Projects</h1>
+    <p class="subtitle">Active research, software, and analytics work.</p>
+  </header>
 
-  <div class="card-header">
-    <span class="card-num">01</span>
-    <div>
-      <div class="card-title">OLAVE-NFL</div>
-      <div class="card-title-sub">Advanced metrics framework · Python · R · Jupyter</div>
-    </div>
-    <div class="card-status">
-      <span class="status-badge">IN PROGRESS</span>
-      <div class="card-links-top">
-        <a class="card-link-btn" href="https://github.com/vasugov/analytics" target="_blank">GitHub ↗</a>
+  <!-- ============================================================
+       PROJECT 1: Olave / NFL Analytics
+       To edit: update the content inside this .project-card block.
+       To add a new project: copy this entire block below it.
+       ============================================================ -->
+  <article class="project-card reveal">
+
+    <div class="card-top">
+      <div class="card-top-left">
+        <h2>Olave — NFL Analytics</h2>
+        <p class="card-sub">Advanced metrics framework · Python · R · Jupyter</p>
       </div>
-    </div>
-  </div>
-
-  <div class="card-body">
-
-    <!-- Left: description -->
-    <div class="card-desc">
-      <p class="card-desc-label">ABOUT</p>
-      <p class="card-desc-text">
-        A research-oriented framework for computing advanced NFL metrics from play-by-play data.
-        Currently processes historical datasets using nflfastR, with future plans for real-time
-        streaming during live games via Apache Kafka or Redis Streams.
-      </p>
-
-      <p class="metrics-label">METRICS COMPUTED</p>
-      <div class="metrics-grid">
-        <div class="metric-cell">
-          <div class="metric-name">EPA</div>
-          <div class="metric-desc">Expected points added per play</div>
-        </div>
-        <div class="metric-cell">
-          <div class="metric-name">SUCCESS RATE</div>
-          <div class="metric-desc">Play-level success frequency</div>
-        </div>
-        <div class="metric-cell">
-          <div class="metric-name">WPA</div>
-          <div class="metric-desc">Win probability added</div>
-        </div>
-        <div class="metric-cell">
-          <div class="metric-name">RED ZONE</div>
-          <div class="metric-desc">Red zone efficiency by team</div>
-        </div>
-        <div class="metric-cell">
-          <div class="metric-name">DRIVE EFF.</div>
-          <div class="metric-desc">Drive-level scoring efficiency</div>
-        </div>
-        <div class="metric-cell">
-          <div class="metric-name">COMPARATIVE</div>
-          <div class="metric-desc">Cross-season team rankings</div>
-        </div>
-      </div>
-
-      <p class="stack-label">STACK</p>
-      <div class="stack-tags">
-        <span class="stack-tag">Python</span>
-        <span class="stack-tag">R / nflfastR</span>
-        <span class="stack-tag">Pandas</span>
-        <span class="stack-tag">Plotly</span>
-        <span class="stack-tag">Jupyter</span>
-        <span class="stack-tag">PostgreSQL</span>
-        <span class="stack-tag">Kafka (planned)</span>
+      <div class="card-top-right">
+        <span class="tag tag-accent">In Progress</span>
+        <a href="https://github.com/vasugov/analytics" target="_blank" rel="noopener" class="btn btn-outline">GitHub ↗</a>
       </div>
     </div>
 
-    <!-- Right: notebook -->
-    <div class="card-notebook">
-      <div>
-        <p class="nb-label">NOTEBOOK</p>
-        <p class="nb-title">metrics1.ipynb</p>
+    <div class="card-body">
+
+      <!-- Description & metrics -->
+      <div class="card-desc-area">
+        <p>
+          A research-oriented framework for computing advanced NFL metrics from play-by-play data.
+          Processes historical datasets using nflfastR, with future plans for real-time
+          streaming during live games. Hosted live at
+          <a href="https://olave.govardha.net" target="_blank" rel="noopener"
+             style="color:var(--accent);text-decoration:none;font-weight:500">olave.govardha.net ↗</a>.
+        </p>
+
+        <!-- Metrics table — add/remove rows freely -->
+        <table class="metrics-table">
+          <thead>
+            <tr><th>Metric</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>EPA</td><td>Expected points added per play</td></tr>
+            <tr><td>WPA</td><td>Win probability added</td></tr>
+            <tr><td>Success Rate</td><td>Play-level success frequency</td></tr>
+            <tr><td>Red Zone Eff.</td><td>Red zone efficiency by team</td></tr>
+            <tr><td>Drive Eff.</td><td>Drive-level scoring efficiency</td></tr>
+            <tr><td>Comparative</td><td>Cross-season team rankings</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Tech stack — add <span> tags freely -->
+        <div class="stack-row">
+          <span>Python</span>
+          <span>R / nflfastR</span>
+          <span>Pandas</span>
+          <span>Plotly</span>
+          <span>Jupyter</span>
+          <span>PostgreSQL</span>
+          <span>Kafka (planned)</span>
+        </div>
       </div>
 
-      <div class="nb-actions">
-        <a class="nb-btn nb-btn-primary"
+      <!-- Action buttons -->
+      <div class="card-actions">
+        <div class="section-label">Open project</div>
+
+        <a class="action-btn primary"
+           href="https://olave.govardha.net"
+           target="_blank" rel="noopener">
+          <div class="action-btn-left">
+            <span class="action-btn-name">Live site</span>
+            <span class="action-btn-sub">olave.govardha.net</span>
+          </div>
+          <span class="action-btn-arrow">→</span>
+        </a>
+
+        <a class="action-btn"
            href="https://mybinder.org/v2/gh/vasugov/analytics/HEAD?labpath=notebooks%2Flooks%2Fmetrics1.ipynb"
-           target="_blank">
-          <div class="nb-btn-text">
-            <div class="nb-btn-icon">⚡</div>
-            <div>
-              <div class="nb-btn-label">RUN IN BINDER</div>
-              <div class="nb-btn-sub">Interactive · no install needed</div>
-            </div>
+           target="_blank" rel="noopener">
+          <div class="action-btn-left">
+            <span class="action-btn-name">Run in Binder</span>
+            <span class="action-btn-sub">Interactive, no install</span>
           </div>
-          <span class="nb-btn-arrow">→</span>
+          <span class="action-btn-arrow">↗</span>
         </a>
 
-        <a class="nb-btn"
+        <a class="action-btn"
            href="https://colab.research.google.com/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb"
-           target="_blank">
-          <div class="nb-btn-text">
-            <div class="nb-btn-icon">▷</div>
-            <div>
-              <div class="nb-btn-label">OPEN IN COLAB</div>
-              <div class="nb-btn-sub">Google Colab · requires sign-in</div>
-            </div>
+           target="_blank" rel="noopener">
+          <div class="action-btn-left">
+            <span class="action-btn-name">Open in Colab</span>
+            <span class="action-btn-sub">Google Colab</span>
           </div>
-          <span class="nb-btn-arrow">→</span>
+          <span class="action-btn-arrow">↗</span>
         </a>
 
-        <a class="nb-btn"
+        <a class="action-btn"
            href="https://nbviewer.org/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb"
-           target="_blank">
-          <div class="nb-btn-text">
-            <div class="nb-btn-icon">◉</div>
-            <div>
-              <div class="nb-btn-label">VIEW NOTEBOOK</div>
-              <div class="nb-btn-sub">Read-only · nbviewer</div>
-            </div>
+           target="_blank" rel="noopener">
+          <div class="action-btn-left">
+            <span class="action-btn-name">View Notebook</span>
+            <span class="action-btn-sub">Read-only · nbviewer</span>
           </div>
-          <span class="nb-btn-arrow">→</span>
+          <span class="action-btn-arrow">↗</span>
         </a>
-      </div>
-
-      <!-- Static iframe preview (nbviewer) -->
-      <div class="nb-preview-wrap"
-           onclick="window.open('https://nbviewer.org/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb','_blank')">
-        <div class="nb-preview-label">
-          <span class="nb-preview-dot"></span>
-          PREVIEW — metrics1.ipynb
-        </div>
-        <iframe
-          class="nb-iframe"
-          src="https://nbviewer.org/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb"
-          loading="lazy"
-          title="NFL Analytics notebook preview">
-        </iframe>
-        <div class="nb-iframe-overlay">
-          <div class="nb-open-hint">
-            <span>OPEN NOTEBOOK</span>
-            <span>click to view full screen</span>
-          </div>
-        </div>
       </div>
 
     </div>
+  </article>
+  <!-- ============================================================
+       END PROJECT 1
+       ============================================================ -->
+
+
+  <!-- ============================================================
+       HOW TO ADD A NEW PROJECT:
+       Copy the block below (between the dashes) and paste it
+       above the .add-project placeholder. Fill in the fields.
+       - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  <article class="project-card reveal">
+    <div class="card-top">
+      <div class="card-top-left">
+        <h2>Project Name</h2>
+        <p class="card-sub">Short subtitle · Tech stack</p>
+      </div>
+      <div class="card-top-right">
+        <span class="tag tag-accent">Status</span>
+        <a href="#" class="btn btn-outline">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc-area">
+        <p>Project description goes here.</p>
+        <div class="stack-row">
+          <span>Python</span>
+          <span>Flask</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        <div class="section-label">Open project</div>
+        <a class="action-btn primary" href="#" target="_blank">
+          <div class="action-btn-left">
+            <span class="action-btn-name">Visit</span>
+            <span class="action-btn-sub">project-name.govardha.net</span>
+          </div>
+          <span class="action-btn-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </article>
+
+       - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+       END TEMPLATE
+       ============================================================ -->
+
+
+  <!-- Placeholder shown until more projects are added -->
+  <div class="add-project reveal">
+    <strong>More projects coming</strong>
+    More projects — including Flask apps and other work — will be listed here as they're built.
   </div>
+
 </div>
 
-<!-- Footer -->
-<footer>
-  <span>© 2026 Vasudevan Govardhanen</span>
-  <a href="/">Home</a>
+<!-- ── Footer ──────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2026 Vasudevan Govardhanen</span>
+    <div class="footer-links">
+      <a href="/">Home</a>
+    </div>
+  </div>
 </footer>
 
-<script>
-/* ── Cursor ── */
-const cDot  = document.getElementById('cDot');
-const cRing = document.getElementById('cRing');
-let mx = innerWidth/2, my = innerHeight/2;
-let dx = mx, dy = my, rx = mx, ry = my;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-(function tick() {
-  dx += (mx-dx)*.45; dy += (my-dy)*.45;
-  rx += (mx-rx)*.1;  ry += (my-ry)*.1;
-  cDot.style.left  = dx+'px'; cDot.style.top  = dy+'px';
-  cRing.style.left = rx+'px'; cRing.style.top = ry+'px';
-  requestAnimationFrame(tick);
-})();
-document.querySelectorAll('a,button').forEach(el => {
-  el.addEventListener('mouseenter', () => { cDot.classList.add('on');  cRing.classList.add('on');  });
-  el.addEventListener('mouseleave', () => { cDot.classList.remove('on'); cRing.classList.remove('on'); });
-});
-
-/* ── Scroll bar ── */
-const scrollBar = document.getElementById('scrollBar');
-window.addEventListener('scroll', () => {
-  const p = scrollY / (document.documentElement.scrollHeight - innerHeight);
-  scrollBar.style.transform = `scaleX(${p})`;
-}, { passive: true });
-
-/* ── Scroll reveal ── */
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.05 });
-document.querySelectorAll('.project-card').forEach(el => io.observe(el));
-</script>
+<script src="/js/site.js"></script>
 </body>
 </html>
