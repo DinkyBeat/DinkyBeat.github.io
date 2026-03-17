@@ -1,15 +1,15 @@
 /* GOVARDHA.NET — GLOBAL STYLES
-   To retheme: edit :root variables only.
-   To add a page: copy any page's <head>, <nav>, <footer>. */
+   To retheme: edit :root variables only. */
 
 :root {
   --bg:     #FFFFFF;
-  --text:   #111111;
-  --muted:  #999999;
-  --border: #E8E8E8;
-  --ff:     'Inter', system-ui, -apple-system, sans-serif;
-  --max-w:  660px;
-  --pad-x:  clamp(24px, 5vw, 48px);
+  --text:   rgba(0,0,0,0.73);
+  --muted:  rgba(0,0,0,0.40);
+  --border: #e8e8e8;
+  --accent: #1775c1;
+  --ff:     'Noto Sans', Helvetica, Arial, sans-serif;
+  --max-w:  760px;
+  --pad-x:  clamp(24px, 5vw, 52px);
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,24 +18,28 @@ body  {
   font-family: var(--ff);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.75;
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 img { display: block; max-width: 100%; }
-a   {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--border);
-}
-a:hover { text-decoration-color: var(--text); }
 
-/* Scroll progress — 1px line at top */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+  font-weight: 300;
+  color: rgba(0,0,0,0.80);
+}
+
+/* Scroll progress — 1px line */
 #scrollBar {
   position: fixed; top: 0; left: 0;
   height: 1px; width: 100%;
-  background: var(--text);
+  background: var(--accent);
   transform-origin: left;
   transform: scaleX(0);
   z-index: 9999;
@@ -44,31 +48,34 @@ a:hover { text-decoration-color: var(--text); }
 /* Navigation */
 .site-nav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(255,255,255,0.96);
-  backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.97);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .nav-inner {
   max-width: var(--max-w);
   margin: 0 auto;
   padding: 0 var(--pad-x);
-  height: 48px;
+  height: 50px;
   display: flex; align-items: center; justify-content: space-between;
 }
 .nav-logo {
   font-size: 13px; font-weight: 500;
-  color: var(--text); text-decoration: none;
+  color: rgba(0,0,0,0.60);
+  text-decoration: none;
+  letter-spacing: 0.01em;
 }
-.nav-logo:hover { color: var(--muted); }
-.nav-links {
-  list-style: none;
-  display: flex; gap: 20px;
-}
+.nav-logo:hover { color: var(--accent); text-decoration: none; }
+.nav-links { list-style: none; display: flex; gap: 22px; }
 .nav-links a {
-  font-size: 13px; color: var(--muted);
+  font-size: 13px; font-weight: 500;
+  color: rgba(0,0,0,0.55);
   text-decoration: none;
 }
-.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.nav-links a:hover, .nav-links a.active {
+  color: var(--accent);
+  text-decoration: none;
+}
 
 /* Page wrapper */
 .page-wrap {
@@ -79,16 +86,18 @@ a:hover { text-decoration-color: var(--text); }
 
 /* Page title block */
 .page-title {
-  padding: 64px 0 40px;
+  padding: 52px 0 32px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 .page-title h1 {
-  font-size: 18px; font-weight: 600;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
 }
 
 /* Footer */
-.site-footer { margin-top: 96px; border-top: 1px solid var(--border); }
+.site-footer { margin-top: 80px; border-top: 1px solid var(--border); }
 .footer-inner {
   max-width: var(--max-w);
   margin: 0 auto;
@@ -97,7 +106,7 @@ a:hover { text-decoration-color: var(--text); }
   font-size: 12px; color: var(--muted);
 }
 .footer-inner a { color: var(--muted); text-decoration: none; }
-.footer-inner a:hover { color: var(--text); }
+.footer-inner a:hover { color: var(--accent); }
 
 /* Responsive */
 @media (max-width: 540px) {

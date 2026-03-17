@@ -6,7 +6,7 @@
 <title>Vasublog</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
@@ -17,20 +17,14 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 14px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border);
   text-decoration: none;
-  color: var(--text);
 }
 .post-row:first-child { border-top: 1px solid var(--border); }
-.post-row:hover .post-name { text-decoration-color: var(--text); }
 
-.post-name {
-  font-size: 15px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--border);
-}
+.post-name { font-size: 15px; color: var(--accent); font-weight: 400; }
+.post-row:hover .post-name { text-decoration: underline; }
 .post-date { font-size: 13px; color: var(--muted); flex-shrink: 0; margin-left: 20px; }
 </style>
 </head>
