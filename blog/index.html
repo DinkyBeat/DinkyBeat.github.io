@@ -6,225 +6,81 @@
 <title>Vasublog</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 
-<!-- MathJax — used when expanding post content -->
-<script>
-window.MathJax = {
-  tex: {
-    macros: { Ima: "\\operatorname{im}" },
-    inlineMath: [['$','$'],['\\(','\\)']],
-    displayMath: [['\\[','\\]']]
-  }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-
 <style>
-/* ── Blog page ─────────────────────────────────── */
+.post-list { padding-bottom: 96px; }
 
-/* Post list */
-.post-list { margin-bottom: 60px; }
-
+/* To add a post: add an <a class="post-row"> block below */
 .post-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 0;
   border-bottom: 1px solid var(--border);
-  opacity: 0; transform: translateY(16px);
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
-}
-.post-row.visible { opacity: 1; transform: translateY(0); }
-
-.post-trigger {
-  display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 16px;
-  padding: 22px 0;
-  cursor: pointer;
-  user-select: none;
-}
-.post-trigger:hover .post-title { color: var(--accent); }
-
-.post-main { flex: 1; }
-.post-num {
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 1px; text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 6px;
-}
-.post-title {
-  font-family: var(--ff-head);
-  font-size: clamp(20px, 3vw, 30px);
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 6px;
-  transition: color 0.18s;
-}
-.post-meta {
-  font-size: 13px; color: var(--muted);
-  display: flex; align-items: center; gap: 12px;
-}
-.post-code {
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 1px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 1px 7px; border-radius: 3px;
-}
-
-.post-actions {
-  display: flex; align-items: center; gap: 12px;
-  flex-shrink: 0; padding-top: 4px;
-}
-.expand-btn {
-  font-size: 18px; color: var(--accent);
-  transition: transform 0.25s var(--ease);
-  line-height: 1;
-}
-.expand-btn.open { transform: rotate(180deg); }
-.open-tab {
-  font-size: 13px; color: var(--muted);
   text-decoration: none;
-  transition: color 0.18s;
+  color: var(--text);
 }
-.open-tab:hover { color: var(--text); }
+.post-row:first-child { border-top: 1px solid var(--border); }
+.post-row:hover .post-name { text-decoration-color: var(--text); }
 
-/* Expanded post body */
-.post-body {
-  display: none;
-  padding: 24px 28px 32px;
-  margin: 0 0 12px 0;
-  border-left: 3px solid var(--accent);
-  background: var(--surface);
-  border-radius: 0 6px 6px 0;
+.post-name {
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border);
 }
-.post-body.open { display: block; }
-
-/* Prose styles for injected HTML fragments */
-.post-body h1 { font-family: var(--ff-head); font-size: clamp(22px, 3.5vw, 34px); margin-bottom: 10px; font-weight: 700; }
-.post-body h2 { font-family: var(--ff-head); font-size: clamp(18px, 2.5vw, 26px); margin: 28px 0 10px; font-weight: 700; }
-.post-body h3 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
-.post-body p  { font-size: 16px; line-height: 1.85; margin-bottom: 16px; color: var(--text); }
-.post-body .meta { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
-.post-body strong { font-weight: 600; }
-.post-body mjx-container[display="true"] { overflow-x: auto; }
+.post-date { font-size: 13px; color: var(--muted); flex-shrink: 0; margin-left: 20px; }
 </style>
 </head>
 <body>
 
 <div id="scrollBar"></div>
 
-<!-- ── Navigation ──────────────────────────────── -->
 <nav class="site-nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
     <ul class="nav-links">
-      <li><a href="/about/">About</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/problems/">Problems</a></li>
       <li><a href="/projects/">Projects</a></li>
       <li><a href="/notes/">Notes</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/about/">About</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ── Content ─────────────────────────────────── -->
 <div class="page-wrap">
-
-  <header class="page-header">
-    <p class="eyebrow">Writing</p>
+  <div class="page-title">
     <h1>Blog</h1>
-    <p class="subtitle">
-      Click a post to expand it inline. Cite the code in parentheses when referencing.
-      Contact me for PDF versions.
-    </p>
-  </header>
-
-  <!-- ── Post list ──────────────────────────────── -->
-  <!-- To add a post:
-       1. Create an HTML fragment at blog/posts/your-post.html
-       2. Copy the .post-row block below and update:
-          - data-src="posts/your-post.html"
-          - data-target="body-xxx" (unique ID)
-          - post-num, post-title, post-date, post-code
-          - id on .post-body to match data-target
-  -->
-  <div class="post-list">
-
-    <div class="post-row" id="row-nha">
-      <div class="post-trigger"
-           data-src="posts/homological-algebra.html"
-           data-target="body-nha">
-        <div class="post-main">
-          <div class="post-num">01</div>
-          <div class="post-title">Homological Algebra</div>
-          <div class="post-meta">
-            <span>June 2024</span>
-            <span class="post-code">(nha)</span>
-          </div>
-        </div>
-        <div class="post-actions">
-          <span class="expand-btn" aria-label="Expand">↓</span>
-          <a class="open-tab"
-             href="posts/homological-algebra.html"
-             target="_blank"
-             title="Open in new tab"
-             onclick="event.stopPropagation()">⧉</a>
-        </div>
-      </div>
-      <div class="post-body" id="body-nha"></div>
-    </div>
-
-    <!-- Add new posts above this comment -->
-
   </div>
 
+  <div class="post-list">
+
+    <!-- To add a post:
+         1. Create blog/posts/your-post.html as a full HTML page
+         2. Add a line here: <a class="post-row" href="posts/your-post.html">
+              <span class="post-name">Title</span>
+              <span class="post-date">Month Year</span>
+            </a>
+    -->
+
+    <a class="post-row" href="posts/homological-algebra.html">
+      <span class="post-name">Homological Algebra</span>
+      <span class="post-date">June 2024</span>
+    </a>
+
+  </div>
 </div>
 
-<!-- ── Footer ──────────────────────────────────── -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2026 Vasudevan Govardhanen</span>
-    <div class="footer-links">
-      <a href="/">Home</a>
-    </div>
+    <span>© 2026</span>
+    <a href="/contact/">Contact</a>
   </div>
 </footer>
 
 <script src="/js/site.js"></script>
-<script>
-/* ── Post expand / collapse ── */
-document.querySelectorAll('.post-trigger').forEach(trigger => {
-  trigger.addEventListener('click', async e => {
-    const src    = trigger.dataset.src;
-    const target = trigger.dataset.target;
-    const body   = document.getElementById(target);
-    const btn    = trigger.querySelector('.expand-btn');
-
-    if (body.classList.contains('open')) {
-      body.classList.remove('open');
-      btn.textContent = '↓';
-      btn.classList.remove('open');
-    } else {
-      body.classList.add('open');
-      btn.textContent = '↑';
-      btn.classList.add('open');
-      if (!body.innerHTML.trim()) {
-        const res  = await fetch(src);
-        const html = await res.text();
-        body.innerHTML = html;
-        if (window.MathJax) MathJax.typesetPromise([body]);
-      }
-    }
-  });
-});
-
-/* Stagger post rows */
-document.querySelectorAll('.post-row').forEach((el, i) => {
-  el.style.transitionDelay = `${i * 0.07}s`;
-});
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.06 });
-document.querySelectorAll('.post-row').forEach(el => io.observe(el));
-</script>
 </body>
 </html>

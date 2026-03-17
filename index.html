@@ -6,179 +6,37 @@
 <title>Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
-
-<style>
-/* ── Home page ─────────────────────────────────── */
-
-/* Hero */
-.hero {
-  padding: 80px 0 64px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 60px;
-}
-.hero-label {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-size: 12px; font-weight: 600;
-  letter-spacing: 1px; text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 24px;
-}
-.hero-label::before {
-  content: '';
-  display: block; width: 20px; height: 2px;
-  background: var(--accent);
-}
-.hero h1 {
-  font-family: var(--ff-head);
-  font-size: clamp(42px, 8vw, 88px);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -2px;
-  margin-bottom: 22px;
-}
-.hero-tagline {
-  font-size: 17px; color: var(--muted);
-  line-height: 1.75; max-width: 500px;
-  margin-bottom: 32px;
-}
-.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-
-/* Section grid */
-.section-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 64px;
-}
-.section-card {
-  background: var(--bg);
-  padding: 28px 28px 24px;
-  text-decoration: none; color: var(--text);
-  display: flex; flex-direction: column;
-  transition: background 0.2s;
-}
-.section-card:hover { background: var(--surface); }
-.section-card:hover .card-arrow { transform: translateX(4px); }
-.card-num {
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 1px; text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 14px;
-}
-.card-title {
-  font-family: var(--ff-head);
-  font-size: 20px; font-weight: 700;
-  margin-bottom: 8px;
-}
-.card-desc {
-  font-size: 13.5px; color: var(--muted);
-  line-height: 1.6; margin-bottom: 16px;
-  flex: 1;
-}
-.card-arrow {
-  font-size: 14px; color: var(--accent);
-  display: inline-block;
-  transition: transform 0.25s var(--ease);
-}
-</style>
 </head>
 <body>
 
 <div id="scrollBar"></div>
 
-<!-- ── Navigation ──────────────────────────────── -->
 <nav class="site-nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
     <ul class="nav-links">
-      <li><a href="/about/">About</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/problems/">Problems</a></li>
       <li><a href="/projects/">Projects</a></li>
       <li><a href="/notes/">Notes</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/about/">About</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ── Hero ────────────────────────────────────── -->
 <div class="page-wrap">
-  <section class="hero">
-    <div class="hero-label">govardha.net</div>
-    <h1>Vasudevan<br>Govardhanen</h1>
-    <p class="hero-tagline">
-      Senior in the Science &amp; Engineering program at Manalapan High School, NJ.
-      Interested in algebraic geometry, commutative algebra, computing theory, and number theory.
-    </p>
-    <div class="hero-actions">
-      <a href="/about/"    class="btn btn-primary">About me →</a>
-      <a href="/blog/"     class="btn btn-outline">Read the blog</a>
-      <a href="/projects/" class="btn btn-outline">Projects</a>
-    </div>
+  <section style="padding: 96px 0 0;">
+    <h1 style="font-size: 22px; font-weight: 600; margin-bottom: 12px;">Vasudevan Govardhanen</h1>
+    <p style="color: var(--muted); font-size: 14px;">Mathematics · Computing · Manalapan, NJ</p>
   </section>
-
-  <!-- ── Section links ───────────────────────── -->
-  <!-- To add a new section: copy one .section-card block below -->
-  <div class="section-grid">
-
-    <a href="/blog/" class="section-card reveal">
-      <div class="card-num">01 — Writing</div>
-      <div class="card-title">Blog</div>
-      <p class="card-desc">Long-form posts on mathematics, computing, and ideas.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/problems/" class="section-card reveal">
-      <div class="card-num">02 — Mathematics</div>
-      <div class="card-title">Open Problems</div>
-      <p class="card-desc">A running list of open questions in algebra and geometry.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/projects/" class="section-card reveal">
-      <div class="card-num">03 — Engineering</div>
-      <div class="card-title">Projects</div>
-      <p class="card-desc">Research, software, and analytics work — with live demos.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/notes/" class="section-card reveal">
-      <div class="card-num">04 — Reference</div>
-      <div class="card-title">Notes</div>
-      <p class="card-desc">Study notes and quick-reference material on topics I'm learning.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/about/" class="section-card reveal">
-      <div class="card-num">05 — Profile</div>
-      <div class="card-title">About</div>
-      <p class="card-desc">Background, interests, and what I'm currently up to.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-    <a href="/contact/" class="section-card reveal">
-      <div class="card-num">06 — Contact</div>
-      <div class="card-title">Get in touch</div>
-      <p class="card-desc">Email for questions, collaborations, or anything else.</p>
-      <span class="card-arrow">→</span>
-    </a>
-
-  </div>
 </div>
 
-<!-- ── Footer ──────────────────────────────────── -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2026 Vasudevan Govardhanen</span>
-    <div class="footer-links">
-      <a href="/blog/">Blog</a>
-      <a href="/contact/">Contact</a>
-    </div>
+    <span>© 2026</span>
+    <a href="/contact/">Contact</a>
   </div>
 </footer>
 

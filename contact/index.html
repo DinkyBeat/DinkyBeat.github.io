@@ -3,96 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact — Vasudevan Govardhanen</title>
+<title>Contact</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
-
-<style>
-/* ── Contact page ──────────────────────────────── */
-.contact-card {
-  display: inline-flex; flex-direction: column;
-  gap: 6px;
-  padding: 24px 28px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-decoration: none; color: var(--text);
-  transition: all 0.2s;
-  margin-top: 8px;
-}
-.contact-card:hover { background: var(--surface); border-color: #bbb; }
-.contact-card .contact-label {
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--muted);
-}
-.contact-card .contact-value {
-  font-family: var(--ff-head);
-  font-size: 20px; font-weight: 700;
-  color: var(--accent);
-}
-.contact-card .contact-hint {
-  font-size: 13px; color: var(--muted);
-}
-</style>
 </head>
 <body>
 
 <div id="scrollBar"></div>
 
-<!-- ── Navigation ──────────────────────────────── -->
 <nav class="site-nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
     <ul class="nav-links">
-      <li><a href="/about/">About</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/problems/">Problems</a></li>
       <li><a href="/projects/">Projects</a></li>
       <li><a href="/notes/">Notes</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/about/">About</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ── Content ─────────────────────────────────── -->
 <div class="page-wrap">
-
-  <header class="page-header">
-    <p class="eyebrow">Get in touch</p>
+  <div class="page-title">
     <h1>Contact</h1>
-    <p class="subtitle">
-      Feel free to reach out about mathematics, computing, or anything else.
-    </p>
-  </header>
-
-  <div class="reveal">
-    <!-- Email — update the href with the actual address -->
-    <!-- Format: first initial + last name @ gmail.com  -->
-    <a class="contact-card"
-       href="mailto:vgovardhanen@gmail.com">
-      <span class="contact-label">Email</span>
-      <span class="contact-value">vgovardhanen@gmail.com</span>
-      <span class="contact-hint">Best way to reach me</span>
-    </a>
   </div>
-
-  <!-- Coming soon — remove when you add more contact methods -->
-  <div class="coming-soon reveal" style="padding-top: 60px;">
-    <div class="cs-icon">✦</div>
-    <h2>More links coming</h2>
-    <p>Social and academic profiles will be listed here.</p>
-  </div>
-
+  <p style="padding-bottom: 96px;">
+    <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
+  </p>
 </div>
 
-<!-- ── Footer ──────────────────────────────────── -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2026 Vasudevan Govardhanen</span>
-    <div class="footer-links">
-      <a href="/">Home</a>
-    </div>
+    <span>© 2026</span>
   </div>
 </footer>
 

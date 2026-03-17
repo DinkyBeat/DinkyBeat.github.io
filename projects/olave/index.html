@@ -6,214 +6,103 @@
 <title>OLAVE-NFL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
-/* ── Olave project page ────────────────────────── */
+.section { margin-bottom: 48px; }
+.section h2 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
 
-.launch-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-  margin-bottom: 40px;
-}
-.launch-card {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  padding: 16px 18px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  text-decoration: none; color: var(--text);
-  transition: all 0.18s;
-}
-.launch-card:hover { background: var(--surface); border-color: #bbb; }
-.launch-card.primary {
-  background: var(--accent); color: #fff;
-  border-color: var(--accent);
-}
-.launch-card.primary:hover { background: #e55a14; border-color: #e55a14; }
-.lc-info { display: flex; flex-direction: column; gap: 3px; }
-.lc-name { font-size: 14px; font-weight: 600; }
-.lc-sub  { font-size: 12px; opacity: 0.7; }
-.lc-arrow { font-size: 14px; }
+/* Link list — used for launch options */
+.link-list { display: flex; flex-direction: column; gap: 2px; }
+.link-list a { font-size: 15px; }
 
-.metrics-section { margin-bottom: 48px; }
-.metrics-section h2 {
-  font-family: var(--ff-head);
-  font-size: 20px; font-weight: 700;
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-}
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.metric-cell {
-  background: var(--bg);
-  padding: 16px 18px;
-  transition: background 0.18s;
-}
-.metric-cell:hover { background: var(--surface); }
-.metric-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-.metric-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+/* Metrics table */
+.metrics-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.metrics-table td { padding: 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.metrics-table td:first-child { font-weight: 500; width: 40%; }
+.metrics-table td:last-child { color: var(--muted); }
 
-.about-section { margin-bottom: 48px; }
-.about-section p {
-  font-size: 15px; color: var(--muted);
-  line-height: 1.8; margin-bottom: 12px;
-}
+/* Stack */
+.stack { font-size: 14px; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <div id="scrollBar"></div>
 
-<!-- ── Navigation ──────────────────────────────── -->
 <nav class="site-nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
     <ul class="nav-links">
-      <li><a href="/about/">About</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/problems/">Problems</a></li>
       <li><a href="/projects/">Projects</a></li>
       <li><a href="/notes/">Notes</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/about/">About</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ── Content ─────────────────────────────────── -->
 <div class="page-wrap">
-
-  <header class="page-header">
-    <p class="eyebrow">Project · In Progress</p>
-    <h1>OLAVE</h1>
-    <p class="subtitle">
-      A research framework for computing advanced NFL metrics from play-by-play data.
-      Python · R / nflfastR · Jupyter
-    </p>
-  </header>
-
-  <!-- Launch buttons -->
-  <!-- Add or remove .launch-card blocks to add/remove run options -->
-  <div class="launch-grid reveal">
-
-    <a class="launch-card primary"
-       href="https://mybinder.org/v2/gh/vasugov/analytics/HEAD?labpath=notebooks%2Flooks%2Fmetrics1.ipynb"
-       target="_blank" rel="noopener">
-      <div class="lc-info">
-        <span class="lc-name">Run in Binder</span>
-        <span class="lc-sub">Interactive · no install needed</span>
-      </div>
-      <span class="lc-arrow">→</span>
-    </a>
-
-    <a class="launch-card"
-       href="https://colab.research.google.com/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb"
-       target="_blank" rel="noopener">
-      <div class="lc-info">
-        <span class="lc-name">Open in Colab</span>
-        <span class="lc-sub">Google Colab · requires sign-in</span>
-      </div>
-      <span class="lc-arrow">↗</span>
-    </a>
-
-    <a class="launch-card"
-       href="https://nbviewer.org/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb"
-       target="_blank" rel="noopener">
-      <div class="lc-info">
-        <span class="lc-name">View Notebook</span>
-        <span class="lc-sub">Read-only · nbviewer</span>
-      </div>
-      <span class="lc-arrow">↗</span>
-    </a>
-
-    <a class="launch-card"
-       href="https://github.com/vasugov/analytics"
-       target="_blank" rel="noopener">
-      <div class="lc-info">
-        <span class="lc-name">Source Code</span>
-        <span class="lc-sub">GitHub repository</span>
-      </div>
-      <span class="lc-arrow">↗</span>
-    </a>
-
+  <div class="page-title">
+    <h1>OLAVE-NFL</h1>
   </div>
 
-  <!-- About -->
-  <div class="about-section reveal">
-    <div class="metrics-section">
-      <h2>About</h2>
+  <div style="padding-bottom: 96px;">
+
+    <div class="section">
+      <p style="margin-bottom: 16px; color: var(--muted); font-size: 14px;">
+        Operational Longitudinal Analytics Validation Engine for the National Football League.
+        In progress, 2024.
+      </p>
+      <p style="font-size: 14px; color: var(--muted);">
+        A framework for computing advanced NFL metrics from play-by-play data via nflfastR.
+        Future plans include real-time streaming during live games.
+      </p>
     </div>
-    <p>
-      Olave processes historical NFL play-by-play datasets using nflfastR to compute
-      a set of advanced metrics beyond box-score stats. The goal is a reproducible
-      research framework that can eventually support real-time streaming during live
-      games via Apache Kafka or Redis Streams.
-    </p>
-    <p>
-      The notebook <code>metrics1.ipynb</code> is the main entry point —
-      run it interactively via Binder (no setup required) or clone the repo locally.
-    </p>
-    <div class="stack-row" style="margin-top: 16px;">
-      <span>Python</span>
-      <span>R / nflfastR</span>
-      <span>Pandas</span>
-      <span>Plotly</span>
-      <span>Jupyter</span>
-      <span>PostgreSQL</span>
-      <span>Kafka (planned)</span>
+
+    <!-- Launch options — add/remove <a> lines freely -->
+    <div class="section">
+      <h2>Run</h2>
+      <div class="link-list">
+        <a href="https://mybinder.org/v2/gh/vasugov/analytics/HEAD?labpath=notebooks%2Flooks%2Fmetrics1.ipynb" target="_blank" rel="noopener">Run in Binder</a>
+        <a href="https://colab.research.google.com/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb" target="_blank" rel="noopener">Open in Colab</a>
+        <a href="https://nbviewer.org/github/vasugov/analytics/blob/main/notebooks/looks/metrics1.ipynb" target="_blank" rel="noopener">View notebook</a>
+        <a href="https://github.com/vasugov/analytics" target="_blank" rel="noopener">GitHub</a>
+      </div>
     </div>
+
+    <!-- Metrics — add/remove <tr> rows freely -->
+    <div class="section">
+      <h2>Metrics</h2>
+      <table class="metrics-table">
+        <tbody>
+          <tr><td>EPA</td><td>Expected points added per play</td></tr>
+          <tr><td>WPA</td><td>Win probability added</td></tr>
+          <tr><td>Success Rate</td><td>Play-level success frequency</td></tr>
+          <tr><td>Red Zone Eff.</td><td>Red zone efficiency by team</td></tr>
+          <tr><td>Drive Eff.</td><td>Drive-level scoring efficiency</td></tr>
+          <tr><td>Comparative</td><td>Cross-season team rankings</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Stack — edit freely -->
+    <div class="section">
+      <h2>Stack</h2>
+      <p class="stack">Python · R / nflfastR · Pandas · Plotly · Jupyter · PostgreSQL · Kafka (planned)</p>
+    </div>
+
+    <a href="/projects/" style="font-size: 14px;">← Projects</a>
+
   </div>
-
-  <!-- Metrics -->
-  <!-- Add/remove .metric-cell blocks to update what's listed -->
-  <div class="metrics-section reveal">
-    <h2>Metrics computed</h2>
-    <div class="metrics-grid">
-      <div class="metric-cell">
-        <div class="metric-name">EPA</div>
-        <div class="metric-desc">Expected points added per play</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-name">WPA</div>
-        <div class="metric-desc">Win probability added</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-name">Success Rate</div>
-        <div class="metric-desc">Play-level success frequency</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-name">Red Zone Eff.</div>
-        <div class="metric-desc">Red zone efficiency by team</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-name">Drive Eff.</div>
-        <div class="metric-desc">Drive-level scoring efficiency</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-name">Comparative</div>
-        <div class="metric-desc">Cross-season team rankings</div>
-      </div>
-    </div>
-  </div>
-
-  <a href="/projects/" class="btn btn-outline reveal" style="margin-bottom: 16px;">← All projects</a>
-
 </div>
 
-<!-- ── Footer ──────────────────────────────────── -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2026 Vasudevan Govardhanen</span>
-    <div class="footer-links"><a href="/projects/">Projects</a></div>
+    <span>© 2026</span>
+    <a href="/contact/">Contact</a>
   </div>
 </footer>
 

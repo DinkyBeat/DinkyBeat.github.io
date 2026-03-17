@@ -6,146 +6,50 @@
 <title>About — Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
-
-<style>
-/* ── About page ────────────────────────────────── */
-
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 48px;
-}
-.about-section { margin-bottom: 48px; }
-.about-section h2 {
-  font-family: var(--ff-head);
-  font-size: 22px; font-weight: 700;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-}
-.about-section p {
-  font-size: 15px; color: var(--muted);
-  line-height: 1.8; margin-bottom: 12px;
-}
-.about-section a {
-  color: var(--accent); text-decoration: none;
-}
-.about-section a:hover { text-decoration: underline; }
-
-.interests-list {
-  list-style: none;
-  display: flex; flex-wrap: wrap; gap: 8px;
-  margin-top: 4px;
-}
-.interests-list li {
-  font-size: 13px; font-weight: 500;
-  padding: 5px 12px;
-  border-radius: 4px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.misc-link {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 14px; font-weight: 500;
-  color: var(--text); text-decoration: none;
-  padding: 10px 16px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  transition: all 0.18s;
-}
-.misc-link:hover { background: var(--surface); border-color: #bbb; }
-
-@media (max-width: 640px) {
-  .about-grid { grid-template-columns: 1fr; gap: 0; }
-}
-</style>
 </head>
 <body>
 
 <div id="scrollBar"></div>
 
-<!-- ── Navigation ──────────────────────────────── -->
 <nav class="site-nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
     <ul class="nav-links">
-      <li><a href="/about/">About</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/problems/">Problems</a></li>
       <li><a href="/projects/">Projects</a></li>
       <li><a href="/notes/">Notes</a></li>
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/contact/">Contact</a></li>
+      <li><a href="/about/">About</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ── Content ─────────────────────────────────── -->
 <div class="page-wrap">
-
-  <header class="page-header">
-    <p class="eyebrow">Profile</p>
+  <div class="page-title">
     <h1>About</h1>
-    <p class="subtitle">A bit about who I am and what I'm interested in.</p>
-  </header>
+  </div>
 
-  <!-- Bio -->
-  <div class="about-section reveal">
-    <h2>Background</h2>
+  <div style="display: flex; flex-direction: column; gap: 32px; padding-bottom: 96px;">
+
+    <p>Senior, Science &amp; Engineering Program, Manalapan High School, NJ.</p>
+
     <p>
-      I'm a senior in the Science and Engineering program at Manalapan High School, NJ.
-      My academic interests sit at the intersection of pure mathematics and theoretical computing.
+      Interests: algebraic geometry, commutative algebra, computing theory, number theory.
     </p>
+
     <p>
-      More biography coming soon.
+      <a href="https://rateyourmusic.com/~theb1scu1t" target="_blank" rel="noopener">Rateyourmusic</a>
     </p>
-  </div>
 
-  <!-- Academic interests -->
-  <div class="about-section reveal">
-    <h2>Academic Interests</h2>
-    <ul class="interests-list">
-      <li>Algebraic Geometry</li>
-      <li>Commutative Algebra</li>
-      <li>Computing Theory</li>
-      <li>Number Theory</li>
-      <li>Homological Algebra</li>
-    </ul>
   </div>
-
-  <!-- Misc -->
-  <div class="about-section reveal">
-    <h2>Elsewhere</h2>
-    <p>I track my music listening on RateYourMusic.</p>
-    <a class="misc-link" href="https://rateyourmusic.com/~theb1scu1t" target="_blank" rel="noopener">
-      RateYourMusic profile ↗
-    </a>
-  </div>
-
-  <!-- Coming soon placeholder -->
-  <!-- Remove or replace this block when you add more content -->
-  <div class="coming-soon reveal">
-    <div class="cs-icon">✦</div>
-    <h2>More coming soon</h2>
-    <p>
-      This page will include a more detailed bio, CV, and other information.
-    </p>
-    <a href="/contact/" class="btn btn-outline">Contact me in the meantime</a>
-  </div>
-
 </div>
 
-<!-- ── Footer ──────────────────────────────────── -->
 <footer class="site-footer">
   <div class="footer-inner">
-    <span>© 2026 Vasudevan Govardhanen</span>
-    <div class="footer-links">
-      <a href="/">Home</a>
-      <a href="/contact/">Contact</a>
-    </div>
+    <span>© 2026</span>
+    <a href="/contact/">Contact</a>
   </div>
 </footer>
 
