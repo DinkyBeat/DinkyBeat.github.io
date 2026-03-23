@@ -6,11 +6,52 @@
 <title>Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── Intro overlay ────────────────────────────────────────── */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000;
+  cursor: crosshair;
+}
+#up-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#intro-hint {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 10001;
+  animation: hint-pulse 2.8s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.75; }
+}
+</style>
 </head>
 <body>
 
+<!-- ── INTRO ─────────────────────────────────────────────── -->
+<div id="intro">
+  <canvas id="up-canvas"></canvas>
+</div>
+<div id="intro-hint">click to enter</div>
+
+<!-- ── MAIN PAGE ──────────────────────────────────────────── -->
 <div id="scrollBar"></div>
 
 <nav class="site-nav">
@@ -57,5 +98,178 @@
 </footer>
 
 <script src="/js/site.js"></script>
+<script>
+// ── Unknown Pleasures intro ──────────────────────────────────────────────────
+(function () {
+  const introEl = document.getElementById('intro');
+  const hintEl  = document.getElementById('intro-hint');
+  const canvas  = document.getElementById('up-canvas');
+  const ctx     = canvas.getContext('2d');
+
+  let W, H;
+  const mouse = { x: -9999, y: -9999 };
+  let shockwave = null;  // { x, y, radius, birthTs }
+  let done = false;
+  let rafId;
+
+  // ── Seeded PRNG (LCG) — seed 1919 = PSR B1919+21 ──────────────────────────
+  function makeRng(seed) {
+    let s = seed >>> 0;
+    return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
+  }
+
+  // ── Waveform data ──────────────────────────────────────────────────────────
+  const NUM_LINES = 80;
+  const PTS       = 300;
+  let waves;  // Float32Array[]
+
+  function gauss(x, mu, sig) { return Math.exp(-0.5 * ((x - mu) / sig) ** 2); }
+
+  // Amplitude profile: famous spike cluster sits ~60% down the stack
+  function lineAmp(i) {
+    const t = i / (NUM_LINES - 1);
+    return 0.07 + gauss(t, 0.60, 0.13) * 0.93;
+  }
+
+  function buildWaves() {
+    const rng = makeRng(1919);
+    waves = Array.from({ length: NUM_LINES }, (_, i) => {
+      const amp = lineAmp(i);
+      const row = new Float32Array(PTS);
+      for (let j = 0; j < PTS; j++) {
+        const t = j / (PTS - 1);
+        let y = (rng() - 0.5) * 0.05;                                          // flat noise
+        y += amp       * gauss(t, 0.28,  0.036 + rng() * 0.012);               // main peak
+        y += amp * 0.3 * gauss(t, 0.50 + (rng() - 0.5) * 0.12, 0.02 + rng() * 0.018); // secondary
+        y += amp * 0.12 * (rng() - 0.5) * gauss(t, 0.72 + (rng() - 0.5) * 0.18, 0.025); // far noise
+        row[j] = Math.max(0, y);
+      }
+      return row;
+    });
+  }
+
+  // ── Displacement: mouse hover pushes lines up ──────────────────────────────
+  function mouseDisp(x, baseY) {
+    const dx = x - mouse.x, dy = baseY - mouse.y;
+    const d  = Math.sqrt(dx * dx + dy * dy);
+    if (d > 140) return 0;
+    return (1 - d / 140) ** 2 * 52;
+  }
+
+  // ── Displacement: shockwave ring distorts lines as it passes ───────────────
+  function shockDisp(x, baseY, sw) {
+    const dx = x - sw.x, dy = baseY - sw.y;
+    const d    = Math.sqrt(dx * dx + dy * dy);
+    const diff = d - sw.radius;
+    if (Math.abs(diff) > 120) return 0;
+    return Math.sin(-diff / 11) * Math.exp(-Math.abs(diff) / 40) * 95;
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function frame(ts) {
+    if (done) return;
+    rafId = requestAnimationFrame(frame);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    if (shockwave) shockwave.radius = (ts - shockwave.birthTs) / 1000 * 900;
+
+    const spacing = H / (NUM_LINES + 3);
+    const amp     = spacing * 3.5;
+
+    // Draw bottom → top so each line's black fill masks the ones below it
+    for (let i = 0; i < NUM_LINES; i++) {
+      const baseY = H - spacing - i * spacing;
+      const row   = waves[i];
+
+      const xs = new Float32Array(PTS);
+      const ys = new Float32Array(PTS);
+      for (let j = 0; j < PTS; j++) {
+        xs[j] = (j / (PTS - 1)) * W;
+        let dy = row[j] * amp + mouseDisp(xs[j], baseY);
+        if (shockwave) dy += shockDisp(xs[j], baseY, shockwave);
+        ys[j] = baseY - dy;
+      }
+
+      // Black fill below line (masks lines underneath)
+      ctx.beginPath();
+      ctx.moveTo(0, baseY + 2);
+      for (let j = 0; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
+      ctx.lineTo(W, baseY + 2);
+      ctx.closePath();
+      ctx.fillStyle = '#000';
+      ctx.fill();
+
+      // White line
+      ctx.beginPath();
+      ctx.moveTo(xs[0], ys[0]);
+      for (let j = 1; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.90)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Expanding hole: destination-out cuts through the canvas,
+    // revealing the site beneath as the shockwave tears outward
+    if (shockwave) {
+      const { x, y, radius } = shockwave;
+      const inner = Math.max(0, radius - 140);
+
+      ctx.globalCompositeOperation = 'destination-out';
+      const g = ctx.createRadialGradient(x, y, inner, x, y, radius);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over';
+
+      // Once the soft inner edge has swept past every corner, we're done
+      if (inner > Math.hypot(W, H)) finish();
+    }
+  }
+
+  function finish() {
+    done = true;
+    cancelAnimationFrame(rafId);
+    introEl.style.transition = 'opacity 0.5s ease';
+    hintEl.style.transition  = 'opacity 0.3s ease';
+    introEl.style.opacity = '0';
+    hintEl.style.opacity  = '0';
+    document.body.style.overflow = '';
+    setTimeout(() => { introEl.remove(); hintEl.remove(); }, 600);
+  }
+
+  // ── Events ─────────────────────────────────────────────────────────────────
+  window.addEventListener('resize', () => {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  });
+
+  canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  canvas.addEventListener('mouseleave', () => { mouse.x = mouse.y = -9999; });
+
+  function trigger(x, y) {
+    if (shockwave) return;
+    hintEl.style.opacity = '0';
+    shockwave = { x, y, radius: 0, birthTs: performance.now() };
+  }
+
+  canvas.addEventListener('click',    e => trigger(e.clientX, e.clientY));
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    trigger(t.clientX, t.clientY);
+  }, { passive: false });
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  document.body.style.overflow = 'hidden';
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  buildWaves();
+  requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
