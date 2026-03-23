@@ -6,78 +6,62 @@
 <title>GOFAR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  /* ── GOFAR ornate overrides ── */
+  /* ── GOFAR technical overrides ── */
 
   .gofar-hero {
     text-align: center;
     padding: 72px 0 56px;
   }
 
-  .gofar-ornament {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
+  /* top bracket tag */
+  .gofar-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
     margin-bottom: 36px;
   }
-  .gofar-ornament::before,
-  .gofar-ornament::after {
-    content: '';
-    flex: 1;
-    max-width: 80px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--border));
-  }
-  .gofar-ornament::after {
-    background: linear-gradient(to left, transparent, var(--border));
-  }
-  .gofar-ornament-diamond {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    transform: rotate(45deg);
-    flex-shrink: 0;
-  }
-
-  .gofar-wordmark {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(52px, 12vw, 84px);
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    color: rgba(0,0,0,0.88);
-    line-height: 1;
-    margin-bottom: 10px;
-  }
-
-  .gofar-expansion {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-    margin-bottom: 40px;
-  }
+  .gofar-tag-bracket { color: var(--accent); }
 
   /* gopher SVG container */
   .gopher-wrap {
     display: flex;
     justify-content: center;
-    margin: 0 auto 40px;
+    margin: 0 auto 36px;
   }
   .gopher-wrap svg {
-    width: 110px;
+    width: 96px;
     height: auto;
-    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.08));
   }
 
+  .gofar-wordmark {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(44px, 11vw, 76px);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: rgba(0,0,0,0.88);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .gofar-expansion {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 40px;
+  }
+
+  /* horizontal rule with label */
   .gofar-divider {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     margin: 0 auto 40px;
-    max-width: 320px;
+    max-width: 360px;
   }
   .gofar-divider::before,
   .gofar-divider::after {
@@ -87,34 +71,36 @@
     background: var(--border);
   }
   .gofar-divider-text {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-style: italic;
-    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
     color: var(--muted);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     white-space: nowrap;
   }
 
   .gofar-desc {
     max-width: 480px;
     margin: 0 auto;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 300;
-    line-height: 1.8;
+    line-height: 1.85;
     color: var(--text);
   }
 
   .gofar-soon {
-    display: inline-block;
+    display: block;
     margin-top: 32px;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-style: italic;
-    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
     color: var(--muted);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     border-top: 1px solid var(--border);
-    padding-top: 20px;
-    width: 100%;
+    padding-top: 18px;
+  }
+  .gofar-soon::before {
+    content: '// ';
+    color: var(--accent);
   }
 </style>
 </head>
@@ -138,20 +124,20 @@
 <div class="page-wrap">
   <div class="gofar-hero">
 
-    <div class="gofar-ornament">
-      <div class="gofar-ornament-diamond"></div>
+    <div class="gofar-tag">
+      <span class="gofar-tag-bracket">[</span>&nbsp;init&nbsp;<span class="gofar-tag-bracket">]</span>
     </div>
 
     <!-- Gopher mascot -->
     <div class="gopher-wrap">
       <svg viewBox="0 0 120 148" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="GOFAR gopher mascot">
         <!-- ears -->
-        <ellipse cx="35" cy="30" rx="11" ry="13" fill="#7BBFCC"/>
-        <ellipse cx="85" cy="30" rx="11" ry="13" fill="#7BBFCC"/>
-        <ellipse cx="35" cy="30" rx="6" ry="8" fill="#F0BBBB"/>
-        <ellipse cx="85" cy="30" rx="6" ry="8" fill="#F0BBBB"/>
+        <ellipse cx="35" cy="30" rx="11" ry="13" fill="#C0392B"/>
+        <ellipse cx="85" cy="30" rx="11" ry="13" fill="#C0392B"/>
+        <ellipse cx="35" cy="30" rx="6" ry="8" fill="#E8958D"/>
+        <ellipse cx="85" cy="30" rx="6" ry="8" fill="#E8958D"/>
         <!-- head -->
-        <circle cx="60" cy="56" r="32" fill="#7BBFCC"/>
+        <circle cx="60" cy="56" r="32" fill="#C0392B"/>
         <!-- eye whites -->
         <circle cx="45" cy="52" r="9" fill="white"/>
         <circle cx="75" cy="52" r="9" fill="white"/>
@@ -162,23 +148,23 @@
         <circle cx="50" cy="49" r="2" fill="white"/>
         <circle cx="80" cy="49" r="2" fill="white"/>
         <!-- snout -->
-        <ellipse cx="60" cy="68" rx="13" ry="9" fill="#8DCBD8"/>
+        <ellipse cx="60" cy="68" rx="13" ry="9" fill="#A93226"/>
         <!-- nose -->
-        <ellipse cx="60" cy="64" rx="5" ry="3.5" fill="#D4919A"/>
+        <ellipse cx="60" cy="64" rx="5" ry="3.5" fill="#E8958D"/>
         <!-- teeth -->
         <rect x="54" y="70" width="5" height="9" rx="1.5" fill="white"/>
         <rect x="61" y="70" width="5" height="9" rx="1.5" fill="white"/>
         <line x1="60" y1="70" x2="60" y2="79" stroke="#d0d0d0" stroke-width="0.8"/>
         <!-- body -->
-        <ellipse cx="60" cy="118" rx="30" ry="26" fill="#7BBFCC"/>
+        <ellipse cx="60" cy="118" rx="30" ry="26" fill="#C0392B"/>
         <!-- arms -->
-        <ellipse cx="25" cy="108" rx="8" ry="15" fill="#7BBFCC" transform="rotate(-20 25 108)"/>
-        <ellipse cx="95" cy="108" rx="8" ry="15" fill="#7BBFCC" transform="rotate(20 95 108)"/>
+        <ellipse cx="25" cy="108" rx="8" ry="15" fill="#C0392B" transform="rotate(-20 25 108)"/>
+        <ellipse cx="95" cy="108" rx="8" ry="15" fill="#C0392B" transform="rotate(20 95 108)"/>
         <!-- little paws -->
-        <ellipse cx="19" cy="120" rx="7" ry="5" fill="#6AAEBB"/>
-        <ellipse cx="101" cy="120" rx="7" ry="5" fill="#6AAEBB"/>
+        <ellipse cx="19" cy="120" rx="7" ry="5" fill="#A93226"/>
+        <ellipse cx="101" cy="120" rx="7" ry="5" fill="#A93226"/>
         <!-- tail stub -->
-        <ellipse cx="60" cy="142" rx="10" ry="5" fill="#6AAEBB"/>
+        <ellipse cx="60" cy="142" rx="10" ry="5" fill="#A93226"/>
       </svg>
     </div>
 
