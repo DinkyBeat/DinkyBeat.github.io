@@ -2,7 +2,7 @@
    To retheme: edit :root variables only. */
 
 :root {
-  --bg:     #111111;
+  --bg:     #0a0a0a;
   --text:   rgba(255,255,255,0.80);
   --muted:  rgba(255,255,255,0.38);
   --border: rgba(255,255,255,0.10);
@@ -17,6 +17,10 @@ html  { scroll-behavior: smooth; }
 body  {
   font-family: var(--ff);
   background: var(--bg);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 60px 60px;
   color: var(--text);
   font-size: 14px;
   line-height: 1.7;
@@ -48,7 +52,7 @@ h1, h2, h3, h4 {
 /* Navigation */
 .site-nav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(17,17,17,0.97);
+  background: rgba(10,10,10,0.97);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 8px rgba(0,0,0,0.4);
 }
@@ -112,4 +116,20 @@ h1, h2, h3, h4 {
 @media (max-width: 540px) {
   .nav-links { gap: 14px; }
   .nav-links li:nth-child(n+4) { display: none; }
+}
+
+/* ── Global keyframes ─────────────────────────────────── */
+@keyframes scan-line {
+  from { top: -1px; }
+  to   { top: 100vh; }
+}
+@keyframes brutal-reveal {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes name-glitch {
+  0%  { text-shadow: none; }
+  30% { text-shadow: -3px 0 rgba(90,172,245,0.7), 3px 0 rgba(255,60,60,0.5); }
+  60% { text-shadow: 3px 0 rgba(90,172,245,0.7), -3px 0 rgba(255,60,60,0.5); }
+  100% { text-shadow: none; }
 }

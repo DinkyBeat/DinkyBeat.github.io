@@ -6,7 +6,7 @@
 <title>Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
 /* ── Intro overlay ────────────────────────────────────────── */
@@ -22,32 +22,45 @@
   width: 100%;
   height: 100%;
 }
+
+/* ── Scanline overlay ─────────────────────────────────── */
+.scanline {
+  position: fixed; left: 0; top: 0;
+  width: 100%; height: 1px;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+  z-index: 500;
+  animation: scan-line 7s linear infinite;
+}
+
+/* ── [NEW DAWN FADES] label ───────────────────────────── */
 #intro-label {
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   font-family: 'Space Mono', monospace;
-  font-size: clamp(11px, 1.8vw, 16px);
+  font-size: clamp(11px, 1.8vw, 15px);
   color: rgba(255,255,255,0.82);
   letter-spacing: 0.30em;
   pointer-events: none;
   z-index: 10001;
-  animation: label-breathe 4s ease-in-out infinite;
+  animation: label-breathe 3.5s ease-in-out infinite;
   transition: opacity 0.4s ease;
+  text-align: center;
 }
 @keyframes label-breathe {
-  0%, 100% { opacity: 0.55; }
+  0%, 100% { opacity: 0.45; }
   50%       { opacity: 0.90; }
 }
+
+/* ── hint ─────────────────────────────────────────────── */
 #intro-hint {
   position: fixed;
-  bottom: 28px;
-  left: 50%;
+  bottom: 28px; left: 50%;
   transform: translateX(-50%);
   font-family: 'Space Mono', monospace;
   font-size: 10px;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.25);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   pointer-events: none;
@@ -56,12 +69,86 @@
   transition: opacity 0.4s ease;
 }
 @keyframes hint-pulse {
-  0%, 100% { opacity: 0.28; }
-  50%       { opacity: 0.60; }
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.55; }
 }
+
+/* ── Brutalist main page ──────────────────────────────── */
+.sys-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.20em;
+  margin-bottom: 18px;
+}
+.brutal-name {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(26px, 5.5vw, 50px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.08;
+  color: rgba(255,255,255,0.92);
+  margin-bottom: 22px;
+  cursor: default;
+}
+.brutal-name:hover {
+  animation: name-glitch 0.18s steps(1) 2;
+}
+.brutal-rule {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.13);
+  margin-bottom: 14px;
+}
+.brutal-affil {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.09em;
+}
+.brutal-affil a { color: var(--accent); text-decoration: none; }
+.brutal-affil a:hover { text-decoration: underline; }
+.brutal-affil .sep { margin: 0 10px; }
+
+.brutal-bio {
+  border-left: 2px solid rgba(255,255,255,0.14);
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.95;
+}
+
+#osc-canvas {
+  display: block;
+  width: 100%;
+  height: 90px;
+  margin-top: 10px;
+}
+
+.catalog-link {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  display: inline-block;
+  margin-top: 8px;
+  text-decoration: none;
+  transition: letter-spacing 0.35s ease;
+}
+.catalog-link:hover {
+  letter-spacing: 0.18em;
+  text-decoration: none;
+}
+
+/* staggered reveal */
+.brutal-intro  { animation: brutal-reveal 0.7s ease both; }
+.brutal-bio    { animation: brutal-reveal 0.7s 0.12s ease both; }
+.brutal-signal { animation: brutal-reveal 0.7s 0.22s ease both; }
+.brutal-catalog{ animation: brutal-reveal 0.7s 0.32s ease both; }
 </style>
 </head>
 <body>
+
+<div class="scanline"></div>
 
 <!-- ── INTRO ─────────────────────────────────────────────── -->
 <div id="intro">
@@ -87,26 +174,32 @@
 </nav>
 
 <div class="page-wrap">
-  <section style="padding: 72px 0 0;">
-    <h1 style="font-size: 24px; font-weight: 300; margin-bottom: 10px;">Vasudevan Govardhanen</h1>
-    <p style="font-size: 13px; margin-bottom: 10px;">
-      <a href="https://sites.google.com/frhsd.com/seopenhouse/home?authuser=0" style="color: var(--accent);">SNE @ Manalapan HS, NJ</a>
-      <span style="color: var(--muted); margin: 0 6px;">|</span>
-      <a href="/gofar/" style="color: var(--accent);">GOFAR</a>
-    </p>
+
+  <section class="brutal-intro" style="padding: 80px 0 0;">
+    <div class="sys-tag">SYS // 2026</div>
+    <h1 class="brutal-name">VASUDEVAN<br>GOVARDHANEN</h1>
+    <div class="brutal-rule"></div>
+    <div class="brutal-affil">
+      <a href="https://sites.google.com/frhsd.com/seopenhouse/home?authuser=0">SNE · MANALAPAN HS, NJ</a>
+      <span class="sep">|</span>
+      <a href="/gofar/">GOFAR</a>
+    </div>
+  </section>
+
+  <section class="brutal-bio" style="margin-top: 52px;">
     <p>I am a HS senior from Manalapan, New Jersey interested in computing architecture, operating systems, and parallel computing.</p>
   </section>
 
-  <section style="padding: 45px 0 0;">
-    <img
-      src="https://thesoniccollective.com/wp-content/uploads/2023/02/Velvet-1920x1080-1.jpg"
-      alt="The Velvet Underground & Nico"
-      style="width: 100%; display: block;">
-    <p style="font-size: 12px; color: var(--muted); margin-top: 10px;">
-      The Velvet Underground &amp; Nico &nbsp;·&nbsp;
-      <a href="https://rateyourmusic.com/~theb1scu1t" target="_blank" rel="noopener">My rateyourmusic</a>
-    </p>
+  <section class="brutal-signal" style="margin-top: 64px;">
+    <div class="sys-tag">SIGNAL // LIVE</div>
+    <canvas id="osc-canvas"></canvas>
   </section>
+
+  <section class="brutal-catalog" style="margin-top: 52px;">
+    <div class="sys-tag">CATALOG</div>
+    <a href="https://rateyourmusic.com/~theb1scu1t" target="_blank" rel="noopener" class="catalog-link">RYM // theb1scu1t →</a>
+  </section>
+
 </div>
 
 <footer class="site-footer">
@@ -118,34 +211,33 @@
 
 <script src="/js/site.js"></script>
 <script>
-// ── Unknown Pleasures intro ──────────────────────────────────────────────────
+// ── Intro waveform (Unknown Pleasures) ───────────────────────────────────────
 (function () {
   const introEl  = document.getElementById('intro');
   const labelEl  = document.getElementById('intro-label');
   const hintEl   = document.getElementById('intro-hint');
   const canvas   = document.getElementById('up-canvas');
-  const ctx     = canvas.getContext('2d');
+  const ctx      = canvas.getContext('2d');
 
   let W, H;
   const mouse = { x: -9999, y: -9999 };
-  let shockwave = null;  // { x, y, radius, birthTs }
+  let shockwave = null;
   let done = false;
   let rafId;
+  let startTs = null;
 
-  // ── Seeded PRNG (LCG) — seed 1919 = PSR B1919+21 ──────────────────────────
+  const AUTO_PERIOD = 2400; // ms between pulses
+
   function makeRng(seed) {
     let s = seed >>> 0;
     return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
   }
 
-  // ── Waveform data ──────────────────────────────────────────────────────────
-  const NUM_LINES = 80;
-  const PTS       = 300;
-  let waves;  // Float32Array[]
+  const NUM_LINES = 80, PTS = 300;
+  let waves;
 
   function gauss(x, mu, sig) { return Math.exp(-0.5 * ((x - mu) / sig) ** 2); }
 
-  // Amplitude profile: famous spike cluster sits ~60% down the stack
   function lineAmp(i) {
     const t = i / (NUM_LINES - 1);
     return 0.07 + gauss(t, 0.60, 0.13) * 0.93;
@@ -155,49 +247,60 @@
     const rng = makeRng(1919);
     waves = Array.from({ length: NUM_LINES }, (_, i) => {
       const amp = lineAmp(i);
-      // Per-line shape params computed ONCE — not inside the point loop
-      const pkCtr   = 0.27 + (rng() - 0.5) * 0.03;
-      const pkSig   = 0.030 + rng() * 0.016;
-      const s1Ctr   = 0.50 + (rng() - 0.5) * 0.09;
-      const s1Sig   = 0.018 + rng() * 0.014;
-      const s2Ctr   = 0.70 + (rng() - 0.5) * 0.12;
-      const s2Sig   = 0.020 + rng() * 0.012;
-      const s2Sign  = rng() > 0.5 ? 1 : -1;
-
+      const pkCtr  = 0.27 + (rng() - 0.5) * 0.03;
+      const pkSig  = 0.030 + rng() * 0.016;
+      const s1Ctr  = 0.50 + (rng() - 0.5) * 0.09;
+      const s1Sig  = 0.018 + rng() * 0.014;
+      const s2Ctr  = 0.70 + (rng() - 0.5) * 0.12;
+      const s2Sig  = 0.020 + rng() * 0.012;
+      const s2Sign = rng() > 0.5 ? 1 : -1;
       const row = new Float32Array(PTS);
       for (let j = 0; j < PTS; j++) {
         const t = j / (PTS - 1);
-        let y = (rng() - 0.5) * 0.04;                          // per-point noise
-        y += amp        * gauss(t, pkCtr, pkSig);               // main peak
-        y += amp * 0.30 * gauss(t, s1Ctr, s1Sig);              // secondary
-        y += amp * 0.11 * s2Sign * gauss(t, s2Ctr, s2Sig);     // tertiary
+        let y = (rng() - 0.5) * 0.04;
+        y += amp        * gauss(t, pkCtr, pkSig);
+        y += amp * 0.30 * gauss(t, s1Ctr, s1Sig);
+        y += amp * 0.11 * s2Sign * gauss(t, s2Ctr, s2Sig);
         row[j] = Math.max(0, y);
       }
       return row;
     });
   }
 
-  // ── Displacement: mouse hover pushes lines up ──────────────────────────────
   function mouseDisp(x, baseY) {
     const dx = x - mouse.x, dy = baseY - mouse.y;
-    const d  = Math.sqrt(dx * dx + dy * dy);
+    const d = Math.sqrt(dx * dx + dy * dy);
     if (d > 140) return 0;
     return (1 - d / 140) ** 2 * 52;
   }
 
-  // ── Displacement: shockwave ring distorts lines as it passes ───────────────
   function shockDisp(x, baseY, sw) {
     const dx = x - sw.x, dy = baseY - sw.y;
-    const d    = Math.sqrt(dx * dx + dy * dy);
+    const d = Math.sqrt(dx * dx + dy * dy);
     const diff = d - sw.radius;
     if (Math.abs(diff) > 120) return 0;
     return Math.sin(-diff / 11) * Math.exp(-Math.abs(diff) / 40) * 95;
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // Continuous gentle pulse from center (where label sits)
+  function autoPulseDisp(x, baseY, ts) {
+    if (!startTs) return 0;
+    const elapsed = ts - startTs;
+    const phase = (elapsed % AUTO_PERIOD) / AUTO_PERIOD;
+    const maxR = Math.hypot(W, H) * 0.75;
+    const radius = phase * maxR;
+    const amp = (1 - phase) * 26; // fades as it expands
+    const dx = x - W / 2, dy = baseY - H / 2;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    const diff = d - radius;
+    if (Math.abs(diff) > 60) return 0;
+    return Math.sin(-diff / 9) * Math.exp(-Math.abs(diff) / 24) * amp;
+  }
+
   function frame(ts) {
     if (done) return;
     rafId = requestAnimationFrame(frame);
+    if (!startTs) startTs = ts;
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#000';
@@ -208,22 +311,18 @@
     const spacing = H / (NUM_LINES + 3);
     const amp     = spacing * 3.5;
 
-    // Draw bottom → top so each line's black fill masks the ones below it
     for (let i = 0; i < NUM_LINES; i++) {
       const baseY = H - spacing - i * spacing;
       const row   = waves[i];
-
       const xs = new Float32Array(PTS);
       const ys = new Float32Array(PTS);
       for (let j = 0; j < PTS; j++) {
         xs[j] = (j / (PTS - 1)) * W;
-        let dy = row[j] * amp + mouseDisp(xs[j], baseY);
+        let dy = row[j] * amp + mouseDisp(xs[j], baseY) + autoPulseDisp(xs[j], baseY, ts);
         if (shockwave) dy += shockDisp(xs[j], baseY, shockwave);
         ys[j] = baseY - dy;
       }
 
-      // Black fill from line trace all the way to canvas bottom —
-      // masks everything beneath this line so lower strokes stay hidden
       ctx.beginPath();
       ctx.moveTo(0, H + 2);
       for (let j = 0; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
@@ -232,7 +331,6 @@
       ctx.fillStyle = '#000';
       ctx.fill();
 
-      // White line
       ctx.beginPath();
       ctx.moveTo(xs[0], ys[0]);
       for (let j = 1; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
@@ -241,12 +339,9 @@
       ctx.stroke();
     }
 
-    // Expanding hole: destination-out cuts through the canvas,
-    // revealing the site beneath as the shockwave tears outward
     if (shockwave) {
       const { x, y, radius } = shockwave;
       const inner = Math.max(0, radius - 140);
-
       ctx.globalCompositeOperation = 'destination-out';
       const g = ctx.createRadialGradient(x, y, inner, x, y, radius);
       g.addColorStop(0, 'rgba(0,0,0,1)');
@@ -254,8 +349,6 @@
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'source-over';
-
-      // Once the soft inner edge has swept past every corner, we're done
       if (inner > Math.hypot(W, H)) finish();
     }
   }
@@ -263,45 +356,96 @@
   function finish() {
     done = true;
     cancelAnimationFrame(rafId);
-    introEl.style.transition  = 'opacity 0.5s ease';
-    labelEl.style.transition  = 'opacity 0.5s ease';
-    hintEl.style.transition   = 'opacity 0.3s ease';
-    introEl.style.opacity  = '0';
-    labelEl.style.opacity  = '0';
-    hintEl.style.opacity   = '0';
+    [introEl, labelEl, hintEl].forEach(el => {
+      el.style.transition = 'opacity 0.5s ease';
+      el.style.opacity = '0';
+    });
     document.body.style.overflow = '';
     setTimeout(() => { introEl.remove(); labelEl.remove(); hintEl.remove(); }, 600);
   }
 
-  // ── Events ─────────────────────────────────────────────────────────────────
   window.addEventListener('resize', () => {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
   });
-
   canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
   canvas.addEventListener('mouseleave', () => { mouse.x = mouse.y = -9999; });
 
   function trigger(x, y) {
     if (shockwave) return;
-    labelEl.style.opacity = '0';
-    hintEl.style.opacity  = '0';
+    [labelEl, hintEl].forEach(el => { el.style.transition = 'opacity 0.3s'; el.style.opacity = '0'; });
     shockwave = { x, y, radius: 0, birthTs: performance.now() };
   }
 
-  canvas.addEventListener('click',    e => trigger(e.clientX, e.clientY));
+  canvas.addEventListener('click', e => trigger(e.clientX, e.clientY));
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
     const t = e.changedTouches[0];
     trigger(t.clientX, t.clientY);
   }, { passive: false });
 
-  // ── Boot ───────────────────────────────────────────────────────────────────
   document.body.style.overflow = 'hidden';
   W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
   buildWaves();
   requestAnimationFrame(frame);
+})();
+
+// ── Oscilloscope canvas for main page ────────────────────────────────────────
+(function () {
+  const canvas = document.getElementById('osc-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  let glitchFrames = 0;
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function draw() {
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    // Random glitch trigger (~every 4s on average at 60fps)
+    if (Math.random() < 0.004) glitchFrames = 5 + Math.floor(Math.random() * 8);
+    if (glitchFrames > 0) glitchFrames--;
+    const isGlitch = glitchFrames > 0;
+
+    ctx.beginPath();
+    ctx.strokeStyle = isGlitch
+      ? `rgba(${180 + Math.random()*75|0},${180 + Math.random()*75|0},${180 + Math.random()*75|0},0.95)`
+      : 'rgba(255,255,255,0.82)';
+    ctx.lineWidth = 1;
+
+    for (let x = 0; x <= W; x++) {
+      const xn = x / W;
+      let y = Math.sin((xn + t) * Math.PI * 5)  * 0.32
+            + Math.sin((xn + t * 0.71) * Math.PI * 13) * 0.11
+            + Math.sin((xn * 2 - t * 1.3) * Math.PI * 3) * 0.14;
+      if (isGlitch) y += (Math.random() - 0.5) * 0.18;
+      // slow drift — machine losing control
+      y += Math.sin(t * 0.18) * 0.06;
+      const py = H / 2 - y * H * 0.58;
+      x === 0 ? ctx.moveTo(0, py) : ctx.lineTo(x, py);
+    }
+    ctx.stroke();
+
+    t += 0.009;
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  draw();
 })();
 </script>
 </body>
