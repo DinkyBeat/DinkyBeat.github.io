@@ -6,392 +6,147 @@
 <title>Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
 <style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; cursor: grab; }
+body:active { cursor: grabbing; }
 
-/* ── Base override: full-bleed, no scroll ───────────────────── */
-html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
-
-/* ── INTRO ──────────────────────────────────────────────────── */
+/* ── INTRO ── */
 #intro {
-  position: fixed; inset: 0;
-  z-index: 10000; background: #000; cursor: crosshair;
+  position: fixed; inset: 0; z-index: 10000;
+  background: #000; cursor: crosshair;
 }
 #up-canvas { display: block; width: 100%; height: 100%; }
-
 #intro-label {
   position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   font-family: 'Space Mono', monospace;
-  font-size: clamp(11px, 1.9vw, 17px);
-  color: rgba(255,255,255,0.88);
-  letter-spacing: 0.38em;
+  font-size: clamp(10px, 1.8vw, 16px);
+  color: rgba(255,255,255,0.80);
+  letter-spacing: 0.40em;
   pointer-events: none; z-index: 10001;
   text-align: center; white-space: nowrap;
-  animation: label-breathe 3.2s ease-in-out infinite;
-  transition: opacity 0.4s ease;
+  animation: lbl-breathe 3.2s ease-in-out infinite;
 }
-@keyframes label-breathe {
-  0%, 100% { opacity: 0.30; }
-  50%       { opacity: 1.00; }
-}
+@keyframes lbl-breathe { 0%,100%{opacity:.28} 50%{opacity:1} }
 #intro-hint {
   position: fixed; bottom: 32px; left: 50%;
   transform: translateX(-50%);
   font-family: 'Space Mono', monospace;
-  font-size: 9px; letter-spacing: 0.30em;
-  color: rgba(255,255,255,0.18);
-  text-transform: uppercase;
+  font-size: 9px; letter-spacing: 0.30em; text-transform: uppercase;
+  color: rgba(255,255,255,0.16);
   pointer-events: none; z-index: 10001;
-  animation: hint-pulse 3.2s ease-in-out infinite;
-  transition: opacity 0.3s ease;
-}
-@keyframes hint-pulse {
-  0%, 100% { opacity: 0.18; }
-  50%       { opacity: 0.55; }
+  animation: lbl-breathe 3.2s ease-in-out infinite;
 }
 
-/* ── MAIN PAGE (revealed after intro) ──────────────────────── */
-#main-page {
-  position: fixed; inset: 0;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.9s ease;
+/* ── 3D WORLD ── */
+#world {
+  position: fixed; inset: 0; z-index: 1;
+  opacity: 0; transition: opacity 1.2s ease;
 }
-#main-page.visible {
-  opacity: 1; pointer-events: all;
-}
+#world.visible { opacity: 1; }
+#world canvas { display: block; width: 100% !important; height: 100% !important; }
 
-/* ── Security cam canvas ────────────────────────────────────── */
-#cam-canvas {
-  position: absolute; inset: 0;
-  display: block; width: 100%; height: 100%;
-}
-
-/* ── Global scanline ────────────────────────────────────────── */
-.scanline {
-  position: fixed; left: 0; top: 0; width: 100%; height: 2px;
-  background: linear-gradient(to right,
-    transparent 0%,
-    rgba(100,200,100,0.05) 50%,
-    transparent 100%);
-  pointer-events: none; z-index: 9998;
-  animation: scan-line 7s linear infinite;
-}
-
-/* ── Cyborg arm nav ─────────────────────────────────────────── */
-#arm-nav {
-  position: fixed; left: 0; top: 0;
-  width: 360px; height: 100vh;
+/* ── Vignette overlay ── */
+#vignette {
+  position: fixed; inset: 0; z-index: 50;
   pointer-events: none;
-  z-index: 500;
-}
-#arm-nav.ready { pointer-events: all; }
-
-#arm-svg {
-  position: absolute; left: 0; top: 0;
-  width: 360px; height: 100%;
-  overflow: visible;
+  background: radial-gradient(ellipse at 50% 50%,
+    transparent 38%, rgba(0,4,12,0.65) 100%);
 }
 
-/* Shoulder trigger */
-#shoulder-trigger { cursor: pointer; }
-#shoulder-outer {
-  animation: shoulder-pulse 2.4s ease-in-out infinite;
+/* ── Scanline ── */
+#scanline {
+  position: fixed; left: 0; top: 0; width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(160,180,220,0.04), transparent);
+  pointer-events: none; z-index: 200;
+  animation: scan 8s linear infinite;
 }
-@keyframes shoulder-pulse {
-  0%, 100% { opacity: 0.50; }
-  50%       { opacity: 1.00; }
-}
+@keyframes scan { from{top:-2px} to{top:100vh} }
 
-/* Upper arm — extends horizontally (left→right) */
-#arm-upper-g {
-  transform-box: fill-box;
-  transform-origin: left center;
-  transform: scaleX(0);
-  transition: transform 0.60s cubic-bezier(0.77, 0, 0.18, 1);
-}
-/* Forearm — drops vertically from elbow */
-#arm-lower-g {
-  transform-box: fill-box;
-  transform-origin: center top;
-  transform: scaleY(0);
-  transition: transform 0.50s cubic-bezier(0.77, 0, 0.18, 1) 0.50s;
-}
-/* Nav items fade in after arm is fully extended */
-#arm-nav-items {
-  opacity: 0;
-  transition: opacity 0.35s ease 0.95s;
-}
-#arm-nav.open #arm-upper-g { transform: scaleX(1); }
-#arm-nav.open #arm-lower-g { transform: scaleY(1); }
-#arm-nav.open #arm-nav-items { opacity: 1; }
-
-/* SVG nav link text */
-.arm-link-text {
+/* ── HUD ── */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 22px; height: 46px;
+  background: rgba(1,3,10,0.82);
+  border-bottom: 1px solid rgba(40,60,100,0.35);
+  backdrop-filter: blur(6px);
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  fill: rgba(100, 200, 100, 0.65);
-  cursor: pointer;
-  transition: fill 0.15s;
+  opacity: 0; transition: opacity 0.8s ease 0.6s;
+  pointer-events: none;
 }
-.arm-link-text:hover { fill: rgba(160, 255, 160, 0.95); }
+#hud.visible { opacity: 1; pointer-events: all; }
 
+.hud-id {
+  font-size: 10px; letter-spacing: 0.18em;
+  color: rgba(140,160,200,0.55); white-space: nowrap;
+}
+.hud-drag {
+  font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase;
+  color: rgba(100,130,180,0.38);
+  animation: lbl-breathe 3s ease-in-out infinite;
+}
+.hud-nav { display: flex; gap: 20px; list-style: none; }
+.hud-nav a {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(140,160,200,0.50); text-decoration: none;
+  transition: color 0.15s;
+}
+.hud-nav a:hover { color: rgba(200,210,240,0.95); }
+
+/* ── Crosshair ── */
+#crosshair {
+  position: fixed; top: 50%; left: 50%; z-index: 90;
+  transform: translate(-50%,-50%);
+  width: 14px; height: 14px;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.6s ease 1s;
+}
+#crosshair.visible { opacity: 1; }
+#crosshair::before, #crosshair::after {
+  content: ''; position: absolute; background: rgba(120,150,210,0.30);
+}
+#crosshair::before { width: 1px; height: 14px; left: 50%; transform: translateX(-50%); }
+#crosshair::after  { width: 14px; height: 1px; top: 50%; transform: translateY(-50%); }
 </style>
 </head>
 <body>
 
-<div class="scanline"></div>
-
-<!-- ══════════════════ INTRO ══════════════════ -->
+<!-- INTRO -->
 <div id="intro"><canvas id="up-canvas"></canvas></div>
 <div id="intro-label">[ NEW DAWN FADES ]</div>
 <div id="intro-hint">click to enter</div>
 
-<!-- ══════════════════ MAIN PAGE ══════════════════ -->
-<div id="main-page">
+<!-- 3D WORLD -->
+<div id="world"></div>
 
-  <!-- Security cam full-viewport canvas -->
-  <canvas id="cam-canvas"></canvas>
+<!-- OVERLAYS -->
+<div id="vignette"></div>
+<div id="scanline"></div>
+<div id="crosshair"></div>
 
-  <!-- Cyborg arm nav -->
-  <nav id="arm-nav" aria-label="Navigation">
-    <svg id="arm-svg" xmlns="http://www.w3.org/2000/svg">
-
-      <!-- ── SPINE (vertical rail running full height) ── -->
-      <line x1="22" y1="0" x2="22" y2="9999"
-        stroke="rgba(80,160,80,0.22)" stroke-width="1.5"
-        vector-effect="non-scaling-stroke"/>
-      <!-- Spine measurement ticks -->
-      <g stroke="rgba(80,160,80,0.16)" stroke-width="1"
-         vector-effect="non-scaling-stroke">
-        <line x1="17" y1="55"  x2="27" y2="55"/>
-        <line x1="19" y1="75"  x2="25" y2="75"/>
-        <line x1="17" y1="460" x2="27" y2="460"/>
-        <line x1="19" y1="520" x2="25" y2="520"/>
-        <line x1="17" y1="620" x2="27" y2="620"/>
-        <line x1="19" y1="720" x2="25" y2="720"/>
-        <line x1="17" y1="820" x2="27" y2="820"/>
-      </g>
-      <!-- Spine label -->
-      <text x="10" y="42"
-        font-family="Space Mono, monospace" font-size="7"
-        letter-spacing="1" fill="rgba(80,160,80,0.25)"
-        writing-mode="tb" glyph-orientation-vertical="0">AXIS·A</text>
-
-      <!-- ── SHOULDER JOINT (trigger) ── -->
-      <g id="shoulder-trigger" onclick="toggleArm()">
-        <!-- Concentric rings -->
-        <circle id="shoulder-outer" cx="22" cy="106" r="19"
-          fill="none" stroke="rgba(80,200,80,0.50)" stroke-width="1.2"
-          vector-effect="non-scaling-stroke"/>
-        <circle cx="22" cy="106" r="13"
-          fill="none" stroke="rgba(80,200,80,0.30)" stroke-width="1"
-          vector-effect="non-scaling-stroke" stroke-dasharray="3 4"/>
-        <circle cx="22" cy="106" r="8"
-          fill="rgba(10,25,10,0.92)" stroke="rgba(80,200,80,0.45)" stroke-width="1"
-          vector-effect="non-scaling-stroke"/>
-        <circle cx="22" cy="106" r="3.5" fill="rgba(80,220,80,0.85)"/>
-        <!-- Cardinal ticks -->
-        <line x1="22" y1="83"  x2="22" y2="90"
-          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
-        <line x1="22" y1="122" x2="22" y2="129"
-          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
-        <line x1="0"  y1="106" x2="7"  y2="106"
-          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
-        <line x1="37" y1="106" x2="44" y2="106"
-          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
-        <!-- Menu label -->
-        <text x="48" y="110"
-          font-family="Space Mono, monospace" font-size="8"
-          letter-spacing="2.5" fill="rgba(80,200,80,0.42)">[NAV]</text>
-      </g>
-
-      <!-- ── UPPER ARM (horizontal, scaleX: 0→1) ── -->
-      <g id="arm-upper-g">
-        <!-- Main structural beam -->
-        <line x1="22" y1="106" x2="215" y2="106"
-          stroke="rgba(80,200,80,0.62)" stroke-width="2.8"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Parallel wires (above/below beam) -->
-        <line x1="28" y1="101" x2="215" y2="101"
-          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
-          vector-effect="non-scaling-stroke"/>
-        <line x1="28" y1="111" x2="215" y2="111"
-          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Sagging cable (disheveled, droops below beam) -->
-        <polyline
-          points="35,106 55,115 85,120 115,122 145,120 175,115 205,107"
-          fill="none" stroke="rgba(80,200,80,0.10)" stroke-width="1.2"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Stray wire (chaotic, goes off-axis) -->
-        <polyline
-          points="40,106 52,98 70,103 88,96 110,100 130,106"
-          fill="none" stroke="rgba(80,200,80,0.07)" stroke-width="0.8"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Cross-braces (truss pattern) -->
-        <g stroke="rgba(80,200,80,0.22)" stroke-width="0.9"
-           vector-effect="non-scaling-stroke">
-          <line x1="55"  y1="99"  x2="70"  y2="113"/>
-          <line x1="70"  y1="99"  x2="55"  y2="113"/>
-          <line x1="95"  y1="99"  x2="110" y2="113"/>
-          <line x1="110" y1="99"  x2="95"  y2="113"/>
-          <line x1="135" y1="99"  x2="150" y2="113"/>
-          <line x1="150" y1="99"  x2="135" y2="113"/>
-          <line x1="175" y1="99"  x2="190" y2="113"/>
-          <line x1="190" y1="99"  x2="175" y2="113"/>
-        </g>
-        <!-- Rivets / bolts -->
-        <g fill="rgba(80,200,80,0.38)" vector-effect="non-scaling-stroke">
-          <circle cx="50"  cy="106" r="2.2"/>
-          <circle cx="85"  cy="106" r="2.2"/>
-          <circle cx="120" cy="106" r="2.2"/>
-          <circle cx="155" cy="106" r="2.2"/>
-          <circle cx="190" cy="106" r="2.2"/>
-        </g>
-        <!-- Wear marks / scratches -->
-        <line x1="62"  y1="104" x2="66"  y2="108"
-          stroke="rgba(80,200,80,0.08)" stroke-width="0.6" vector-effect="non-scaling-stroke"/>
-        <line x1="140" y1="103" x2="143" y2="109"
-          stroke="rgba(80,200,80,0.08)" stroke-width="0.6" vector-effect="non-scaling-stroke"/>
-        <!-- Elbow joint -->
-        <circle cx="215" cy="106" r="9"
-          fill="rgba(8,22,8,0.95)" stroke="rgba(80,200,80,0.55)" stroke-width="1.5"
-          vector-effect="non-scaling-stroke"/>
-        <circle cx="215" cy="106" r="4" fill="rgba(80,200,80,0.60)"/>
-        <circle cx="215" cy="106" r="1.8" fill="rgba(8,22,8,0.95)"/>
-      </g>
-
-      <!-- ── FOREARM (vertical, scaleY: 0→1 from elbow down) ── -->
-      <g id="arm-lower-g">
-        <!-- Main beam -->
-        <line x1="215" y1="106" x2="215" y2="455"
-          stroke="rgba(80,200,80,0.62)" stroke-width="2.8"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Parallel wires -->
-        <line x1="210" y1="112" x2="210" y2="455"
-          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
-          vector-effect="non-scaling-stroke"/>
-        <line x1="220" y1="112" x2="220" y2="455"
-          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Sagging cable (bows to the right — gravity dishevelment) -->
-        <polyline
-          points="215,118 222,155 226,210 224,270 220,330 217,390 215,448"
-          fill="none" stroke="rgba(80,200,80,0.10)" stroke-width="1.2"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Stray wire (chaotic) -->
-        <polyline
-          points="215,130 208,150 212,175 206,200 210,230"
-          fill="none" stroke="rgba(80,200,80,0.07)" stroke-width="0.8"
-          vector-effect="non-scaling-stroke"/>
-        <!-- Cross-braces -->
-        <g stroke="rgba(80,200,80,0.20)" stroke-width="0.9"
-           vector-effect="non-scaling-stroke">
-          <line x1="208" y1="168" x2="222" y2="182"/>
-          <line x1="222" y1="168" x2="208" y2="182"/>
-          <line x1="208" y1="248" x2="222" y2="262"/>
-          <line x1="222" y1="248" x2="208" y2="262"/>
-          <line x1="208" y1="328" x2="222" y2="342"/>
-          <line x1="222" y1="328" x2="208" y2="342"/>
-        </g>
-        <!-- Rivets -->
-        <g fill="rgba(80,200,80,0.35)" vector-effect="non-scaling-stroke">
-          <circle cx="215" cy="155" r="2.2"/>
-          <circle cx="215" cy="230" r="2.2"/>
-          <circle cx="215" cy="305" r="2.2"/>
-          <circle cx="215" cy="380" r="2.2"/>
-        </g>
-        <!-- Wrist terminal -->
-        <circle cx="215" cy="455" r="7"
-          fill="rgba(8,22,8,0.95)" stroke="rgba(80,200,80,0.45)" stroke-width="1.3"
-          vector-effect="non-scaling-stroke"/>
-        <circle cx="215" cy="455" r="3" fill="rgba(80,200,80,0.45)"/>
-
-        <!-- ── NAV ITEMS (fade in after arm extends) ── -->
-        <g id="arm-nav-items">
-          <!-- y positions: 178, 236, 294, 352, 410 -->
-
-          <!-- Blog -->
-          <line x1="215" y1="178" x2="235" y2="178"
-            stroke="rgba(80,200,80,0.48)" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-          <circle cx="215" cy="178" r="3.5" fill="rgba(80,200,80,0.60)"/>
-          <circle cx="215" cy="178" r="1.5" fill="rgba(8,22,8,0.95)"/>
-          <a href="/blog/">
-            <text x="240" y="182"
-              class="arm-link-text"
-              font-family="Space Mono, monospace" font-size="10"
-              letter-spacing="3" fill="rgba(80,200,80,0.65)">BLOG</text>
-          </a>
-
-          <!-- Problems -->
-          <line x1="215" y1="236" x2="235" y2="236"
-            stroke="rgba(80,200,80,0.48)" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-          <circle cx="215" cy="236" r="3.5" fill="rgba(80,200,80,0.60)"/>
-          <circle cx="215" cy="236" r="1.5" fill="rgba(8,22,8,0.95)"/>
-          <a href="/problems/">
-            <text x="240" y="240"
-              class="arm-link-text"
-              font-family="Space Mono, monospace" font-size="10"
-              letter-spacing="3" fill="rgba(80,200,80,0.65)">PROBLEMS</text>
-          </a>
-
-          <!-- Projects -->
-          <line x1="215" y1="294" x2="235" y2="294"
-            stroke="rgba(80,200,80,0.48)" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-          <circle cx="215" cy="294" r="3.5" fill="rgba(80,200,80,0.60)"/>
-          <circle cx="215" cy="294" r="1.5" fill="rgba(8,22,8,0.95)"/>
-          <a href="/projects/">
-            <text x="240" y="298"
-              class="arm-link-text"
-              font-family="Space Mono, monospace" font-size="10"
-              letter-spacing="3" fill="rgba(80,200,80,0.65)">PROJECTS</text>
-          </a>
-
-          <!-- Notes -->
-          <line x1="215" y1="352" x2="235" y2="352"
-            stroke="rgba(80,200,80,0.48)" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-          <circle cx="215" cy="352" r="3.5" fill="rgba(80,200,80,0.60)"/>
-          <circle cx="215" cy="352" r="1.5" fill="rgba(8,22,8,0.95)"/>
-          <a href="/notes/">
-            <text x="240" y="356"
-              class="arm-link-text"
-              font-family="Space Mono, monospace" font-size="10"
-              letter-spacing="3" fill="rgba(80,200,80,0.65)">NOTES</text>
-          </a>
-
-          <!-- About -->
-          <line x1="215" y1="410" x2="235" y2="410"
-            stroke="rgba(80,200,80,0.48)" stroke-width="1"
-            vector-effect="non-scaling-stroke"/>
-          <circle cx="215" cy="410" r="3.5" fill="rgba(80,200,80,0.60)"/>
-          <circle cx="215" cy="410" r="1.5" fill="rgba(8,22,8,0.95)"/>
-          <a href="/about/">
-            <text x="240" y="414"
-              class="arm-link-text"
-              font-family="Space Mono, monospace" font-size="10"
-              letter-spacing="3" fill="rgba(80,200,80,0.65)">ABOUT</text>
-          </a>
-        </g>
-      </g>
-
-    </svg>
-  </nav>
-
-</div><!-- /#main-page -->
+<!-- HUD -->
+<nav id="hud">
+  <span class="hud-id">GOVARDHA.NET // 2026</span>
+  <span class="hud-drag">[ drag to navigate ]</span>
+  <ul class="hud-nav">
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="/problems/">Problems</a></li>
+    <li><a href="/projects/">Projects</a></li>
+    <li><a href="/notes/">Notes</a></li>
+    <li><a href="/about/">About</a></li>
+  </ul>
+</nav>
 
 <script src="/js/site.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
-// INTRO — Unknown Pleasures waveform + auto-pulse + shockwave tear
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// INTRO — Unknown Pleasures waveform
+// ═══════════════════════════════════════════════════════
 (function () {
   const introEl = document.getElementById('intro');
   const labelEl = document.getElementById('intro-label');
@@ -401,9 +156,8 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
 
   let W, H, done = false, rafId, startTs = null, shockwave = null;
   const mouse = { x: -9999, y: -9999 };
-  const AUTO_PERIOD = 2200; // ms per auto-pulse cycle
+  const AUTO_PERIOD = 2200;
 
-  // Seeded LCG RNG — seed = pulsar PSR B1919+21
   function makeRng(seed) {
     let s = seed >>> 0;
     return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
@@ -413,7 +167,6 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
   let waves;
 
   function gauss(x, mu, sig) { return Math.exp(-0.5 * ((x - mu) / sig) ** 2); }
-
   function lineAmp(i) {
     const t = i / (NL - 1);
     return 0.07 + gauss(t, 0.58, 0.14) * 0.93;
@@ -423,18 +176,17 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
     const rng = makeRng(1919);
     waves = Array.from({ length: NL }, (_, i) => {
       const a   = lineAmp(i);
-      // All random params computed ONCE per line — never inside the point loop
-      const pkC = 0.27 + (rng() - 0.5) * 0.03,  pkS = 0.030 + rng() * 0.016;
-      const s1C = 0.50 + (rng() - 0.5) * 0.09,  s1S = 0.018 + rng() * 0.014;
-      const s2C = 0.70 + (rng() - 0.5) * 0.12,  s2S = 0.020 + rng() * 0.012;
+      const pkC = 0.27 + (rng() - 0.5) * 0.03, pkS = 0.030 + rng() * 0.016;
+      const s1C = 0.50 + (rng() - 0.5) * 0.09, s1S = 0.018 + rng() * 0.014;
+      const s2C = 0.70 + (rng() - 0.5) * 0.12, s2S = 0.020 + rng() * 0.012;
       const s2g = rng() > 0.5 ? 1 : -1;
       const row = new Float32Array(PTS);
       for (let j = 0; j < PTS; j++) {
         const t = j / (PTS - 1);
-        let y = (rng() - 0.5) * 0.04;            // point noise
-        y += a        * gauss(t, pkC, pkS);        // main peak
-        y += a * 0.30 * gauss(t, s1C, s1S);        // secondary
-        y += a * 0.11 * s2g * gauss(t, s2C, s2S);  // tertiary
+        let y = (rng() - 0.5) * 0.04;
+        y += a        * gauss(t, pkC, pkS);
+        y += a * 0.30 * gauss(t, s1C, s1S);
+        y += a * 0.11 * s2g * gauss(t, s2C, s2S);
         row[j] = Math.max(0, y);
       }
       return row;
@@ -443,8 +195,7 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
 
   function mouseDisp(x, by) {
     const d = Math.hypot(x - mouse.x, by - mouse.y);
-    if (d > 155) return 0;
-    return (1 - d / 155) ** 2 * 60;
+    return d > 155 ? 0 : (1 - d / 155) ** 2 * 60;
   }
 
   function shockDisp(x, by, sw) {
@@ -454,14 +205,13 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
     return Math.sin(-diff / 11) * Math.exp(-Math.abs(diff) / 42) * 105;
   }
 
-  // Continuous gentle auto-pulse — makes waveform feel alive before click
   function pulseDisp(x, by, ts) {
     if (!startTs) return 0;
     const phase = ((ts - startTs) % AUTO_PERIOD) / AUTO_PERIOD;
-    const R     = phase * Math.hypot(W, H) * 0.82;
-    const amp   = (1 - phase) * 42;
-    const d     = Math.hypot(x - W * 0.5, by - H * 0.5);
-    const diff  = d - R;
+    const R   = phase * Math.hypot(W, H) * 0.82;
+    const amp = (1 - phase) * 42;
+    const d   = Math.hypot(x - W * 0.5, by - H * 0.5);
+    const diff = d - R;
     if (Math.abs(diff) > 68) return 0;
     return Math.sin(-diff / 9) * Math.exp(-Math.abs(diff) / 27) * amp;
   }
@@ -484,17 +234,12 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
       const row = waves[i];
       const xs  = new Float32Array(PTS);
       const ys  = new Float32Array(PTS);
-
       for (let j = 0; j < PTS; j++) {
         xs[j] = (j / (PTS - 1)) * W;
-        let dy = row[j] * scale
-               + mouseDisp(xs[j], by)
-               + pulseDisp(xs[j], by, ts);
+        let dy = row[j] * scale + mouseDisp(xs[j], by) + pulseDisp(xs[j], by, ts);
         if (shockwave) dy += shockDisp(xs[j], by, shockwave);
         ys[j] = by - dy;
       }
-
-      // Black fill to canvas bottom — masks all lines below this one
       ctx.beginPath();
       ctx.moveTo(0, H + 2);
       for (let j = 0; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
@@ -502,8 +247,6 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
       ctx.closePath();
       ctx.fillStyle = '#000';
       ctx.fill();
-
-      // White trace line
       ctx.beginPath();
       ctx.moveTo(xs[0], ys[0]);
       for (let j = 1; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
@@ -512,7 +255,6 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
       ctx.stroke();
     }
 
-    // Expanding tear — destination-out cuts a hole revealing the site underneath
     if (shockwave) {
       const { x, y, radius } = shockwave;
       const inner = Math.max(0, radius - 155);
@@ -531,12 +273,11 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
     done = true;
     cancelAnimationFrame(rafId);
     [introEl, labelEl, hintEl].forEach(el => {
-      el.style.transition = 'opacity 0.55s ease';
+      el.style.transition = 'opacity 0.6s ease';
       el.style.opacity    = '0';
     });
-    document.body.style.overflow = '';
-    setTimeout(revealPage, 200);
-    setTimeout(() => [introEl, labelEl, hintEl].forEach(el => el.remove()), 750);
+    setTimeout(revealPage, 300);
+    setTimeout(() => [introEl, labelEl, hintEl].forEach(el => el.remove()), 900);
   }
 
   window.addEventListener('resize', () => {
@@ -548,13 +289,9 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
 
   function trigger(x, y) {
     if (shockwave) return;
-    [labelEl, hintEl].forEach(el => {
-      el.style.transition = 'opacity 0.2s';
-      el.style.opacity    = '0';
-    });
+    [labelEl, hintEl].forEach(el => { el.style.transition = 'opacity 0.2s'; el.style.opacity = '0'; });
     shockwave = { x, y, radius: 0, birthTs: performance.now() };
   }
-
   canvas.addEventListener('click', e => trigger(e.clientX, e.clientY));
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
@@ -562,7 +299,6 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
     trigger(t.clientX, t.clientY);
   }, { passive: false });
 
-  // Boot
   document.body.style.overflow = 'hidden';
   W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
@@ -570,323 +306,480 @@ html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
   requestAnimationFrame(frame);
 })();
 
-// ═══════════════════════════════════════════════════════════════
-// ARM NAV TOGGLE
-// ═══════════════════════════════════════════════════════════════
-function toggleArm() {
-  document.getElementById('arm-nav').classList.toggle('open');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PAGE REVEAL (fires after intro shockwave tears open)
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// PAGE REVEAL
+// ═══════════════════════════════════════════════════════
 function revealPage() {
-  document.getElementById('main-page').classList.add('visible');
-  document.getElementById('arm-nav').classList.add('ready');
-  startCam();
-  // Arm auto-deploys after a beat — like the machine waking up
-  setTimeout(() => document.getElementById('arm-nav').classList.add('open'), 700);
+  document.getElementById('world').classList.add('visible');
+  document.getElementById('hud').classList.add('visible');
+  document.getElementById('crosshair').classList.add('visible');
+  initScene();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// SECURITY CAM CANVAS — brutalist night scene
-// ═══════════════════════════════════════════════════════════════
-let camStarted = false;
-function startCam() {
-  if (camStarted) return;
-  camStarted = true;
+// ═══════════════════════════════════════════════════════
+// 3D SCENE
+// ═══════════════════════════════════════════════════════
+function initScene() {
+  const worldEl = document.getElementById('world');
 
-  const canvas = document.getElementById('cam-canvas');
-  const ctx    = canvas.getContext('2d');
-  let W, H, buildings = [], t = 0, glitchFrames = 0;
-
-  // Seeded RNG — produces reproducible building layout
-  function seededRng(seed) {
-    let s = seed >>> 0;
+  // ── Seeded RNG ──
+  function rng19(seed) {
+    let s = (seed ^ 0xdeadbeef) >>> 0;
     return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
   }
+  const rng = rng19(9191);
 
-  // Window flicker state
-  const winStates = {};
+  // ── Renderer ──
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x010306, 1);
+  worldEl.appendChild(renderer.domElement);
 
-  function genBuildings(w, h) {
-    const rng     = seededRng(42);
-    const groundY = h * 0.60;
-    buildings = [];
-    let x = -40;
+  // ── Scene & Fog ──
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x010306, 0.006);
 
-    while (x < w + 80) {
-      const isTower = rng() > 0.38;
-      const bw = isTower
-        ? 28 + rng() * 58
-        : 65 + rng() * 140;
-      const bh = isTower
-        ? h * (0.30 + rng() * 0.44)
-        : h * (0.08 + rng() * 0.20);
-      const gap  = rng() * 14 - 2;
-      const cols = Math.max(1, Math.floor(bw / 13));
-      const rows = Math.max(1, Math.floor(bh / 15));
+  // ── Camera ──
+  const camera = new THREE.PerspectiveCamera(82, window.innerWidth / window.innerHeight, 0.1, 900);
+  camera.position.set(0, 0, 0);
+  camera.rotation.order = 'YXZ';
 
-      const windows = [];
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const key = `${Math.floor(x)}_${r}_${c}`;
-          if (!(key in winStates)) {
-            winStates[key] = {
-              lit:     rng() > 0.52,
-              flicker: rng() > 0.85,
-            };
-          }
-          windows.push({ r, c, key });
-        }
+  // ── Lights ──
+  scene.add(new THREE.AmbientLight(0x050e20, 1.0));
+
+  const moonLight = new THREE.DirectionalLight(0x0a1a3a, 1.8);
+  moonLight.position.set(-60, 120, -80);
+  scene.add(moonLight);
+
+  const rimLight = new THREE.DirectionalLight(0x0d1a2e, 0.7);
+  rimLight.position.set(80, -20, 60);
+  scene.add(rimLight);
+
+  // ── Color palette ──
+  const WALL_COLORS = [
+    0x060c18, 0x080e1c, 0x0a1220,
+    0x0d1628, 0x101a2e, 0x131e34,
+    0x16223a, 0x1a2640, 0x1e2a46,
+    0x1c2238, 0x232c42,
+  ];
+  const EDGE_COLORS = [
+    0x2a3a54, 0x344460, 0x3e506e,
+    0x4a607c, 0x566e8c, 0x647a9a,
+    0x7090aa, 0x8098b0,
+  ];
+
+  function wc() { return WALL_COLORS[Math.floor(rng() * WALL_COLORS.length)]; }
+  function ec() { return EDGE_COLORS[Math.floor(rng() * EDGE_COLORS.length)]; }
+
+  function mat(col) {
+    return new THREE.MeshPhongMaterial({
+      color: col, shininess: 8, specular: 0x0a1428,
+    });
+  }
+
+  function addEdges(geo, mesh, scene, col, opacity) {
+    const edges = new THREE.EdgesGeometry(geo, 15);
+    const line  = new THREE.LineSegments(
+      edges,
+      new THREE.LineBasicMaterial({ color: col || ec(), opacity: opacity || 0.55, transparent: true })
+    );
+    line.position.copy(mesh.position);
+    line.rotation.copy(mesh.rotation);
+    line.scale.copy(mesh.scale);
+    scene.add(line);
+  }
+
+  // ── Canvas-texture text label ──
+  function makeTextTex(lines, opts) {
+    const o = Object.assign({ w: 512, h: 256, bg: 'rgba(0,0,0,0)', fg: 'rgba(180,200,240,0.90)', fs: 28, ls: 6, ff: "'Space Mono', monospace" }, opts);
+    const c = document.createElement('canvas');
+    c.width = o.w; c.height = o.h;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, o.w, o.h);
+    x.font = `700 ${o.fs}px ${o.ff}`;
+    x.fillStyle = o.fg;
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    const lineH = o.fs * 1.5;
+    const startY = o.h / 2 - ((lines.length - 1) * lineH) / 2;
+    lines.forEach((l, i) => x.fillText(l, o.w / 2, startY + i * lineH));
+    return new THREE.CanvasTexture(c);
+  }
+
+  function textPlane(lines, w, h, opts) {
+    const tex = makeTextTex(lines, opts);
+    const geo = new THREE.PlaneGeometry(w, h);
+    const m   = new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false });
+    return new THREE.Mesh(geo, m);
+  }
+
+  // ── Building helpers ──
+  function addBox(group, gx, gy, gz, ry, rz, col) {
+    const geo = new THREE.BoxGeometry(gx, gy, gz);
+    const m   = new THREE.Mesh(geo, mat(col || wc()));
+    m.rotation.y = ry || 0;
+    m.rotation.z = rz || 0;
+    group.add(m);
+    addEdges(geo, m, group, ec(), 0.50);
+  }
+
+  // ── BUILDING FACTORIES ──
+
+  // Tall monolith — dramatic vertical slab
+  function buildTower(bx, by, bz) {
+    const g = new THREE.Group();
+    const h = 35 + rng() * 55, w = 5 + rng() * 9, d = 5 + rng() * 9;
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const m   = new THREE.Mesh(geo, mat(wc()));
+    m.position.y = h / 2;
+    g.add(m);
+    addEdges(geo, m, g, ec(), 0.55);
+
+    // Optional cantilever
+    if (rng() > 0.45) {
+      const sw = w + 5 + rng() * 14, sh = 2.5 + rng() * 3, sd = d + 3 + rng() * 8;
+      const sg = new THREE.BoxGeometry(sw, sh, sd);
+      const sm = new THREE.Mesh(sg, mat(wc()));
+      sm.position.set((rng() - 0.5) * 6, h * (0.38 + rng() * 0.44), 0);
+      g.add(sm);
+      addEdges(sg, sm, g, ec(), 0.50);
+    }
+    // Optional piloti column
+    if (rng() > 0.6) {
+      const col2 = new THREE.CylinderGeometry(0.6, 0.6, h * 0.32, 6);
+      const cm   = new THREE.Mesh(col2, mat(wc()));
+      cm.position.set(w * 0.35, h * 0.16, d * 0.35);
+      g.add(cm);
+    }
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    if (rng() > 0.72) g.rotation.z = (rng() - 0.5) * 0.35;
+    return g;
+  }
+
+  // Wide brutalist slab (elevated on pilotis)
+  function buildSlab(bx, by, bz) {
+    const g = new THREE.Group();
+    const h = 6 + rng() * 10, w = 25 + rng() * 45, d = 10 + rng() * 18;
+    const liftY = 8 + rng() * 12;
+
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const m   = new THREE.Mesh(geo, mat(wc()));
+    m.position.y = liftY + h / 2;
+    g.add(m);
+    addEdges(geo, m, g, ec(), 0.55);
+
+    // Columns below slab
+    const ncols = Math.floor(2 + rng() * 3);
+    for (let ci = 0; ci < ncols; ci++) {
+      const cx = (ci / (ncols - 1) - 0.5) * (w * 0.75);
+      const cg = new THREE.CylinderGeometry(0.7, 0.7, liftY, 5);
+      const cm = new THREE.Mesh(cg, mat(wc()));
+      cm.position.set(cx, liftY / 2, 0);
+      g.add(cm);
+    }
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    return g;
+  }
+
+  // Abstract polyhedron (icosahedron / dodecahedron — brutalist alien)
+  function buildPoly(bx, by, bz) {
+    const g    = new THREE.Group();
+    const r    = 6 + rng() * 14;
+    const kind = rng() > 0.5;
+    const geo  = kind
+      ? new THREE.IcosahedronGeometry(r, 0)
+      : new THREE.DodecahedronGeometry(r, 0);
+    const m = new THREE.Mesh(geo, mat(wc()));
+    m.position.y = r;
+    g.add(m);
+    addEdges(geo, m, g, ec(), 0.65);
+
+    // Spike: extrude a box out of it
+    if (rng() > 0.5) {
+      const sg = new THREE.BoxGeometry(1.5, 18 + rng() * 20, 1.5);
+      const sm = new THREE.Mesh(sg, mat(wc()));
+      sm.position.y = r * 1.6 + 8;
+      sm.rotation.z = (rng() - 0.5) * 0.5;
+      g.add(sm);
+      addEdges(sg, sm, g, ec(), 0.50);
+    }
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    g.rotation.x = (rng() - 0.5) * 0.4;
+    if (rng() > 0.6) g.userData.driftSpeed = (rng() - 0.5) * 0.0008;
+    return g;
+  }
+
+  // Stepped pyramid / inverted pyramid
+  function buildPyramid(bx, by, bz) {
+    const g       = new THREE.Group();
+    const nSteps  = 3 + Math.floor(rng() * 3);
+    const inverted = rng() > 0.5;
+    for (let s = 0; s < nSteps; s++) {
+      const frac = inverted ? (s / nSteps) : (1 - s / nSteps);
+      const sw   = 4 + frac * 22;
+      const sh   = 5 + rng() * 4;
+      const geo  = new THREE.BoxGeometry(sw, sh, sw * 0.85);
+      const m    = new THREE.Mesh(geo, mat(wc()));
+      m.position.y = s * sh + sh / 2;
+      g.add(m);
+      addEdges(geo, m, g, ec(), 0.55);
+    }
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    if (inverted) g.position.y = by + 30 + rng() * 15;
+    if (rng() > 0.65) g.rotation.z = (rng() - 0.5) * 0.5;
+    return g;
+  }
+
+  // Cruciform (two slabs crossing at center)
+  function buildCross(bx, by, bz) {
+    const g = new THREE.Group();
+    const h = 20 + rng() * 40, thick = 5 + rng() * 6, span = 20 + rng() * 30;
+    for (let axis = 0; axis < 2; axis++) {
+      const geo = new THREE.BoxGeometry(axis === 0 ? span : thick, h, axis === 0 ? thick : span);
+      const m   = new THREE.Mesh(geo, mat(wc()));
+      m.position.y = h / 2;
+      g.add(m);
+      addEdges(geo, m, g, ec(), 0.55);
+    }
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    if (rng() > 0.7) g.rotation.z = (rng() - 0.5) * 0.28;
+    return g;
+  }
+
+  // Monolithic shard (thin, very tall, dramatically tilted)
+  function buildShard(bx, by, bz) {
+    const g  = new THREE.Group();
+    const h  = 40 + rng() * 60;
+    const geo = new THREE.BoxGeometry(2.5 + rng() * 3, h, 2 + rng() * 2.5);
+    const m  = new THREE.Mesh(geo, mat(wc()));
+    m.position.y = h / 2;
+    g.add(m);
+    addEdges(geo, m, g, ec(), 0.70);
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    g.rotation.z = (rng() - 0.5) * 1.0; // dramatic lean
+    g.rotation.x = (rng() - 0.5) * 0.5;
+    if (rng() > 0.5) g.userData.driftSpeed = (rng() - 0.5) * 0.0005;
+    return g;
+  }
+
+  // Torus arch — brutal circular form
+  function buildArch(bx, by, bz) {
+    const g   = new THREE.Group();
+    const R   = 8 + rng() * 14, r = 1.5 + rng() * 3;
+    const geo = new THREE.TorusGeometry(R, r, 6, 16);
+    const m   = new THREE.Mesh(geo, mat(wc()));
+    m.position.y = R;
+    m.rotation.x = Math.PI / 2;
+    g.add(m);
+    addEdges(geo, m, g, ec(), 0.60);
+    g.position.set(bx, by, bz);
+    g.rotation.y = rng() * Math.PI * 2;
+    if (rng() > 0.5) g.userData.driftSpeed = (rng() - 0.5) * 0.0006;
+    return g;
+  }
+
+  // ── Place buildings ──
+  const factories = [buildTower, buildTower, buildTower, buildSlab, buildPoly, buildPyramid, buildCross, buildShard, buildArch];
+  const N = 80;
+
+  for (let i = 0; i < N; i++) {
+    const angle  = rng() * Math.PI * 2;
+    const dist   = 30 + rng() * 180;
+    const bx     = Math.cos(angle) * dist;
+    const bz     = Math.sin(angle) * dist;
+    const by     = (rng() - 0.5) * 20 - 18; // most sit below camera, some float
+    const f      = factories[Math.floor(rng() * factories.length)];
+    const group  = f(bx, by, bz);
+    scene.add(group);
+  }
+
+  // ── Floating debris (small fragments drifting in void) ──
+  for (let i = 0; i < 30; i++) {
+    const angle = rng() * Math.PI * 2;
+    const dist  = 10 + rng() * 60;
+    const bx    = Math.cos(angle) * dist;
+    const bz    = Math.sin(angle) * dist;
+    const by    = (rng() - 0.5) * 40;
+    const s     = 0.5 + rng() * 3;
+    const geo   = rng() > 0.5
+      ? new THREE.BoxGeometry(s, s * (1 + rng() * 4), s)
+      : new THREE.OctahedronGeometry(s * 1.5, 0);
+    const m = new THREE.Mesh(geo, mat(wc()));
+    m.position.set(bx, by, bz);
+    m.rotation.set(rng() * Math.PI, rng() * Math.PI, rng() * Math.PI);
+    m.userData.driftSpeed = (rng() - 0.5) * 0.002;
+    scene.add(m);
+    addEdges(geo, m, scene, ec(), 0.40);
+  }
+
+  // ── Identity billboard (directly ahead when world first appears) ──
+  {
+    // Backing slab
+    const backing = new THREE.Mesh(
+      new THREE.BoxGeometry(38, 9, 0.4),
+      new THREE.MeshPhongMaterial({ color: 0x030810, transparent: true, opacity: 0.85 })
+    );
+    backing.position.set(0, 0, -55);
+    scene.add(backing);
+    addEdges(new THREE.BoxGeometry(38, 9, 0.4), backing, scene, 0x4a6088, 0.55);
+
+    // Name text
+    const namePlane = textPlane(
+      ['VASUDEVAN GOVARDHANEN'],
+      34, 5,
+      { w: 1024, h: 160, fs: 52, fg: 'rgba(200,215,245,0.92)', bg: 'transparent' }
+    );
+    namePlane.position.set(0, 1.2, -54.6);
+    scene.add(namePlane);
+
+    // Sub-text
+    const subPlane = textPlane(
+      ['HS SENIOR  ·  MANALAPAN NJ  ·  COMPUTING ARCHITECTURE'],
+      34, 2,
+      { w: 1024, h: 64, fs: 20, fg: 'rgba(100,130,190,0.65)', bg: 'transparent' }
+    );
+    subPlane.position.set(0, -1.8, -54.6);
+    scene.add(subPlane);
+  }
+
+  // ── Nav labels embedded in the world ──
+  const navItems = [
+    { label: 'BLOG',     href: '/blog/',     angle: 0.55,  dist: 48, y:  2 },
+    { label: 'PROBLEMS', href: '/problems/', angle: 1.20,  dist: 52, y: -3 },
+    { label: 'PROJECTS', href: '/projects/', angle: -0.70, dist: 45, y:  4 },
+    { label: 'NOTES',    href: '/notes/',    angle: 2.20,  dist: 55, y: -1 },
+    { label: 'ABOUT',    href: '/about/',    angle: -1.80, dist: 50, y:  3 },
+  ];
+
+  const navMeshes = [];
+  navItems.forEach(item => {
+    const bx = Math.sin(item.angle) * item.dist;
+    const bz = -Math.cos(item.angle) * item.dist;
+
+    // Backing panel
+    const bg = new THREE.Mesh(
+      new THREE.BoxGeometry(14, 4.5, 0.3),
+      new THREE.MeshPhongMaterial({ color: 0x030810, transparent: true, opacity: 0.80 })
+    );
+    bg.position.set(bx, item.y, bz);
+    bg.lookAt(0, item.y, 0);
+    scene.add(bg);
+    addEdges(new THREE.BoxGeometry(14, 4.5, 0.3), bg, scene, 0x3a5070, 0.55);
+
+    // Text
+    const plane = textPlane(
+      [item.label],
+      12, 3,
+      { w: 512, h: 128, fs: 44, fg: 'rgba(160,185,230,0.90)', bg: 'transparent' }
+    );
+    plane.position.set(bx, item.y, bz);
+    plane.lookAt(0, item.y, 0);
+    // Offset slightly toward camera so text is in front of backing
+    const dir = new THREE.Vector3(0, 0, 0).sub(plane.position).normalize();
+    plane.position.addScaledVector(dir, 0.2);
+    scene.add(plane);
+
+    // Raycasting for click
+    navMeshes.push({ mesh: bg, href: item.href });
+  });
+
+  // ── Ground grid (faint, far below) ──
+  const grid = new THREE.GridHelper(800, 60, 0x0d1a2e, 0x080e1a);
+  grid.position.y = -22;
+  scene.add(grid);
+
+  // Horizon ring (gives sense of ground)
+  const ringGeo = new THREE.TorusGeometry(200, 0.3, 4, 60);
+  const ringMat = new THREE.LineBasicMaterial({ color: 0x0f1e30, opacity: 0.40, transparent: true });
+  const ring    = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x0f1e30, transparent: true, opacity: 0.15 }));
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = -22;
+  scene.add(ring);
+
+  // ── Raycaster for nav click ──
+  const raycaster = new THREE.Raycaster();
+  const mouse2d   = new THREE.Vector2();
+
+  // ── Camera controls ──
+  let azimuth = 0, elevation = 0;
+  let velAz = 0, velEl = 0;
+  let isDragging = false, prevX = 0, prevY = 0;
+  let dragDist = 0;
+
+  function onPointerDown(x, y) {
+    isDragging = true; prevX = x; prevY = y;
+    dragDist = 0; velAz = velEl = 0;
+  }
+  function onPointerMove(x, y) {
+    if (!isDragging) return;
+    const dx = x - prevX, dy = y - prevY;
+    dragDist += Math.hypot(dx, dy);
+    velAz = dx * 0.0042; velEl = dy * 0.0035;
+    azimuth   -= dx * 0.0042;
+    elevation  = Math.max(-1.1, Math.min(1.1, elevation - dy * 0.0035));
+    prevX = x; prevY = y;
+  }
+  function onPointerUp(x, y) {
+    isDragging = false;
+    // Click (low drag distance = no real drag)
+    if (dragDist < 8) {
+      mouse2d.x =  (x / window.innerWidth)  * 2 - 1;
+      mouse2d.y = -(y / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse2d, camera);
+      const hits = raycaster.intersectObjects(navMeshes.map(n => n.mesh));
+      if (hits.length) {
+        const nav = navMeshes.find(n => n.mesh === hits[0].object);
+        if (nav) window.location.href = nav.href;
       }
-
-      buildings.push({
-        x, y: groundY - bh,
-        w: bw, h: bh,
-        cols, rows, windows,
-        isTower,
-        groundY,
-      });
-      x += bw + gap;
     }
   }
 
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    genBuildings(W, H);
-  }
+  const el = renderer.domElement;
+  el.addEventListener('mousedown',  e => onPointerDown(e.clientX, e.clientY));
+  el.addEventListener('mousemove',  e => onPointerMove(e.clientX, e.clientY));
+  el.addEventListener('mouseup',    e => onPointerUp(e.clientX, e.clientY));
+  el.addEventListener('mouseleave', () => { isDragging = false; });
+  el.addEventListener('touchstart', e => { e.preventDefault(); onPointerDown(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  el.addEventListener('touchmove',  e => { e.preventDefault(); onPointerMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  el.addEventListener('touchend',   e => { onPointerUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY); });
 
-  function drawFrame() {
-    // ── Sky ──
-    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.62);
-    sky.addColorStop(0,    '#000800');
-    sky.addColorStop(0.45, '#010d01');
-    sky.addColorStop(1,    '#021502');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H);
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
 
-    // ── Ground / road ──
-    const groundY = H * 0.60;
-    const grd = ctx.createLinearGradient(0, groundY, 0, H);
-    grd.addColorStop(0, '#010e01');
-    grd.addColorStop(1, '#000600');
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, groundY, W, H - groundY);
+  // ── Animate ──
+  function animate() {
+    requestAnimationFrame(animate);
 
-    // Wet road sheen
-    ctx.fillStyle = 'rgba(60,130,60,0.05)';
-    ctx.fillRect(0, groundY + 2, W, 14);
+    if (!isDragging) {
+      azimuth  -= velAz;
+      elevation = Math.max(-1.1, Math.min(1.1, elevation - velEl));
+      velAz *= 0.89; velEl *= 0.89;
+      // Imperceptible auto-drift — world breathes
+      azimuth += 0.00025;
+    }
 
-    // ── Buildings ──
-    buildings.forEach(b => {
-      // Drop shadow (depth)
-      ctx.fillStyle = '#020702';
-      ctx.fillRect(b.x + 5, b.y + 7, b.w, b.h);
+    camera.rotation.y = azimuth;
+    camera.rotation.x = elevation;
 
-      // Main wall
-      ctx.fillStyle = b.isTower ? '#0a1a0a' : '#0c1c0c';
-      ctx.fillRect(b.x, b.y, b.w, b.h);
-
-      // Brutalist concrete floor bands
-      ctx.fillStyle = 'rgba(20,45,20,0.35)';
-      const bandStep = b.isTower ? 24 : 30;
-      for (let fb = 1; fb <= Math.ceil(b.h / bandStep); fb++) {
-        ctx.fillRect(b.x, b.y + fb * bandStep - 1, b.w, 1.5);
-      }
-
-      // Vertical pillar lines
-      if (b.isTower) {
-        ctx.strokeStyle = 'rgba(20,45,20,0.25)';
-        ctx.lineWidth = 1;
-        for (let pc = 1; pc < b.cols; pc++) {
-          const px = b.x + (b.w / b.cols) * pc;
-          ctx.beginPath();
-          ctx.moveTo(px, b.y);
-          ctx.lineTo(px, b.y + b.h);
-          ctx.stroke();
-        }
-      }
-
-      // Windows
-      const cellW = b.w / b.cols;
-      const cellH = b.h / b.rows;
-      b.windows.forEach(({ r, c, key }) => {
-        const ws = winStates[key];
-        if (!ws) return;
-
-        if (ws.flicker && Math.random() < 0.006) ws.lit = !ws.lit;
-
-        const wx = b.x + c * cellW + cellW * 0.18;
-        const wy = b.y + r * cellH + cellH * 0.20;
-        const ww = cellW * 0.64;
-        const wh = cellH * 0.55;
-
-        if (ws.lit) {
-          ctx.fillStyle = 'rgba(85,185,85,0.26)';
-          ctx.fillRect(wx, wy, ww, wh);
-          // Glow
-          ctx.fillStyle = 'rgba(60,140,60,0.07)';
-          ctx.fillRect(wx - 2, wy - 2, ww + 4, wh + 4);
-        } else {
-          ctx.fillStyle = 'rgba(4,10,4,0.80)';
-          ctx.fillRect(wx, wy, ww, wh);
-        }
-      });
-
-      // Rooftop antennas / water towers
-      if ((b.x | 0) % 3 === 0) {
-        const ax = b.x + b.w * 0.35 + ((b.x * 7) % (b.w * 0.5));
-        const ah = 10 + ((b.x * 13) % 20);
-        ctx.strokeStyle = 'rgba(60,130,60,0.30)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(ax, b.y);
-        ctx.lineTo(ax, b.y - ah);
-        ctx.stroke();
-        // Crossbar
-        ctx.beginPath();
-        ctx.moveTo(ax - 5, b.y - ah * 0.7);
-        ctx.lineTo(ax + 5, b.y - ah * 0.7);
-        ctx.stroke();
-      }
+    // Drift floating objects
+    scene.children.forEach(child => {
+      if (child.userData.driftSpeed) child.rotation.y += child.userData.driftSpeed;
     });
 
-    // ── Glitch: horizontal slice displacement ──
-    if (glitchFrames > 0) {
-      const sy  = H * 0.15 + Math.random() * H * 0.55;
-      const sh  = 3 + Math.random() * 14 | 0;
-      const sdx = (Math.random() - 0.5) * 28 | 0;
-      try {
-        const id = ctx.getImageData(0, sy | 0, W, sh);
-        ctx.putImageData(id, sdx, sy | 0);
-      } catch (e) {}
-      glitchFrames--;
-    }
-    if (Math.random() < 0.005) glitchFrames = 2 + Math.random() * 4 | 0;
-
-    // ── Identity text overlay ──
-    const cx  = W * 0.5;
-    const cy  = H * 0.38;
-    const fsz = Math.max(14, Math.floor(W * 0.036));
-
-    ctx.save();
-    ctx.textAlign = 'center';
-
-    // Chromatic aberration ghost
-    ctx.fillStyle = 'rgba(200,60,60,0.14)';
-    ctx.font = `700 ${fsz}px 'Space Mono', monospace`;
-    ctx.fillText('VASUDEVAN GOVARDHANEN', cx + 3, cy);
-    ctx.fillStyle = 'rgba(60,60,200,0.14)';
-    ctx.fillText('VASUDEVAN GOVARDHANEN', cx - 3, cy);
-    // Main name
-    ctx.fillStyle = 'rgba(120,220,120,0.90)';
-    ctx.font = `700 ${fsz}px 'Space Mono', monospace`;
-    ctx.fillText('VASUDEVAN GOVARDHANEN', cx, cy);
-
-    // Horizontal rule under name
-    const ruleW = Math.min(fsz * 14, W * 0.55);
-    ctx.strokeStyle = 'rgba(80,180,80,0.30)';
-    ctx.lineWidth   = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx - ruleW / 2, cy + 12);
-    ctx.lineTo(cx + ruleW / 2, cy + 12);
-    ctx.stroke();
-
-    // Descriptors
-    const dfsz = Math.max(9, Math.floor(W * 0.011));
-    const descs = [
-      'HS SENIOR  ·  MANALAPAN, NEW JERSEY',
-      'COMPUTING ARCHITECTURE  /  OS  /  PARALLEL COMPUTING',
-      'GOFAR INITIATIVE  ·  SNE @ MANALAPAN HS',
-    ];
-    ctx.font = `400 ${dfsz}px 'Space Mono', monospace`;
-    descs.forEach((d, i) => {
-      ctx.fillStyle = `rgba(80,185,80,${0.55 - i * 0.10})`;
-      ctx.fillText(d, cx, cy + 28 + i * (dfsz * 2.0));
-    });
-
-    ctx.restore();
-
-    // ── Film grain (fast sparse pixels) ──
-    const grainN = (W * H * 0.006) | 0;
-    for (let n = 0; n < grainN; n++) {
-      const gx = Math.random() * W | 0;
-      const gy = Math.random() * H | 0;
-      const gv = Math.random();
-      ctx.fillStyle = `rgba(60,${100 + (gv * 80) | 0},60,${0.06 + gv * 0.10})`;
-      ctx.fillRect(gx, gy, 1, 1);
-    }
-
-    // ── Scanlines (static) ──
-    for (let y = 0; y < H; y += 3) {
-      ctx.fillStyle = 'rgba(0,0,0,0.10)';
-      ctx.fillRect(0, y, W, 1);
-    }
-
-    // ── Moving scan beam ──
-    const beamY = (t * 55) % H;
-    ctx.fillStyle = 'rgba(80,200,80,0.025)';
-    ctx.fillRect(0, beamY, W, 4);
-
-    // ── Vignette ──
-    const vig = ctx.createRadialGradient(cx, H * 0.5, H * 0.18, cx, H * 0.5, H * 0.82);
-    vig.addColorStop(0, 'rgba(0,0,0,0)');
-    vig.addColorStop(1, 'rgba(0,6,0,0.90)');
-    ctx.fillStyle = vig;
-    ctx.fillRect(0, 0, W, H);
-
-    // ── HUD overlay ──
-    ctx.save();
-    ctx.font = `400 11px 'Space Mono', monospace`;
-
-    // Top-left: cam ID + sector
-    ctx.fillStyle = 'rgba(80,200,80,0.62)';
-    ctx.textAlign = 'left';
-    ctx.fillText('CAM-01  ·  SECTOR 7  ·  NV-MODE', 22, 26);
-
-    // Top-right: live timestamp
-    const now = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    const ts  = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}  ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(ts, W - 22, 26);
-
-    // Bottom-left: REC blink (every ~0.8s)
-    if (Math.floor(t * 1.25) % 2 === 0) {
-      ctx.fillStyle = 'rgba(220,70,70,0.82)';
-      ctx.textAlign = 'left';
-      ctx.fillText('● REC', 22, H - 20);
-    }
-
-    // Bottom-right: site credit
-    ctx.fillStyle = 'rgba(80,200,80,0.38)';
-    ctx.textAlign = 'right';
-    ctx.fillText('GOVARDHA.NET  //  2026', W - 22, H - 20);
-
-    // Corner brackets (HUD frame)
-    const bl = 20;
-    ctx.strokeStyle = 'rgba(80,200,80,0.32)';
-    ctx.lineWidth   = 1.5;
-    // TL
-    ctx.beginPath(); ctx.moveTo(12, 12 + bl); ctx.lineTo(12, 12); ctx.lineTo(12 + bl, 12); ctx.stroke();
-    // TR
-    ctx.beginPath(); ctx.moveTo(W - 12 - bl, 12); ctx.lineTo(W - 12, 12); ctx.lineTo(W - 12, 12 + bl); ctx.stroke();
-    // BL
-    ctx.beginPath(); ctx.moveTo(12, H - 12 - bl); ctx.lineTo(12, H - 12); ctx.lineTo(12 + bl, H - 12); ctx.stroke();
-    // BR
-    ctx.beginPath(); ctx.moveTo(W - 12 - bl, H - 12); ctx.lineTo(W - 12, H - 12); ctx.lineTo(W - 12, H - 12 - bl); ctx.stroke();
-
-    ctx.restore();
-
-    t += 0.016;
-    requestAnimationFrame(drawFrame);
+    renderer.render(scene, camera);
   }
 
-  window.addEventListener('resize', resize);
-  resize();
-  requestAnimationFrame(drawFrame);
+  animate();
 }
 </script>
 </body>
