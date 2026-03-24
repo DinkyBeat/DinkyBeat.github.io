@@ -6,11 +6,14 @@
 <title>Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
 
-/* ── Intro ──────────────────────────────────────────────── */
+/* ── Base override: full-bleed, no scroll ───────────────────── */
+html, body { height: 100%; overflow: hidden; margin: 0; background: #000; }
+
+/* ── INTRO ──────────────────────────────────────────────────── */
 #intro {
   position: fixed; inset: 0;
   z-index: 10000; background: #000; cursor: crosshair;
@@ -30,131 +33,111 @@
   transition: opacity 0.4s ease;
 }
 @keyframes label-breathe {
-  0%, 100% { opacity: 0.38; }
+  0%, 100% { opacity: 0.30; }
   50%       { opacity: 1.00; }
 }
 #intro-hint {
-  position: fixed; bottom: 30px; left: 50%;
+  position: fixed; bottom: 32px; left: 50%;
   transform: translateX(-50%);
   font-family: 'Space Mono', monospace;
-  font-size: 9px; letter-spacing: 0.28em;
-  color: rgba(255,255,255,0.20);
+  font-size: 9px; letter-spacing: 0.30em;
+  color: rgba(255,255,255,0.18);
   text-transform: uppercase;
   pointer-events: none; z-index: 10001;
-  animation: hint-pulse 3s ease-in-out infinite;
+  animation: hint-pulse 3.2s ease-in-out infinite;
   transition: opacity 0.3s ease;
 }
 @keyframes hint-pulse {
-  0%, 100% { opacity: 0.20; }
+  0%, 100% { opacity: 0.18; }
   50%       { opacity: 0.55; }
 }
 
-/* ── Scanline ───────────────────────────────────────────── */
+/* ── MAIN PAGE (revealed after intro) ──────────────────────── */
+#main-page {
+  position: fixed; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.9s ease;
+}
+#main-page.visible {
+  opacity: 1; pointer-events: all;
+}
+
+/* ── Security cam canvas ────────────────────────────────────── */
+#cam-canvas {
+  position: absolute; inset: 0;
+  display: block; width: 100%; height: 100%;
+}
+
+/* ── Global scanline ────────────────────────────────────────── */
 .scanline {
   position: fixed; left: 0; top: 0; width: 100%; height: 2px;
-  background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.055) 50%, transparent 100%);
+  background: linear-gradient(to right,
+    transparent 0%,
+    rgba(100,200,100,0.05) 50%,
+    transparent 100%);
   pointer-events: none; z-index: 9998;
-  animation: scan-line 5.5s linear infinite;
+  animation: scan-line 7s linear infinite;
 }
 
-/* ── Section structure ──────────────────────────────────── */
-.sec-head {
-  display: flex; align-items: center; gap: 16px;
-  margin-bottom: 36px;
+/* ── Cyborg arm nav ─────────────────────────────────────────── */
+#arm-nav {
+  position: fixed; left: 0; top: 0;
+  width: 360px; height: 100vh;
+  pointer-events: none;
+  z-index: 500;
 }
-.sec-num {
+#arm-nav.ready { pointer-events: all; }
+
+#arm-svg {
+  position: absolute; left: 0; top: 0;
+  width: 360px; height: 100%;
+  overflow: visible;
+}
+
+/* Shoulder trigger */
+#shoulder-trigger { cursor: pointer; }
+#shoulder-outer {
+  animation: shoulder-pulse 2.4s ease-in-out infinite;
+}
+@keyframes shoulder-pulse {
+  0%, 100% { opacity: 0.50; }
+  50%       { opacity: 1.00; }
+}
+
+/* Upper arm — extends horizontally (left→right) */
+#arm-upper-g {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.60s cubic-bezier(0.77, 0, 0.18, 1);
+}
+/* Forearm — drops vertically from elbow */
+#arm-lower-g {
+  transform-box: fill-box;
+  transform-origin: center top;
+  transform: scaleY(0);
+  transition: transform 0.50s cubic-bezier(0.77, 0, 0.18, 1) 0.50s;
+}
+/* Nav items fade in after arm is fully extended */
+#arm-nav-items {
+  opacity: 0;
+  transition: opacity 0.35s ease 0.95s;
+}
+#arm-nav.open #arm-upper-g { transform: scaleX(1); }
+#arm-nav.open #arm-lower-g { transform: scaleY(1); }
+#arm-nav.open #arm-nav-items { opacity: 1; }
+
+/* SVG nav link text */
+.arm-link-text {
   font-family: 'Space Mono', monospace;
-  font-size: 10px; letter-spacing: 0.22em;
-  color: var(--accent); flex-shrink: 0;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  fill: rgba(100, 200, 100, 0.65);
+  cursor: pointer;
+  transition: fill 0.15s;
 }
-.sec-line {
-  flex: 1; height: 1px;
-  background: rgba(255,255,255,0.16);
-  transform: scaleX(0); transform-origin: left;
-}
-.sec-line.draw { animation: line-draw 0.75s cubic-bezier(0.4,0,0.2,1) forwards; }
-
-/* ── Identity ───────────────────────────────────────────── */
-.s-identity { padding-top: 80px; opacity: 0; }
-.s-identity.revealed { animation: flicker-in 0.7s ease forwards; }
-
-.brutal-name {
-  font-family: 'Space Mono', monospace;
-  font-size: clamp(34px, 6.8vw, 68px);
-  font-weight: 700; letter-spacing: 0.02em; line-height: 1.06;
-  color: #fff; margin-bottom: 28px; cursor: default;
-  transition: text-shadow 0.05s;
-}
-.brutal-name:hover {
-  text-shadow: -3px 0 rgba(90,172,245,0.85), 3px 0 rgba(255,45,45,0.65);
-}
-
-.affil-row {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; letter-spacing: 0.10em; color: var(--muted);
-}
-.affil-row a { color: var(--accent); text-decoration: none; }
-.affil-row a:hover { color: #fff; }
-.affil-row .pipe { margin: 0 12px; opacity: 0.35; }
-
-/* ── Bio ────────────────────────────────────────────────── */
-.s-bio { padding-top: 60px; opacity: 0; }
-.s-bio.revealed { animation: flicker-in 0.7s ease forwards; }
-
-.bio-block {
-  border-left: 2px solid rgba(255,255,255,0.13);
-  padding-left: 22px;
-  font-size: 14px; line-height: 2.0; color: var(--text);
-}
-
-/* ── Signal / Oscilloscope ──────────────────────────────── */
-.s-signal { padding-top: 60px; opacity: 0; }
-.s-signal.revealed { animation: flicker-in 0.7s ease forwards; }
-
-.osc-frame {
-  position: relative;
-  background: #000;
-  border: 1px solid rgba(255,255,255,0.10);
-  overflow: hidden;
-}
-.osc-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 7px 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  font-family: 'Space Mono', monospace;
-  font-size: 9px; letter-spacing: 0.18em; color: rgba(255,255,255,0.22);
-}
-.osc-live {
-  color: var(--accent);
-  animation: osc-blink 1.2s steps(1) infinite;
-}
-/* CRT scanline overlay on the osc */
-.osc-frame::after {
-  content: '';
-  position: absolute; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.18) 0px,
-    rgba(0,0,0,0.18) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  z-index: 2;
-}
-#osc-canvas { display: block; width: 100%; height: 150px; position: relative; z-index: 1; }
-
-/* ── Catalog ────────────────────────────────────────────── */
-.s-catalog { padding-top: 60px; opacity: 0; }
-.s-catalog.revealed { animation: flicker-in 0.7s ease forwards; }
-
-.catalog-link {
-  display: inline-block;
-  font-family: 'Space Mono', monospace;
-  font-size: 13px; letter-spacing: 0.08em;
-  color: var(--accent); text-decoration: none;
-  transition: letter-spacing 0.38s ease, color 0.2s;
-}
-.catalog-link:hover { letter-spacing: 0.22em; color: #fff; text-decoration: none; }
+.arm-link-text:hover { fill: rgba(160, 255, 160, 0.95); }
 
 </style>
 </head>
@@ -162,87 +145,247 @@
 
 <div class="scanline"></div>
 
-<!-- ── INTRO ──────────────────────────────────────────────── -->
+<!-- ══════════════════ INTRO ══════════════════ -->
 <div id="intro"><canvas id="up-canvas"></canvas></div>
 <div id="intro-label">[ NEW DAWN FADES ]</div>
 <div id="intro-hint">click to enter</div>
 
-<!-- ── MAIN ───────────────────────────────────────────────── -->
-<div id="scrollBar"></div>
+<!-- ══════════════════ MAIN PAGE ══════════════════ -->
+<div id="main-page">
 
-<nav class="site-nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
-    <ul class="nav-links">
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/problems/">Problems</a></li>
-      <li><a href="/projects/">Projects</a></li>
-      <li><a href="/notes/">Notes</a></li>
-      <li><a href="/about/">About</a></li>
-    </ul>
-  </div>
-</nav>
+  <!-- Security cam full-viewport canvas -->
+  <canvas id="cam-canvas"></canvas>
 
-<div class="page-wrap">
+  <!-- Cyborg arm nav -->
+  <nav id="arm-nav" aria-label="Navigation">
+    <svg id="arm-svg" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- 01 ─ Identity -->
-  <section class="s-identity">
-    <div class="sec-head">
-      <span class="sec-num">01</span>
-      <div class="sec-line"></div>
-    </div>
-    <h1 class="brutal-name" id="brutal-name">VASUDEVAN<br>GOVARDHANEN</h1>
-    <div class="affil-row">
-      <a href="https://sites.google.com/frhsd.com/seopenhouse/home?authuser=0">SNE · MANALAPAN HS, NJ</a>
-      <span class="pipe">|</span>
-      <a href="/gofar/">GOFAR</a>
-    </div>
-  </section>
+      <!-- ── SPINE (vertical rail running full height) ── -->
+      <line x1="22" y1="0" x2="22" y2="9999"
+        stroke="rgba(80,160,80,0.22)" stroke-width="1.5"
+        vector-effect="non-scaling-stroke"/>
+      <!-- Spine measurement ticks -->
+      <g stroke="rgba(80,160,80,0.16)" stroke-width="1"
+         vector-effect="non-scaling-stroke">
+        <line x1="17" y1="55"  x2="27" y2="55"/>
+        <line x1="19" y1="75"  x2="25" y2="75"/>
+        <line x1="17" y1="460" x2="27" y2="460"/>
+        <line x1="19" y1="520" x2="25" y2="520"/>
+        <line x1="17" y1="620" x2="27" y2="620"/>
+        <line x1="19" y1="720" x2="25" y2="720"/>
+        <line x1="17" y1="820" x2="27" y2="820"/>
+      </g>
+      <!-- Spine label -->
+      <text x="10" y="42"
+        font-family="Space Mono, monospace" font-size="7"
+        letter-spacing="1" fill="rgba(80,160,80,0.25)"
+        writing-mode="tb" glyph-orientation-vertical="0">AXIS·A</text>
 
-  <!-- 02 ─ Bio -->
-  <section class="s-bio">
-    <div class="sec-head">
-      <span class="sec-num">02</span>
-      <div class="sec-line"></div>
-    </div>
-    <div class="bio-block">
-      <p>I am a HS senior from Manalapan, New Jersey interested in computing architecture, operating systems, and parallel computing.</p>
-    </div>
-  </section>
+      <!-- ── SHOULDER JOINT (trigger) ── -->
+      <g id="shoulder-trigger" onclick="toggleArm()">
+        <!-- Concentric rings -->
+        <circle id="shoulder-outer" cx="22" cy="106" r="19"
+          fill="none" stroke="rgba(80,200,80,0.50)" stroke-width="1.2"
+          vector-effect="non-scaling-stroke"/>
+        <circle cx="22" cy="106" r="13"
+          fill="none" stroke="rgba(80,200,80,0.30)" stroke-width="1"
+          vector-effect="non-scaling-stroke" stroke-dasharray="3 4"/>
+        <circle cx="22" cy="106" r="8"
+          fill="rgba(10,25,10,0.92)" stroke="rgba(80,200,80,0.45)" stroke-width="1"
+          vector-effect="non-scaling-stroke"/>
+        <circle cx="22" cy="106" r="3.5" fill="rgba(80,220,80,0.85)"/>
+        <!-- Cardinal ticks -->
+        <line x1="22" y1="83"  x2="22" y2="90"
+          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        <line x1="22" y1="122" x2="22" y2="129"
+          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        <line x1="0"  y1="106" x2="7"  y2="106"
+          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        <line x1="37" y1="106" x2="44" y2="106"
+          stroke="rgba(80,200,80,0.50)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        <!-- Menu label -->
+        <text x="48" y="110"
+          font-family="Space Mono, monospace" font-size="8"
+          letter-spacing="2.5" fill="rgba(80,200,80,0.42)">[NAV]</text>
+      </g>
 
-  <!-- 03 ─ Signal -->
-  <section class="s-signal">
-    <div class="sec-head">
-      <span class="sec-num">03</span>
-      <div class="sec-line"></div>
-    </div>
-    <div class="osc-frame">
-      <div class="osc-bar">
-        <span>SIGNAL</span>
-        <span class="osc-live">■ LIVE</span>
-        <span>CH·01</span>
-      </div>
-      <canvas id="osc-canvas"></canvas>
-    </div>
-  </section>
+      <!-- ── UPPER ARM (horizontal, scaleX: 0→1) ── -->
+      <g id="arm-upper-g">
+        <!-- Main structural beam -->
+        <line x1="22" y1="106" x2="215" y2="106"
+          stroke="rgba(80,200,80,0.62)" stroke-width="2.8"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Parallel wires (above/below beam) -->
+        <line x1="28" y1="101" x2="215" y2="101"
+          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
+          vector-effect="non-scaling-stroke"/>
+        <line x1="28" y1="111" x2="215" y2="111"
+          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Sagging cable (disheveled, droops below beam) -->
+        <polyline
+          points="35,106 55,115 85,120 115,122 145,120 175,115 205,107"
+          fill="none" stroke="rgba(80,200,80,0.10)" stroke-width="1.2"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Stray wire (chaotic, goes off-axis) -->
+        <polyline
+          points="40,106 52,98 70,103 88,96 110,100 130,106"
+          fill="none" stroke="rgba(80,200,80,0.07)" stroke-width="0.8"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Cross-braces (truss pattern) -->
+        <g stroke="rgba(80,200,80,0.22)" stroke-width="0.9"
+           vector-effect="non-scaling-stroke">
+          <line x1="55"  y1="99"  x2="70"  y2="113"/>
+          <line x1="70"  y1="99"  x2="55"  y2="113"/>
+          <line x1="95"  y1="99"  x2="110" y2="113"/>
+          <line x1="110" y1="99"  x2="95"  y2="113"/>
+          <line x1="135" y1="99"  x2="150" y2="113"/>
+          <line x1="150" y1="99"  x2="135" y2="113"/>
+          <line x1="175" y1="99"  x2="190" y2="113"/>
+          <line x1="190" y1="99"  x2="175" y2="113"/>
+        </g>
+        <!-- Rivets / bolts -->
+        <g fill="rgba(80,200,80,0.38)" vector-effect="non-scaling-stroke">
+          <circle cx="50"  cy="106" r="2.2"/>
+          <circle cx="85"  cy="106" r="2.2"/>
+          <circle cx="120" cy="106" r="2.2"/>
+          <circle cx="155" cy="106" r="2.2"/>
+          <circle cx="190" cy="106" r="2.2"/>
+        </g>
+        <!-- Wear marks / scratches -->
+        <line x1="62"  y1="104" x2="66"  y2="108"
+          stroke="rgba(80,200,80,0.08)" stroke-width="0.6" vector-effect="non-scaling-stroke"/>
+        <line x1="140" y1="103" x2="143" y2="109"
+          stroke="rgba(80,200,80,0.08)" stroke-width="0.6" vector-effect="non-scaling-stroke"/>
+        <!-- Elbow joint -->
+        <circle cx="215" cy="106" r="9"
+          fill="rgba(8,22,8,0.95)" stroke="rgba(80,200,80,0.55)" stroke-width="1.5"
+          vector-effect="non-scaling-stroke"/>
+        <circle cx="215" cy="106" r="4" fill="rgba(80,200,80,0.60)"/>
+        <circle cx="215" cy="106" r="1.8" fill="rgba(8,22,8,0.95)"/>
+      </g>
 
-  <!-- 04 ─ Catalog -->
-  <section class="s-catalog">
-    <div class="sec-head">
-      <span class="sec-num">04</span>
-      <div class="sec-line"></div>
-    </div>
-    <a href="https://rateyourmusic.com/~theb1scu1t" target="_blank" rel="noopener" class="catalog-link">RYM // theb1scu1t →</a>
-  </section>
+      <!-- ── FOREARM (vertical, scaleY: 0→1 from elbow down) ── -->
+      <g id="arm-lower-g">
+        <!-- Main beam -->
+        <line x1="215" y1="106" x2="215" y2="455"
+          stroke="rgba(80,200,80,0.62)" stroke-width="2.8"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Parallel wires -->
+        <line x1="210" y1="112" x2="210" y2="455"
+          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
+          vector-effect="non-scaling-stroke"/>
+        <line x1="220" y1="112" x2="220" y2="455"
+          stroke="rgba(80,200,80,0.16)" stroke-width="0.8"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Sagging cable (bows to the right — gravity dishevelment) -->
+        <polyline
+          points="215,118 222,155 226,210 224,270 220,330 217,390 215,448"
+          fill="none" stroke="rgba(80,200,80,0.10)" stroke-width="1.2"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Stray wire (chaotic) -->
+        <polyline
+          points="215,130 208,150 212,175 206,200 210,230"
+          fill="none" stroke="rgba(80,200,80,0.07)" stroke-width="0.8"
+          vector-effect="non-scaling-stroke"/>
+        <!-- Cross-braces -->
+        <g stroke="rgba(80,200,80,0.20)" stroke-width="0.9"
+           vector-effect="non-scaling-stroke">
+          <line x1="208" y1="168" x2="222" y2="182"/>
+          <line x1="222" y1="168" x2="208" y2="182"/>
+          <line x1="208" y1="248" x2="222" y2="262"/>
+          <line x1="222" y1="248" x2="208" y2="262"/>
+          <line x1="208" y1="328" x2="222" y2="342"/>
+          <line x1="222" y1="328" x2="208" y2="342"/>
+        </g>
+        <!-- Rivets -->
+        <g fill="rgba(80,200,80,0.35)" vector-effect="non-scaling-stroke">
+          <circle cx="215" cy="155" r="2.2"/>
+          <circle cx="215" cy="230" r="2.2"/>
+          <circle cx="215" cy="305" r="2.2"/>
+          <circle cx="215" cy="380" r="2.2"/>
+        </g>
+        <!-- Wrist terminal -->
+        <circle cx="215" cy="455" r="7"
+          fill="rgba(8,22,8,0.95)" stroke="rgba(80,200,80,0.45)" stroke-width="1.3"
+          vector-effect="non-scaling-stroke"/>
+        <circle cx="215" cy="455" r="3" fill="rgba(80,200,80,0.45)"/>
 
-</div>
+        <!-- ── NAV ITEMS (fade in after arm extends) ── -->
+        <g id="arm-nav-items">
+          <!-- y positions: 178, 236, 294, 352, 410 -->
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span>© 2026</span>
-    <a href="/contact/">Contact</a>
-  </div>
-</footer>
+          <!-- Blog -->
+          <line x1="215" y1="178" x2="235" y2="178"
+            stroke="rgba(80,200,80,0.48)" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+          <circle cx="215" cy="178" r="3.5" fill="rgba(80,200,80,0.60)"/>
+          <circle cx="215" cy="178" r="1.5" fill="rgba(8,22,8,0.95)"/>
+          <a href="/blog/">
+            <text x="240" y="182"
+              class="arm-link-text"
+              font-family="Space Mono, monospace" font-size="10"
+              letter-spacing="3" fill="rgba(80,200,80,0.65)">BLOG</text>
+          </a>
+
+          <!-- Problems -->
+          <line x1="215" y1="236" x2="235" y2="236"
+            stroke="rgba(80,200,80,0.48)" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+          <circle cx="215" cy="236" r="3.5" fill="rgba(80,200,80,0.60)"/>
+          <circle cx="215" cy="236" r="1.5" fill="rgba(8,22,8,0.95)"/>
+          <a href="/problems/">
+            <text x="240" y="240"
+              class="arm-link-text"
+              font-family="Space Mono, monospace" font-size="10"
+              letter-spacing="3" fill="rgba(80,200,80,0.65)">PROBLEMS</text>
+          </a>
+
+          <!-- Projects -->
+          <line x1="215" y1="294" x2="235" y2="294"
+            stroke="rgba(80,200,80,0.48)" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+          <circle cx="215" cy="294" r="3.5" fill="rgba(80,200,80,0.60)"/>
+          <circle cx="215" cy="294" r="1.5" fill="rgba(8,22,8,0.95)"/>
+          <a href="/projects/">
+            <text x="240" y="298"
+              class="arm-link-text"
+              font-family="Space Mono, monospace" font-size="10"
+              letter-spacing="3" fill="rgba(80,200,80,0.65)">PROJECTS</text>
+          </a>
+
+          <!-- Notes -->
+          <line x1="215" y1="352" x2="235" y2="352"
+            stroke="rgba(80,200,80,0.48)" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+          <circle cx="215" cy="352" r="3.5" fill="rgba(80,200,80,0.60)"/>
+          <circle cx="215" cy="352" r="1.5" fill="rgba(8,22,8,0.95)"/>
+          <a href="/notes/">
+            <text x="240" y="356"
+              class="arm-link-text"
+              font-family="Space Mono, monospace" font-size="10"
+              letter-spacing="3" fill="rgba(80,200,80,0.65)">NOTES</text>
+          </a>
+
+          <!-- About -->
+          <line x1="215" y1="410" x2="235" y2="410"
+            stroke="rgba(80,200,80,0.48)" stroke-width="1"
+            vector-effect="non-scaling-stroke"/>
+          <circle cx="215" cy="410" r="3.5" fill="rgba(80,200,80,0.60)"/>
+          <circle cx="215" cy="410" r="1.5" fill="rgba(8,22,8,0.95)"/>
+          <a href="/about/">
+            <text x="240" y="414"
+              class="arm-link-text"
+              font-family="Space Mono, monospace" font-size="10"
+              letter-spacing="3" fill="rgba(80,200,80,0.65)">ABOUT</text>
+          </a>
+        </g>
+      </g>
+
+    </svg>
+  </nav>
+
+</div><!-- /#main-page -->
 
 <script src="/js/site.js"></script>
 <script>
@@ -258,22 +401,20 @@
 
   let W, H, done = false, rafId, startTs = null, shockwave = null;
   const mouse = { x: -9999, y: -9999 };
-  const AUTO_PERIOD = 2200; // ms per pulse cycle
+  const AUTO_PERIOD = 2200; // ms per auto-pulse cycle
 
-  // ── Seeded LCG RNG (seed = pulsar PSR B1919+21) ──────────────
+  // Seeded LCG RNG — seed = pulsar PSR B1919+21
   function makeRng(seed) {
     let s = seed >>> 0;
     return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
   }
 
-  // ── Waveform generation ──────────────────────────────────────
   const NL = 80, PTS = 300;
   let waves;
 
   function gauss(x, mu, sig) { return Math.exp(-0.5 * ((x - mu) / sig) ** 2); }
 
   function lineAmp(i) {
-    // Cluster peaks around 58% from bottom (matches UP cover)
     const t = i / (NL - 1);
     return 0.07 + gauss(t, 0.58, 0.14) * 0.93;
   }
@@ -281,8 +422,8 @@
   function buildWaves() {
     const rng = makeRng(1919);
     waves = Array.from({ length: NL }, (_, i) => {
-      const a = lineAmp(i);
-      // All random params computed once per line — never inside the point loop
+      const a   = lineAmp(i);
+      // All random params computed ONCE per line — never inside the point loop
       const pkC = 0.27 + (rng() - 0.5) * 0.03,  pkS = 0.030 + rng() * 0.016;
       const s1C = 0.50 + (rng() - 0.5) * 0.09,  s1S = 0.018 + rng() * 0.014;
       const s2C = 0.70 + (rng() - 0.5) * 0.12,  s2S = 0.020 + rng() * 0.012;
@@ -300,7 +441,6 @@
     });
   }
 
-  // ── Displacement functions ───────────────────────────────────
   function mouseDisp(x, by) {
     const d = Math.hypot(x - mouse.x, by - mouse.y);
     if (d > 155) return 0;
@@ -314,19 +454,18 @@
     return Math.sin(-diff / 11) * Math.exp(-Math.abs(diff) / 42) * 105;
   }
 
-  // Continuous gentle pulse from label center — makes waveform feel alive
+  // Continuous gentle auto-pulse — makes waveform feel alive before click
   function pulseDisp(x, by, ts) {
     if (!startTs) return 0;
     const phase = ((ts - startTs) % AUTO_PERIOD) / AUTO_PERIOD;
     const R     = phase * Math.hypot(W, H) * 0.82;
-    const amp   = (1 - phase) * 42; // fades as ring expands
+    const amp   = (1 - phase) * 42;
     const d     = Math.hypot(x - W * 0.5, by - H * 0.5);
     const diff  = d - R;
     if (Math.abs(diff) > 68) return 0;
     return Math.sin(-diff / 9) * Math.exp(-Math.abs(diff) / 27) * amp;
   }
 
-  // ── Render loop ──────────────────────────────────────────────
   function frame(ts) {
     if (done) return;
     rafId = requestAnimationFrame(frame);
@@ -338,7 +477,7 @@
     if (shockwave) shockwave.radius = (ts - shockwave.birthTs) / 1000 * 920;
 
     const spacing = H / (NL + 3);
-    const scale   = spacing * 4.4; // taller, more dramatic peaks
+    const scale   = spacing * 4.4;
 
     for (let i = 0; i < NL; i++) {
       const by  = H - spacing - i * spacing;
@@ -355,7 +494,7 @@
         ys[j] = by - dy;
       }
 
-      // Black fill from waveform trace to canvas bottom — masks all lines below
+      // Black fill to canvas bottom — masks all lines below this one
       ctx.beginPath();
       ctx.moveTo(0, H + 2);
       for (let j = 0; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
@@ -364,7 +503,7 @@
       ctx.fillStyle = '#000';
       ctx.fill();
 
-      // White trace
+      // White trace line
       ctx.beginPath();
       ctx.moveTo(xs[0], ys[0]);
       for (let j = 1; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
@@ -373,7 +512,7 @@
       ctx.stroke();
     }
 
-    // Expanding tear — destination-out cuts a growing hole revealing the site
+    // Expanding tear — destination-out cuts a hole revealing the site underneath
     if (shockwave) {
       const { x, y, radius } = shockwave;
       const inner = Math.max(0, radius - 155);
@@ -396,11 +535,10 @@
       el.style.opacity    = '0';
     });
     document.body.style.overflow = '';
-    setTimeout(revealPage, 250);
+    setTimeout(revealPage, 200);
     setTimeout(() => [introEl, labelEl, hintEl].forEach(el => el.remove()), 750);
   }
 
-  // ── Events ───────────────────────────────────────────────────
   window.addEventListener('resize', () => {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
@@ -410,9 +548,13 @@
 
   function trigger(x, y) {
     if (shockwave) return;
-    [labelEl, hintEl].forEach(el => { el.style.transition = 'opacity 0.2s'; el.style.opacity = '0'; });
+    [labelEl, hintEl].forEach(el => {
+      el.style.transition = 'opacity 0.2s';
+      el.style.opacity    = '0';
+    });
     shockwave = { x, y, radius: 0, birthTs: performance.now() };
   }
+
   canvas.addEventListener('click', e => trigger(e.clientX, e.clientY));
   canvas.addEventListener('touchend', e => {
     e.preventDefault();
@@ -420,7 +562,7 @@
     trigger(t.clientX, t.clientY);
   }, { passive: false });
 
-  // ── Boot ─────────────────────────────────────────────────────
+  // Boot
   document.body.style.overflow = 'hidden';
   W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
@@ -429,100 +571,323 @@
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// Page reveal — fires after intro tears open
+// ARM NAV TOGGLE
 // ═══════════════════════════════════════════════════════════════
-function revealPage() {
-  const sels = ['.s-identity', '.s-bio', '.s-signal', '.s-catalog'];
-  sels.forEach((sel, i) => {
-    setTimeout(() => {
-      const el = document.querySelector(sel);
-      if (!el) return;
-      el.classList.add('revealed');
-      const line = el.querySelector('.sec-line');
-      if (line) {
-        // Delay line draw slightly after section appears
-        setTimeout(() => line.classList.add('draw'), 120);
-      }
-    }, i * 190);
-  });
-
-  // Name flickering starts after identity is revealed
-  setTimeout(() => {
-    const name = document.getElementById('brutal-name');
-    if (name) name.style.animation = 'name-flicker 20s 0.5s infinite';
-  }, 1000);
+function toggleArm() {
+  document.getElementById('arm-nav').classList.toggle('open');
 }
 
 // ═══════════════════════════════════════════════════════════════
-// Oscilloscope — She's Lost Control
+// PAGE REVEAL (fires after intro shockwave tears open)
 // ═══════════════════════════════════════════════════════════════
-(function () {
-  const canvas = document.getElementById('osc-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let t = 0, glitch = 0;
+function revealPage() {
+  document.getElementById('main-page').classList.add('visible');
+  document.getElementById('arm-nav').classList.add('ready');
+  startCam();
+  // Arm auto-deploys after a beat — like the machine waking up
+  setTimeout(() => document.getElementById('arm-nav').classList.add('open'), 700);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECURITY CAM CANVAS — brutalist night scene
+// ═══════════════════════════════════════════════════════════════
+let camStarted = false;
+function startCam() {
+  if (camStarted) return;
+  camStarted = true;
+
+  const canvas = document.getElementById('cam-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, buildings = [], t = 0, glitchFrames = 0;
+
+  // Seeded RNG — produces reproducible building layout
+  function seededRng(seed) {
+    let s = seed >>> 0;
+    return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
+  }
+
+  // Window flicker state
+  const winStates = {};
+
+  function genBuildings(w, h) {
+    const rng     = seededRng(42);
+    const groundY = h * 0.60;
+    buildings = [];
+    let x = -40;
+
+    while (x < w + 80) {
+      const isTower = rng() > 0.38;
+      const bw = isTower
+        ? 28 + rng() * 58
+        : 65 + rng() * 140;
+      const bh = isTower
+        ? h * (0.30 + rng() * 0.44)
+        : h * (0.08 + rng() * 0.20);
+      const gap  = rng() * 14 - 2;
+      const cols = Math.max(1, Math.floor(bw / 13));
+      const rows = Math.max(1, Math.floor(bh / 15));
+
+      const windows = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const key = `${Math.floor(x)}_${r}_${c}`;
+          if (!(key in winStates)) {
+            winStates[key] = {
+              lit:     rng() > 0.52,
+              flicker: rng() > 0.85,
+            };
+          }
+          windows.push({ r, c, key });
+        }
+      }
+
+      buildings.push({
+        x, y: groundY - bh,
+        w: bw, h: bh,
+        cols, rows, windows,
+        isTower,
+        groundY,
+      });
+      x += bw + gap;
+    }
+  }
 
   function resize() {
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width  = canvas.offsetWidth  * dpr;
-    canvas.height = canvas.offsetHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    genBuildings(W, H);
   }
 
-  function draw() {
-    const W = canvas.offsetWidth;
-    const H = canvas.offsetHeight;
-    if (!W || !H) { requestAnimationFrame(draw); return; }
-
-    ctx.fillStyle = '#000';
+  function drawFrame() {
+    // ── Sky ──
+    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.62);
+    sky.addColorStop(0,    '#000800');
+    sky.addColorStop(0.45, '#010d01');
+    sky.addColorStop(1,    '#021502');
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, W, H);
 
-    // Random glitch burst
-    if (Math.random() < 0.004) glitch = 5 + Math.random() * 12 | 0;
-    if (glitch > 0) glitch--;
-    const isG = glitch > 0;
+    // ── Ground / road ──
+    const groundY = H * 0.60;
+    const grd = ctx.createLinearGradient(0, groundY, 0, H);
+    grd.addColorStop(0, '#010e01');
+    grd.addColorStop(1, '#000600');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, groundY, W, H - groundY);
 
-    // Faint center axis
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 8]);
-    ctx.moveTo(0, H / 2);
-    ctx.lineTo(W, H / 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    // Wet road sheen
+    ctx.fillStyle = 'rgba(60,130,60,0.05)';
+    ctx.fillRect(0, groundY + 2, W, 14);
 
-    // Signal trace
-    ctx.beginPath();
-    if (isG) {
-      const r = 180 + Math.random() * 75 | 0;
-      const b = 180 + Math.random() * 75 | 0;
-      ctx.strokeStyle = `rgba(${r},${r},${b},0.95)`;
-    } else {
-      ctx.strokeStyle = 'rgba(255,255,255,0.86)';
+    // ── Buildings ──
+    buildings.forEach(b => {
+      // Drop shadow (depth)
+      ctx.fillStyle = '#020702';
+      ctx.fillRect(b.x + 5, b.y + 7, b.w, b.h);
+
+      // Main wall
+      ctx.fillStyle = b.isTower ? '#0a1a0a' : '#0c1c0c';
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+
+      // Brutalist concrete floor bands
+      ctx.fillStyle = 'rgba(20,45,20,0.35)';
+      const bandStep = b.isTower ? 24 : 30;
+      for (let fb = 1; fb <= Math.ceil(b.h / bandStep); fb++) {
+        ctx.fillRect(b.x, b.y + fb * bandStep - 1, b.w, 1.5);
+      }
+
+      // Vertical pillar lines
+      if (b.isTower) {
+        ctx.strokeStyle = 'rgba(20,45,20,0.25)';
+        ctx.lineWidth = 1;
+        for (let pc = 1; pc < b.cols; pc++) {
+          const px = b.x + (b.w / b.cols) * pc;
+          ctx.beginPath();
+          ctx.moveTo(px, b.y);
+          ctx.lineTo(px, b.y + b.h);
+          ctx.stroke();
+        }
+      }
+
+      // Windows
+      const cellW = b.w / b.cols;
+      const cellH = b.h / b.rows;
+      b.windows.forEach(({ r, c, key }) => {
+        const ws = winStates[key];
+        if (!ws) return;
+
+        if (ws.flicker && Math.random() < 0.006) ws.lit = !ws.lit;
+
+        const wx = b.x + c * cellW + cellW * 0.18;
+        const wy = b.y + r * cellH + cellH * 0.20;
+        const ww = cellW * 0.64;
+        const wh = cellH * 0.55;
+
+        if (ws.lit) {
+          ctx.fillStyle = 'rgba(85,185,85,0.26)';
+          ctx.fillRect(wx, wy, ww, wh);
+          // Glow
+          ctx.fillStyle = 'rgba(60,140,60,0.07)';
+          ctx.fillRect(wx - 2, wy - 2, ww + 4, wh + 4);
+        } else {
+          ctx.fillStyle = 'rgba(4,10,4,0.80)';
+          ctx.fillRect(wx, wy, ww, wh);
+        }
+      });
+
+      // Rooftop antennas / water towers
+      if ((b.x | 0) % 3 === 0) {
+        const ax = b.x + b.w * 0.35 + ((b.x * 7) % (b.w * 0.5));
+        const ah = 10 + ((b.x * 13) % 20);
+        ctx.strokeStyle = 'rgba(60,130,60,0.30)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(ax, b.y);
+        ctx.lineTo(ax, b.y - ah);
+        ctx.stroke();
+        // Crossbar
+        ctx.beginPath();
+        ctx.moveTo(ax - 5, b.y - ah * 0.7);
+        ctx.lineTo(ax + 5, b.y - ah * 0.7);
+        ctx.stroke();
+      }
+    });
+
+    // ── Glitch: horizontal slice displacement ──
+    if (glitchFrames > 0) {
+      const sy  = H * 0.15 + Math.random() * H * 0.55;
+      const sh  = 3 + Math.random() * 14 | 0;
+      const sdx = (Math.random() - 0.5) * 28 | 0;
+      try {
+        const id = ctx.getImageData(0, sy | 0, W, sh);
+        ctx.putImageData(id, sdx, sy | 0);
+      } catch (e) {}
+      glitchFrames--;
     }
-    ctx.lineWidth = 1.2;
+    if (Math.random() < 0.005) glitchFrames = 2 + Math.random() * 4 | 0;
 
-    for (let x = 0; x <= W; x++) {
-      const xn = x / W;
-      let y = Math.sin((xn + t) * Math.PI * 5.3)          * 0.30
-            + Math.sin((xn + t * 0.71) * Math.PI * 13.1)  * 0.12
-            + Math.sin((xn * 1.8 - t * 1.28) * Math.PI * 3.4) * 0.14;
-      if (isG) y += (Math.random() - 0.5) * 0.24;
-      y += Math.sin(t * 0.15) * 0.08; // slow uncontrolled drift
-      const py = H / 2 - y * H * 0.54;
-      x === 0 ? ctx.moveTo(0, py) : ctx.lineTo(x, py);
-    }
+    // ── Identity text overlay ──
+    const cx  = W * 0.5;
+    const cy  = H * 0.38;
+    const fsz = Math.max(14, Math.floor(W * 0.036));
+
+    ctx.save();
+    ctx.textAlign = 'center';
+
+    // Chromatic aberration ghost
+    ctx.fillStyle = 'rgba(200,60,60,0.14)';
+    ctx.font = `700 ${fsz}px 'Space Mono', monospace`;
+    ctx.fillText('VASUDEVAN GOVARDHANEN', cx + 3, cy);
+    ctx.fillStyle = 'rgba(60,60,200,0.14)';
+    ctx.fillText('VASUDEVAN GOVARDHANEN', cx - 3, cy);
+    // Main name
+    ctx.fillStyle = 'rgba(120,220,120,0.90)';
+    ctx.font = `700 ${fsz}px 'Space Mono', monospace`;
+    ctx.fillText('VASUDEVAN GOVARDHANEN', cx, cy);
+
+    // Horizontal rule under name
+    const ruleW = Math.min(fsz * 14, W * 0.55);
+    ctx.strokeStyle = 'rgba(80,180,80,0.30)';
+    ctx.lineWidth   = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - ruleW / 2, cy + 12);
+    ctx.lineTo(cx + ruleW / 2, cy + 12);
     ctx.stroke();
 
-    t += 0.0085;
-    requestAnimationFrame(draw);
+    // Descriptors
+    const dfsz = Math.max(9, Math.floor(W * 0.011));
+    const descs = [
+      'HS SENIOR  ·  MANALAPAN, NEW JERSEY',
+      'COMPUTING ARCHITECTURE  /  OS  /  PARALLEL COMPUTING',
+      'GOFAR INITIATIVE  ·  SNE @ MANALAPAN HS',
+    ];
+    ctx.font = `400 ${dfsz}px 'Space Mono', monospace`;
+    descs.forEach((d, i) => {
+      ctx.fillStyle = `rgba(80,185,80,${0.55 - i * 0.10})`;
+      ctx.fillText(d, cx, cy + 28 + i * (dfsz * 2.0));
+    });
+
+    ctx.restore();
+
+    // ── Film grain (fast sparse pixels) ──
+    const grainN = (W * H * 0.006) | 0;
+    for (let n = 0; n < grainN; n++) {
+      const gx = Math.random() * W | 0;
+      const gy = Math.random() * H | 0;
+      const gv = Math.random();
+      ctx.fillStyle = `rgba(60,${100 + (gv * 80) | 0},60,${0.06 + gv * 0.10})`;
+      ctx.fillRect(gx, gy, 1, 1);
+    }
+
+    // ── Scanlines (static) ──
+    for (let y = 0; y < H; y += 3) {
+      ctx.fillStyle = 'rgba(0,0,0,0.10)';
+      ctx.fillRect(0, y, W, 1);
+    }
+
+    // ── Moving scan beam ──
+    const beamY = (t * 55) % H;
+    ctx.fillStyle = 'rgba(80,200,80,0.025)';
+    ctx.fillRect(0, beamY, W, 4);
+
+    // ── Vignette ──
+    const vig = ctx.createRadialGradient(cx, H * 0.5, H * 0.18, cx, H * 0.5, H * 0.82);
+    vig.addColorStop(0, 'rgba(0,0,0,0)');
+    vig.addColorStop(1, 'rgba(0,6,0,0.90)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── HUD overlay ──
+    ctx.save();
+    ctx.font = `400 11px 'Space Mono', monospace`;
+
+    // Top-left: cam ID + sector
+    ctx.fillStyle = 'rgba(80,200,80,0.62)';
+    ctx.textAlign = 'left';
+    ctx.fillText('CAM-01  ·  SECTOR 7  ·  NV-MODE', 22, 26);
+
+    // Top-right: live timestamp
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const ts  = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}  ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    ctx.textAlign = 'right';
+    ctx.fillText(ts, W - 22, 26);
+
+    // Bottom-left: REC blink (every ~0.8s)
+    if (Math.floor(t * 1.25) % 2 === 0) {
+      ctx.fillStyle = 'rgba(220,70,70,0.82)';
+      ctx.textAlign = 'left';
+      ctx.fillText('● REC', 22, H - 20);
+    }
+
+    // Bottom-right: site credit
+    ctx.fillStyle = 'rgba(80,200,80,0.38)';
+    ctx.textAlign = 'right';
+    ctx.fillText('GOVARDHA.NET  //  2026', W - 22, H - 20);
+
+    // Corner brackets (HUD frame)
+    const bl = 20;
+    ctx.strokeStyle = 'rgba(80,200,80,0.32)';
+    ctx.lineWidth   = 1.5;
+    // TL
+    ctx.beginPath(); ctx.moveTo(12, 12 + bl); ctx.lineTo(12, 12); ctx.lineTo(12 + bl, 12); ctx.stroke();
+    // TR
+    ctx.beginPath(); ctx.moveTo(W - 12 - bl, 12); ctx.lineTo(W - 12, 12); ctx.lineTo(W - 12, 12 + bl); ctx.stroke();
+    // BL
+    ctx.beginPath(); ctx.moveTo(12, H - 12 - bl); ctx.lineTo(12, H - 12); ctx.lineTo(12 + bl, H - 12); ctx.stroke();
+    // BR
+    ctx.beginPath(); ctx.moveTo(W - 12 - bl, H - 12); ctx.lineTo(W - 12, H - 12); ctx.lineTo(W - 12, H - 12 - bl); ctx.stroke();
+
+    ctx.restore();
+
+    t += 0.016;
+    requestAnimationFrame(drawFrame);
   }
 
+  window.addEventListener('resize', resize);
   resize();
-  window.addEventListener('resize', () => { resize(); });
-  draw();
-})();
+  requestAnimationFrame(drawFrame);
+}
 </script>
 </body>
 </html>
