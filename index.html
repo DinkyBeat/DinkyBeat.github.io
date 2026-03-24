@@ -22,6 +22,24 @@
   width: 100%;
   height: 100%;
 }
+#intro-label {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(11px, 1.8vw, 16px);
+  color: rgba(255,255,255,0.82);
+  letter-spacing: 0.30em;
+  pointer-events: none;
+  z-index: 10001;
+  animation: label-breathe 4s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+@keyframes label-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.90; }
+}
 #intro-hint {
   position: fixed;
   bottom: 28px;
@@ -29,7 +47,7 @@
   transform: translateX(-50%);
   font-family: 'Space Mono', monospace;
   font-size: 10px;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.28);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   pointer-events: none;
@@ -38,8 +56,8 @@
   transition: opacity 0.4s ease;
 }
 @keyframes hint-pulse {
-  0%, 100% { opacity: 0.35; }
-  50%       { opacity: 0.75; }
+  0%, 100% { opacity: 0.28; }
+  50%       { opacity: 0.60; }
 }
 </style>
 </head>
@@ -49,6 +67,7 @@
 <div id="intro">
   <canvas id="up-canvas"></canvas>
 </div>
+<div id="intro-label">[ NEW DAWN FADES ]</div>
 <div id="intro-hint">click to enter</div>
 
 <!-- ── MAIN PAGE ──────────────────────────────────────────── -->
@@ -101,9 +120,10 @@
 <script>
 // ── Unknown Pleasures intro ──────────────────────────────────────────────────
 (function () {
-  const introEl = document.getElementById('intro');
-  const hintEl  = document.getElementById('intro-hint');
-  const canvas  = document.getElementById('up-canvas');
+  const introEl  = document.getElementById('intro');
+  const labelEl  = document.getElementById('intro-label');
+  const hintEl   = document.getElementById('intro-hint');
+  const canvas   = document.getElementById('up-canvas');
   const ctx     = canvas.getContext('2d');
 
   let W, H;
@@ -135,13 +155,22 @@
     const rng = makeRng(1919);
     waves = Array.from({ length: NUM_LINES }, (_, i) => {
       const amp = lineAmp(i);
+      // Per-line shape params computed ONCE — not inside the point loop
+      const pkCtr   = 0.27 + (rng() - 0.5) * 0.03;
+      const pkSig   = 0.030 + rng() * 0.016;
+      const s1Ctr   = 0.50 + (rng() - 0.5) * 0.09;
+      const s1Sig   = 0.018 + rng() * 0.014;
+      const s2Ctr   = 0.70 + (rng() - 0.5) * 0.12;
+      const s2Sig   = 0.020 + rng() * 0.012;
+      const s2Sign  = rng() > 0.5 ? 1 : -1;
+
       const row = new Float32Array(PTS);
       for (let j = 0; j < PTS; j++) {
         const t = j / (PTS - 1);
-        let y = (rng() - 0.5) * 0.05;                                          // flat noise
-        y += amp       * gauss(t, 0.28,  0.036 + rng() * 0.012);               // main peak
-        y += amp * 0.3 * gauss(t, 0.50 + (rng() - 0.5) * 0.12, 0.02 + rng() * 0.018); // secondary
-        y += amp * 0.12 * (rng() - 0.5) * gauss(t, 0.72 + (rng() - 0.5) * 0.18, 0.025); // far noise
+        let y = (rng() - 0.5) * 0.04;                          // per-point noise
+        y += amp        * gauss(t, pkCtr, pkSig);               // main peak
+        y += amp * 0.30 * gauss(t, s1Ctr, s1Sig);              // secondary
+        y += amp * 0.11 * s2Sign * gauss(t, s2Ctr, s2Sig);     // tertiary
         row[j] = Math.max(0, y);
       }
       return row;
@@ -193,11 +222,12 @@
         ys[j] = baseY - dy;
       }
 
-      // Black fill below line (masks lines underneath)
+      // Black fill from line trace all the way to canvas bottom —
+      // masks everything beneath this line so lower strokes stay hidden
       ctx.beginPath();
-      ctx.moveTo(0, baseY + 2);
+      ctx.moveTo(0, H + 2);
       for (let j = 0; j < PTS; j++) ctx.lineTo(xs[j], ys[j]);
-      ctx.lineTo(W, baseY + 2);
+      ctx.lineTo(W, H + 2);
       ctx.closePath();
       ctx.fillStyle = '#000';
       ctx.fill();
@@ -233,12 +263,14 @@
   function finish() {
     done = true;
     cancelAnimationFrame(rafId);
-    introEl.style.transition = 'opacity 0.5s ease';
-    hintEl.style.transition  = 'opacity 0.3s ease';
-    introEl.style.opacity = '0';
-    hintEl.style.opacity  = '0';
+    introEl.style.transition  = 'opacity 0.5s ease';
+    labelEl.style.transition  = 'opacity 0.5s ease';
+    hintEl.style.transition   = 'opacity 0.3s ease';
+    introEl.style.opacity  = '0';
+    labelEl.style.opacity  = '0';
+    hintEl.style.opacity   = '0';
     document.body.style.overflow = '';
-    setTimeout(() => { introEl.remove(); hintEl.remove(); }, 600);
+    setTimeout(() => { introEl.remove(); labelEl.remove(); hintEl.remove(); }, 600);
   }
 
   // ── Events ─────────────────────────────────────────────────────────────────
@@ -252,7 +284,8 @@
 
   function trigger(x, y) {
     if (shockwave) return;
-    hintEl.style.opacity = '0';
+    labelEl.style.opacity = '0';
+    hintEl.style.opacity  = '0';
     shockwave = { x, y, radius: 0, birthTs: performance.now() };
   }
 
