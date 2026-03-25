@@ -79,37 +79,6 @@ body {
   text-align: center;
 }
 
-.masthead-tagline {
-  text-align: center;
-  font-family: 'EB Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 14px;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  padding-bottom: 20px;
-}
-
-/* ─── NAV BAR ───────────────────────────────────────────── */
-.mag-nav {
-  background: var(--paper);
-  border-bottom: 1px solid var(--ink);
-  padding: 9px 0;
-  text-align: center;
-}
-
-.mag-nav a {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-  margin: 0 18px;
-}
-
-.mag-nav a:hover { text-decoration: underline; }
-.mag-nav a.active { border-bottom: 1px solid var(--ink); }
-
 /* ─── PAGE WRAP ─────────────────────────────────────────── */
 .mag-wrap {
   max-width: 1060px;
@@ -120,7 +89,6 @@ body {
 /* ─── FEATURED ──────────────────────────────────────────── */
 .featured {
   padding: 56px 0 48px;
-  border-bottom: 1px solid var(--pale);
   max-width: 720px;
   margin: 0 auto;
   text-align: center;
@@ -162,85 +130,7 @@ body {
   margin-bottom: 22px;
 }
 
-.featured-excerpt {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: 1.18rem;
-  line-height: 1.8;
-  color: #3a3830;
-  margin-bottom: 28px;
-}
-
-.read-link {
-  display: inline-block;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 1.5px solid var(--ink);
-  padding-bottom: 3px;
-  transition: opacity 0.2s;
-}
-
-.read-link:hover { opacity: 0.55; }
-
-/* ─── ISSUE ORNAMENT ────────────────────────────────────── */
-.ornament {
-  text-align: center;
-  padding: 32px 0 0;
-  font-size: 22px;
-  color: var(--pale);
-  letter-spacing: 0.4em;
-}
-
-/* ─── COLUMNS (future articles) ─────────────────────────── */
-.columns {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  padding: 40px 0 56px;
-}
-
-.col-item {
-  padding: 0 28px;
-  border-right: 1px solid var(--pale);
-}
-
-.col-item:first-child { padding-left: 0; }
-.col-item:last-child  { border-right: none; padding-right: 0; }
-
-.col-section {
-  font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-
-.col-title {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--muted);
-  font-style: italic;
-}
-
-.col-note {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 0.88rem;
-  color: var(--pale);
-  margin-top: 6px;
-  line-height: 1.5;
-}
-
 @media (max-width: 680px) {
-  .columns { grid-template-columns: 1fr; gap: 28px; }
-  .col-item { border-right: none; border-bottom: 1px solid var(--pale); padding: 0 0 24px; }
-  .col-item:last-child { border-bottom: none; }
   .masthead-meta { flex-direction: column; gap: 4px; text-align: center; }
 }
 
@@ -372,17 +262,7 @@ body {
     </svg>
   </div>
 
-  <p class="masthead-tagline">Short Fiction &amp; Non-Fiction</p>
 </header>
-
-<!-- ═══════════════ NAV ═══════════════ -->
-<nav class="mag-nav">
-  <a href="/">Home</a>
-  <a href="/ZZZ/" class="active">Issues</a>
-  <a href="/projects/">Projects</a>
-  <a href="/problems/">Problems</a>
-  <a href="/about/">About</a>
-</nav>
 
 <!-- ═══════════════ CONTENT ═══════════════ -->
 <div class="mag-wrap">
@@ -394,32 +274,7 @@ body {
       <a href="posts/what-is-3z.html">What Is 3Z?</a>
     </h2>
     <p class="featured-byline">By Vasudevan Govardhanen &nbsp;&middot;&nbsp; March 2026</p>
-    <p class="featured-excerpt">
-      On the name, the zebra, and what exactly this publication is for.
-    </p>
-    <a class="read-link" href="posts/what-is-3z.html">Read the piece &rarr;</a>
   </section>
-
-  <!-- Forthcoming columns -->
-  <div class="ornament">&#10022; &nbsp; &#10022; &nbsp; &#10022;</div>
-
-  <div class="columns">
-    <div class="col-item">
-      <p class="col-section">Fiction</p>
-      <p class="col-title">Coming Soon</p>
-      <p class="col-note">Stories forthcoming.</p>
-    </div>
-    <div class="col-item">
-      <p class="col-section">Essay</p>
-      <p class="col-title">Coming Soon</p>
-      <p class="col-note">Essays forthcoming.</p>
-    </div>
-    <div class="col-item">
-      <p class="col-section">Criticism</p>
-      <p class="col-title">Coming Soon</p>
-      <p class="col-note">Reviews forthcoming.</p>
-    </div>
-  </div>
 
 </div>
 
