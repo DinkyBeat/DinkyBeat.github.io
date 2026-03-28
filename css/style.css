@@ -25,8 +25,8 @@ body {
 
 img { display: block; max-width: 100%; }
 
-a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); }
-a:hover { text-decoration-color: var(--muted); }
+a { color: #9483BF; text-decoration: underline; text-decoration-color: #C4B8E0; }
+a:hover { color: #7460A8; text-decoration-color: #9483BF; }
 
 h1, h2, h3, h4 { font-family: var(--ff-head); font-weight: 400; }
 
@@ -38,6 +38,10 @@ h1, h2, h3, h4 { font-family: var(--ff-head); font-weight: 400; }
   max-width: var(--max-w); margin: 0 auto;
   padding: 0 var(--pad-x); height: 56px;
   display: flex; align-items: center; justify-content: space-between;
+}
+/* Full-width nav variant — logo sits at true viewport corner */
+.nav-inner--full {
+  max-width: none;
 }
 .nav-logo {
   font-family: var(--ff);
