@@ -123,6 +123,17 @@ a:hover { color: var(--link-h); text-decoration-color: var(--link); }
   background-position: top center;
 }
 
+/* Copyright */
+.copyright {
+  position: fixed;
+  bottom: 18px;
+  left: clamp(40px, 6vw, 88px);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
 /* Responsive */
 @media (max-width: 720px) {
   .hero { flex-direction: column; height: auto; }
@@ -148,8 +159,8 @@ a:hover { color: var(--link-h); text-decoration-color: var(--link); }
         <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
       </div>
       <div class="hero-box">
-        <span class="box-label">Blog</span>
-        <a href="/blog/">Writing</a>
+        <span class="box-label">LinkedIn</span>
+        <a href="https://www.linkedin.com/in/vasudevan-govardhanen-551018385/" target="_blank" rel="noopener">vasudevan-govardhanen</a>
       </div>
       <div class="hero-box">
         <span class="box-label">Problems</span>
@@ -163,6 +174,8 @@ a:hover { color: var(--link-h); text-decoration-color: var(--link); }
   </div>
 
 </main>
+
+<p class="copyright">© 2026 Vasudevan Govardhanen. All Rights Reserved.</p>
 
 <script src="/js/site.js"></script>
 </body>
