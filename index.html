@@ -6,60 +6,125 @@
 <title>Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Headland+One&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Headland+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 <style>
-.splash {
-  width: 100%;
-  border-bottom: 1px solid var(--border);
+/* ── Split-screen hero ── */
+.hero {
+  display: flex;
+  height: calc(100vh - 57px);
   overflow: hidden;
-  max-height: 500px;
 }
-.splash img {
-  width: 100%;
-  height: 500px;
+
+/* Left: typography column */
+.hero-left {
+  flex: 1 1 55%;
+  padding: clamp(40px, 6vw, 88px) clamp(28px, 6vw, 88px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+}
+
+.hero-name {
+  font-family: 'Headland One', Georgia, serif;
+  font-size: clamp(38px, 5.2vw, 68px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+
+.hero-sub {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.hero-sub a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+}
+.hero-sub a:hover { color: var(--text); text-decoration-color: var(--muted); }
+
+.hero-focus {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 40px;
+}
+.hero-focus a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+}
+.hero-focus a:hover { color: var(--text); text-decoration-color: var(--muted); }
+
+/* Three outlined boxes */
+.hero-boxes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-box {
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.box-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+.hero-box a {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11.5px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.hero-box a:hover { color: var(--text); }
+
+/* Right: photo + band */
+.hero-right {
+  flex: 0 0 43%;
+  position: relative;
+  background: #D9D3C6;
+  overflow: hidden;
+}
+
+.hero-right img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 87%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
   display: block;
 }
 
-.home-content {
-  padding: 56px 0 96px;
-}
-.home-name {
-  font-family: 'Headland One', Georgia, serif;
-  font-size: clamp(28px, 4.5vw, 44px);
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  margin-bottom: 16px;
-  color: var(--text);
-}
-.home-affil {
-  font-family: 'Headland One', Georgia, serif;
-  font-size: 16px;
-  color: var(--muted);
-  margin-bottom: 24px;
-}
-.home-affil a {
-  color: var(--muted);
-}
-.home-affil a:hover {
-  color: var(--text);
-}
-.home-focus {
-  font-size: 15px;
-  color: var(--muted);
-}
-.home-focus a {
-  color: var(--muted);
-}
-.home-focus a:hover {
-  color: var(--text);
-}
-
-@media (max-width: 540px) {
-  .splash img { height: 260px; }
+/* Responsive: stack on small screens */
+@media (max-width: 700px) {
+  .hero {
+    flex-direction: column;
+    height: auto;
+  }
+  .hero-right {
+    flex: none;
+    height: 52vw;
+    width: 100%;
+  }
+  .hero-right img {
+    width: 100%;
+  }
 }
 </style>
 </head>
@@ -75,22 +140,33 @@
   </div>
 </nav>
 
-<div class="splash">
-  <img src="https://f4.bcbits.com/img/a3508978113_16.jpg" alt="">
-</div>
+<main class="hero">
 
-<div class="page-wrap home-content">
-  <h1 class="home-name">Vasudevan (Vasu) Govardhanen</h1>
-  <p class="home-affil">Incoming freshman, <a href="https://cs.illinois.edu/" target="_blank" rel="noopener">CS @ UIUC</a></p>
-  <p class="home-focus">Areas of focus: ML systems&thinsp;+&thinsp;theory, differential geometry, and <a href="https://projecteuler.net/" target="_blank" rel="noopener">puzzles</a></p>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span>© 2026</span>
-    <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
+  <div class="hero-left">
+    <h1 class="hero-name">Vasudevan<br>(Vasu)<br>Govardhanen</h1>
+    <p class="hero-sub">Incoming freshman, <a href="https://cs.illinois.edu/" target="_blank" rel="noopener">CS&nbsp;@ UIUC</a></p>
+    <p class="hero-focus">Areas of focus: ML systems&thinsp;+&thinsp;theory,<br>differential geometry, and <a href="https://projecteuler.net/" target="_blank" rel="noopener">puzzles</a></p>
+    <div class="hero-boxes">
+      <div class="hero-box">
+        <span class="box-label">Contact</span>
+        <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
+      </div>
+      <div class="hero-box">
+        <span class="box-label">Blog</span>
+        <a href="/blog/">Writing</a>
+      </div>
+      <div class="hero-box">
+        <span class="box-label">Problems</span>
+        <a href="/problems/">Open problems</a>
+      </div>
+    </div>
   </div>
-</footer>
+
+  <div class="hero-right">
+    <img src="https://f4.bcbits.com/img/a3508978113_16.jpg" alt="">
+  </div>
+
+</main>
 
 <script src="/js/site.js"></script>
 </body>
