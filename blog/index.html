@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vasublog</title>
+<title>Blog — Vasudevan Govardhanen</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Headland+One&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
@@ -17,20 +17,19 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--border);
   text-decoration: none;
+  color: var(--text);
 }
 .post-row:first-child { border-top: 1px solid var(--border); }
 
-.post-name { font-size: 15px; color: var(--accent); font-weight: 400; }
-.post-row:hover .post-name { text-decoration: underline; }
+.post-name { font-size: 15px; color: var(--text); font-weight: 400; }
+.post-row:hover .post-name { text-decoration: underline; text-decoration-color: var(--muted); }
 .post-date { font-size: 13px; color: var(--muted); flex-shrink: 0; margin-left: 20px; }
 </style>
 </head>
 <body>
-
-<div id="scrollBar"></div>
 
 <nav class="site-nav">
   <div class="nav-inner">
@@ -38,9 +37,6 @@
     <ul class="nav-links">
       <li><a href="/blog/">Blog</a></li>
       <li><a href="/problems/">Problems</a></li>
-      <li><a href="/projects/">Projects</a></li>
-      <li><a href="/notes/">Notes</a></li>
-      <li><a href="/about/">About</a></li>
     </ul>
   </div>
 </nav>
@@ -53,8 +49,9 @@
   <div class="post-list">
 
     <!-- To add a post:
-         1. Create blog/posts/your-post.html as a full HTML page
-         2. Add a line here: <a class="post-row" href="posts/your-post.html">
+         1. Create blog/posts/your-post.html
+         2. Add a line here:
+            <a class="post-row" href="posts/your-post.html">
               <span class="post-name">Title</span>
               <span class="post-date">Month Year</span>
             </a>
@@ -71,7 +68,7 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <span>© 2026</span>
-    <a href="/contact/">Contact</a>
+    <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
   </div>
 </footer>
 
