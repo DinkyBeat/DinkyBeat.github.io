@@ -1,10 +1,10 @@
 /* GOVARDHA.NET — GLOBAL STYLES */
 
 :root {
-  --bg:      #F6F3ED;
-  --text:    #1A1815;
-  --muted:   #7A7468;
-  --border:  #D8D3C8;
+  --bg:      #FAFAF8;
+  --text:    #18160F;
+  --muted:   #6B6560;
+  --border:  #E0DDD6;
   --ff:      'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --ff-head: 'Headland One', Georgia, serif;
   --max-w:   860px;
