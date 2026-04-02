@@ -16,6 +16,7 @@ body {
   max-width: 740px;
   margin: 52px auto;
   padding: 0 28px 80px;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -57,8 +58,21 @@ hr {
   color: #888;
 }
 
-@media (max-width: 520px) {
-  .headshot { float: none; width: 140px; margin: 0 0 20px 0; }
+/* iPad portrait and below */
+@media (max-width: 768px) {
+  body { margin: 36px auto; padding: 0 24px 64px; }
+}
+
+/* iPhone — stack image above text */
+@media (max-width: 540px) {
+  body { margin: 28px auto; padding: 0 20px 56px; font-size: 15px; }
+  h1 { font-size: 20px; margin-bottom: 20px; }
+  .headshot {
+    float: none;
+    display: block;
+    width: 130px;
+    margin: 0 0 24px 0;
+  }
 }
 </style>
 </head>
