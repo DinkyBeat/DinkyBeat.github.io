@@ -4,74 +4,65 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog — Vasudevan Govardhanen</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Headland+One&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/style.css">
-
 <style>
-.post-list { padding-bottom: 96px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* To add a post: add an <a class="post-row"> block below */
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #111;
+  background: #fff;
+  max-width: 740px;
+  margin: 52px auto;
+  padding: 0 28px 80px;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 28px;
+}
+
+a { color: #1a52a0; }
+a:visited { color: #551a8b; }
+a:hover { text-decoration: none; }
+
+.back { font-size: 14px; margin-bottom: 32px; display: block; }
+
 .post-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
   text-decoration: none;
-  color: var(--text);
+  color: #111;
 }
-.post-row:first-child { border-top: 1px solid var(--border); }
-
-.post-name { font-size: 15px; color: var(--text); font-weight: 400; }
-.post-row:hover .post-name { text-decoration: underline; text-decoration-color: var(--muted); }
-.post-date { font-size: 13px; color: var(--muted); flex-shrink: 0; margin-left: 20px; }
+.post-row:first-of-type { border-top: 1px solid #e0e0e0; }
+.post-name { color: #1a52a0; }
+.post-row:hover .post-name { text-decoration: underline; }
+.post-date { font-size: 14px; color: #888; flex-shrink: 0; margin-left: 20px; }
 </style>
 </head>
 <body>
 
-<nav class="site-nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">Vasudevan Govardhanen</a>
-    <ul class="nav-links">
-      <li><a href="/blog/">Blog</a></li>
-      <li><a href="/problems/">Problems</a></li>
-    </ul>
-  </div>
-</nav>
+<a class="back" href="/">← Vasudevan Govardhanen's Homepage</a>
 
-<div class="page-wrap">
-  <div class="page-title">
-    <h1>Blog</h1>
-  </div>
+<h1>Blog</h1>
 
-  <div class="post-list">
+<!-- To add a post:
+     1. Create blog/posts/your-post.html
+     2. Add: <a class="post-row" href="posts/your-post.html">
+               <span class="post-name">Title</span>
+               <span class="post-date">Month Year</span>
+             </a>
+-->
 
-    <!-- To add a post:
-         1. Create blog/posts/your-post.html
-         2. Add a line here:
-            <a class="post-row" href="posts/your-post.html">
-              <span class="post-name">Title</span>
-              <span class="post-date">Month Year</span>
-            </a>
-    -->
+<a class="post-row" href="posts/homological-algebra.html">
+  <span class="post-name">Homological Algebra</span>
+  <span class="post-date">June 2024</span>
+</a>
 
-    <a class="post-row" href="posts/homological-algebra.html">
-      <span class="post-name">Homological Algebra</span>
-      <span class="post-date">June 2024</span>
-    </a>
-
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-inner">
-    <span>© 2026</span>
-    <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
-  </div>
-</footer>
-
-<script src="/js/site.js"></script>
 </body>
 </html>

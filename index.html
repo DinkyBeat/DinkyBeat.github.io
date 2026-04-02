@@ -3,180 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vasu Govardhanen</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Headland+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Vasudevan Govardhanen</title>
 <style>
-:root {
-  --bg:     #FAFAF8;
-  --text:   #18160F;
-  --muted:  #6B6560;
-  --border: #E0DDD6;
-  --shell:  #E8E5DE;
-  --link:   #9483BF;
-  --link-h: #7460A8;
-}
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #111;
+  background: #fff;
+  max-width: 740px;
+  margin: 52px auto;
+  padding: 0 28px 80px;
 }
 
-a { color: var(--link); text-decoration: underline; text-decoration-color: #C4B8E0; }
-a:hover { color: var(--link-h); text-decoration-color: var(--link); }
-
-/* ── Full-screen split ── */
-.hero {
-  display: flex;
-  height: 100vh;
+h1 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 28px;
 }
 
-/* ── Left column ── */
-.hero-left {
-  flex: 1 1 64%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(48px, 7vw, 100px) clamp(32px, 5vw, 72px) clamp(48px, 7vw, 100px) clamp(40px, 6vw, 88px);
+h2 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 32px 0 8px;
 }
 
-.hero-name {
-  font-family: 'Headland One', Georgia, serif;
-  font-size: clamp(40px, 5.4vw, 70px);
-  font-weight: 400;
-  line-height: 1.06;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  margin-bottom: 24px;
+p { margin-bottom: 10px; }
+
+a { color: #1a52a0; }
+a:visited { color: #551a8b; }
+a:hover { text-decoration: none; }
+
+.headshot {
+  float: right;
+  margin: 0 0 20px 32px;
+  width: 190px;
+  display: block;
 }
 
-.hero-sub {
-  font-size: 15px;
-  color: var(--muted);
-  margin-bottom: 8px;
+.info-line { margin-bottom: 4px; }
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 28px 0;
 }
 
-.hero-focus {
-  font-size: 15px;
-  color: var(--muted);
-  margin-bottom: 44px;
-}
-
-/* Outlined info boxes */
-.hero-boxes {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.hero-box {
-  border: 1px solid var(--border);
-  padding: 13px 17px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.box-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text);
-}
-
-.hero-box a {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 11.5px;
-  color: var(--link);
-  text-decoration: none;
-}
-.hero-box a:hover { color: var(--link-h); }
-
-/* ── Right column ── */
-.hero-right {
-  flex: 0 0 36%;
-  background: var(--shell);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 44px;
-}
-
-/* Tiled image panel — floats, does not span full height */
-.image-panel {
-  width: 100%;
-  height: 68vh;
-  overflow: hidden;
-  background-image:
-    url('https://f4.bcbits.com/img/a1194942138_10.jpg');
-  background-size: 100% auto;
-  background-repeat: repeat-y;
-  background-position: top center;
-}
-
-/* Copyright */
 .copyright {
-  position: fixed;
-  bottom: 18px;
-  left: clamp(40px, 6vw, 88px);
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.02em;
-  pointer-events: none;
+  margin-top: 48px;
+  font-size: 13px;
+  color: #888;
 }
 
-/* Responsive */
-@media (max-width: 720px) {
-  .hero { flex-direction: column; height: auto; }
-  .hero-right {
-    padding: 32px 24px;
-    height: auto;
-  }
-  .image-panel { height: 56vw; }
+@media (max-width: 520px) {
+  .headshot { float: none; width: 140px; margin: 0 0 20px 0; }
 }
 </style>
 </head>
 <body>
 
-<main class="hero">
+<h1>Vasudevan Govardhanen's Homepage</h1>
 
-  <div class="hero-left">
-    <h1 class="hero-name">Vasu Govardhanen</h1>
-    <p class="hero-sub">Incoming freshman, <a href="https://cs.illinois.edu/" target="_blank" rel="noopener">CS @ UIUC</a></p>
-    <p class="hero-focus">Areas of focus: ML systems + theory, differential geometry, and <a href="https://projecteuler.net/" target="_blank" rel="noopener">puzzles</a></p>
-    <div class="hero-boxes">
-      <div class="hero-box">
-        <span class="box-label">Contact</span>
-        <a href="mailto:vgovardhanen@gmail.com">vgovardhanen@gmail.com</a>
-      </div>
-      <div class="hero-box">
-        <span class="box-label">LinkedIn</span>
-        <a href="https://www.linkedin.com/in/vasudevan-govardhanen-551018385/" target="_blank" rel="noopener">vasudevan-govardhanen</a>
-      </div>
-      <div class="hero-box">
-        <span class="box-label">Problems</span>
-        <a href="/problems/">Open problems</a>
-      </div>
-    </div>
-  </div>
+<img class="headshot" src="/cvimage.png" alt="Vasudevan Govardhanen">
 
-  <div class="hero-right">
-    <div class="image-panel"></div>
-  </div>
+<p class="info-line"><b>School:</b> <a href="https://cs.illinois.edu/" target="_blank" rel="noopener">Incoming CS @ UIUC</a></p>
+<p class="info-line"><b>GitHub:</b> <a href="https://github.com/vasugov" target="_blank" rel="noopener">vasugov</a></p>
+<p class="info-line"><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/vasudevan-govardhanen-551018385/" target="_blank" rel="noopener">vasudevan-govardhanen</a></p>
+<p class="info-line"><b>Contact:</b> <a href="mailto:vgovardhanen@gmail.com">vgovardhanen at gmail dot com</a></p>
 
-</main>
+<hr>
+
+<h2>Areas of Interest</h2>
+
+<p>
+  Computing systems — GPU programming and CUDA, operating systems design,
+  systems performance and low-level architecture.
+</p>
+<p>
+  Differential geometry.
+</p>
+
+<hr>
+
+<h2>Writing</h2>
+
+<p><a href="/blog/">Blog</a></p>
 
 <p class="copyright">© 2026 Vasudevan Govardhanen. All Rights Reserved.</p>
 
-<script src="/js/site.js"></script>
 </body>
 </html>
