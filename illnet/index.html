@@ -2,21 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Board</title>
-  <!-- Supabase JS library, loaded from CDN -->
-  <!-- CDN = Content Delivery Network, a way to load libraries 
-       without installing anything -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illnet</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0e0e0e;
+      color: #d4d4d4;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    h1 {
+      font-size: 13px;
+      font-weight: normal;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #cc2200;
+      border-bottom: 1px solid #cc2200;
+      padding-bottom: 10px;
+      margin-bottom: 32px;
+    }
+
+    form {
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    input, textarea {
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      color: #d4d4d4;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 8px 10px;
+      outline: none;
+      width: 100%;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #cc2200;
+    }
+
+    textarea { min-height: 80px; }
+
+    button {
+      background: none;
+      border: 1px solid #cc2200;
+      color: #cc2200;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+
+    button:hover { background: #cc2200; color: #0e0e0e; }
+
+    #thread-list { display: flex; flex-direction: column; gap: 0; }
+
+    #thread-list > div {
+      border-left: 2px solid #2a2a2a;
+      padding: 12px 14px;
+      transition: border-color 0.1s;
+    }
+
+    #thread-list > div:hover { border-left-color: #cc2200; }
+
+    #thread-list h3 { font-size: 13px; font-weight: normal; margin-bottom: 4px; }
+
+    #thread-list h3 a { color: #e8e8e8; text-decoration: none; }
+    #thread-list h3 a:hover { color: #cc2200; }
+
+    #thread-list p { color: #888; font-size: 12px; margin-bottom: 4px; white-space: pre-wrap; }
+
+    #thread-list small { color: #444; font-size: 11px; }
+
+    hr { border: none; border-top: 1px solid #1c1c1c; margin: 0; }
+  </style>
 </head>
 <body>
 
-  <h1>Board</h1>
+  <h1>illnet / board</h1>
 
   <!-- Form to create a new thread -->
   <form id="new-thread-form">
-    <input id="thread-title" type="text" placeholder="Title" required>
-    <textarea id="thread-body" placeholder="Post body" required></textarea>
-    <button type="submit">Post Thread</button>
+    <input id="thread-title" type="text" placeholder="title" required>
+    <textarea id="thread-body" placeholder="post body" required></textarea>
+    <button type="submit">post</button>
   </form>
 
   <!-- This div will be filled with threads by JS -->
@@ -53,7 +136,7 @@
       data.forEach(thread => {
         const div = document.createElement('div');
         div.innerHTML = `
-          <h3><a href="/board/thread.html?id=${thread.id}">${thread.title}</a></h3>
+          <h3><a href="/illnet/thread.html?id=${thread.id}">${thread.title}</a></h3>
           <p>${thread.body}</p>
           <small>${new Date(thread.created_at).toLocaleString()}</small>
           <hr>
