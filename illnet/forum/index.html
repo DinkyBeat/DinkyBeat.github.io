@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>illnet / boards</title>
+  <title>illnet</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
   <script>
@@ -16,7 +16,7 @@
 <body>
 
   <header class="site-header">
-    <span class="site-title">illnet / boards</span>
+    <span class="site-title">illnet</span>
     <div class="header-actions">
       <a class="btn-ghost" id="username-link" href="/illnet/forum/user.html" style="text-decoration:none"></a>
       <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
@@ -24,44 +24,51 @@
     </div>
   </header>
 
-  <div class="board-list">
+  <div class="board-list" id="board-list">
     <a class="board-row" href="/illnet/forum/board.html?b=b">
       <span class="board-code">/b/</span>
       <span class="board-name">random</span>
-      <span class="board-desc">— anything goes</span>
-      <span class="board-arrow">→</span>
+      <span class="board-count" id="count-b">—</span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=econ">
       <span class="board-code">/econ/</span>
       <span class="board-name">economics</span>
-      <span class="board-desc">— markets, macro, theory</span>
-      <span class="board-arrow">→</span>
+      <span class="board-count" id="count-econ">—</span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=math">
       <span class="board-code">/math/</span>
       <span class="board-name">math</span>
-      <span class="board-desc">— problem solving, proofs, discussion</span>
-      <span class="board-arrow">→</span>
+      <span class="board-count" id="count-math">—</span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=cs">
       <span class="board-code">/cs/</span>
-      <span class="board-name">cs & programming</span>
-      <span class="board-desc">— systems, algorithms, software</span>
-      <span class="board-arrow">→</span>
+      <span class="board-name">cs</span>
+      <span class="board-count" id="count-cs">—</span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=meta">
       <span class="board-code">/meta/</span>
       <span class="board-name">meta</span>
-      <span class="board-desc">— about illnet</span>
-      <span class="board-arrow">→</span>
+      <span class="board-count" id="count-meta">—</span>
     </a>
   </div>
 
   <script src="../auth.js"></script>
   <script>
     requireAuth(function(user) {
-      document.getElementById('username-link').textContent = user.email.replace('@illnet.com', '');
+      document.getElementById('username-link').textContent = getUsername(user);
+      loadCounts();
     });
+
+    async function loadCounts() {
+      const { data } = await client.from('threads').select('board');
+      if (!data) return;
+      const counts = {};
+      data.forEach(t => counts[t.board] = (counts[t.board] || 0) + 1);
+      ['b', 'econ', 'math', 'cs', 'meta'].forEach(b => {
+        const el = document.getElementById('count-' + b);
+        if (el) el.textContent = counts[b] ? counts[b] + (counts[b] === 1 ? ' thread' : ' threads') : '';
+      });
+    }
   </script>
 
 </body>

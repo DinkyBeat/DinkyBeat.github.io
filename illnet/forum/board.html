@@ -27,10 +27,10 @@
   <a class="back" href="/illnet/forum/">&larr; boards</a>
 
   <div class="form-section">
-    <span class="form-label">new thread</span>
+    <span class="section-label">new thread</span>
     <form id="new-thread-form">
       <input id="thread-title" type="text" placeholder="title" required>
-      <textarea id="thread-body" placeholder="post body" required></textarea>
+      <textarea id="thread-body" placeholder="body" required></textarea>
       <button type="submit">post</button>
     </form>
   </div>
@@ -39,25 +39,23 @@
 
   <script src="../auth.js"></script>
   <script>
-    const BOARDS = { b: 'random', econ: 'economics', math: 'math', cs: 'cs & programming', meta: 'meta' };
+    const BOARD_NAMES = { b: 'random', econ: 'economics', math: 'math', cs: 'cs', meta: 'meta' };
     const board = new URLSearchParams(window.location.search).get('b') || 'b';
-    const boardName = BOARDS[board] || board;
-
-    document.getElementById('board-title').textContent = `illnet / ${board}`;
+    document.getElementById('board-title').textContent = `/${board}/`;
     document.title = `illnet / /${board}/`;
 
     let currentUser = null;
 
     requireAuth(function(user) {
       currentUser = user;
-      document.getElementById('username-link').textContent = user.email.replace('@illnet.com', '');
+      document.getElementById('username-link').textContent = getUsername(user);
       loadThreads();
     });
 
     async function loadThreads() {
-      const { data, error } = await client
+      const { data: threads, error } = await client
         .from('threads')
-        .select('id, title, body, username, created_at')
+        .select('id, title, username, created_at')
         .eq('board', board)
         .order('created_at', { ascending: false });
 
@@ -66,20 +64,32 @@
       const list = document.getElementById('thread-list');
       list.innerHTML = '';
 
-      if (!data.length) {
-        list.innerHTML = `<div style="padding:14px;color:var(--dim);font-size:12px;">no threads yet.</div>`;
+      if (!threads.length) {
+        list.innerHTML = `<div style="padding:12px 14px;color:var(--dim);font-size:12px;">no threads.</div>`;
         return;
       }
 
-      data.forEach(thread => {
+      // Get reply counts in one query
+      const ids = threads.map(t => t.id);
+      const { data: replies } = await client.from('replies').select('thread_id').in('thread_id', ids);
+      const replyCount = {};
+      (replies || []).forEach(r => replyCount[r.thread_id] = (replyCount[r.thread_id] || 0) + 1);
+
+      threads.forEach(t => {
         const row = document.createElement('div');
         row.className = 'thread-row';
+        const n = replyCount[t.id] || 0;
         row.innerHTML = `
           <div>
-            <h3><a href="/illnet/forum/thread.html?id=${thread.id}">${escHtml(thread.title)}</a></h3>
-            <span class="thread-author" style="font-size:11px;color:var(--dim)">${escHtml(thread.username || '?')}</span>
+            <a class="thread-title" href="/illnet/forum/thread.html?id=${t.id}">${escHtml(t.title)}</a>
+            <div class="thread-byline">
+              <a href="/illnet/forum/user.html?u=${encodeURIComponent(t.username || '')}" class="user-link">${escHtml(t.username || '?')}</a>
+            </div>
           </div>
-          <div class="thread-meta">${fmtTime(thread.created_at)}</div>
+          <div class="thread-meta">
+            <span class="thread-replies">${n} ${n === 1 ? 'reply' : 'replies'}</span>
+            ${fmtDate(t.created_at)}
+          </div>
         `;
         list.appendChild(row);
       });
@@ -89,24 +99,20 @@
       e.preventDefault();
       const title = document.getElementById('thread-title').value.trim();
       const body = document.getElementById('thread-body').value.trim();
-      const username = currentUser.email.replace('@illnet.com', '');
-
       const { error } = await client.from('threads').insert({
         title, body, board,
         user_id: currentUser.id,
-        username
+        username: getUsername(currentUser)
       });
-
-      if (error) { alert('Error: ' + error.message); return; }
+      if (error) { alert(error.message); return; }
       e.target.reset();
       loadThreads();
     });
 
     function escHtml(t) {
-      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-
-    function fmtTime(iso) {
+    function fmtDate(iso) {
       return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
   </script>

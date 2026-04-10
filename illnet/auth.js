@@ -2,6 +2,16 @@ const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const ADMIN_EMAIL = 'kingfisher@illnet.com';
+
+function getUsername(user) {
+  return user.email.replace('@illnet.com', '');
+}
+
+function isAdmin(user) {
+  return user && user.email === ADMIN_EMAIL;
+}
+
 function toggleTheme() {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
@@ -17,14 +27,36 @@ function syncThemeBtn() {
   btn.textContent = current === 'dark' ? 'light' : 'dark';
 }
 
+// Inject admin link into header-actions if user is admin
+function injectAdminLink() {
+  const actions = document.querySelector('.header-actions');
+  if (!actions) return;
+  const a = document.createElement('a');
+  a.href = '/illnet/forum/admin.html';
+  a.className = 'btn-ghost';
+  a.style.color = 'var(--red)';
+  a.textContent = 'admin';
+  actions.prepend(a);
+}
+
 async function requireAuth(onAuthed) {
   const { data: { session } } = await client.auth.getSession();
-  if (!session) { window.location.href = '/illnet/login.html'; return; }
+  if (!session) { window.location.href = '/illnet/'; return; }
   syncThemeBtn();
+  if (isAdmin(session.user)) injectAdminLink();
+  onAuthed(session.user);
+}
+
+async function requireAdmin(onAuthed) {
+  const { data: { session } } = await client.auth.getSession();
+  if (!session) { window.location.href = '/illnet/'; return; }
+  if (!isAdmin(session.user)) { window.location.href = '/illnet/forum/'; return; }
+  syncThemeBtn();
+  injectAdminLink();
   onAuthed(session.user);
 }
 
 async function logout() {
   await client.auth.signOut();
-  window.location.href = '/illnet/login.html';
+  window.location.href = '/illnet/';
 }

@@ -16,7 +16,7 @@
 <body>
 
   <header class="site-header">
-    <span class="site-title" id="board-crumb">illnet / thread</span>
+    <span class="site-title" id="board-crumb">illnet</span>
     <div class="header-actions">
       <a class="btn-ghost" id="username-link" href="/illnet/forum/user.html" style="text-decoration:none"></a>
       <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
@@ -26,23 +26,20 @@
 
   <a class="back" id="back-link" href="/illnet/forum/">&larr; board</a>
 
-  <!-- OP post -->
   <div id="op-post"></div>
 
-  <!-- Reply form -->
-  <h3 class="reply-label">post a reply</h3>
+  <h3 class="reply-label">reply</h3>
   <div id="reply-form-wrap">
     <div class="reply-context" id="reply-context">
       <span id="reply-context-text"></span>
       <button class="btn-ghost" id="cancel-reply">× cancel</button>
     </div>
     <form id="reply-form">
-      <textarea id="reply-body" placeholder="your reply" required></textarea>
-      <button type="submit">reply</button>
+      <textarea id="reply-body" placeholder="write a reply" required></textarea>
+      <button type="submit">post</button>
     </form>
   </div>
 
-  <!-- Replies tree -->
   <h3 class="reply-label" id="replies-label" style="display:none">replies</h3>
   <div id="reply-list"></div>
 
@@ -50,51 +47,42 @@
   <script>
     const threadId = new URLSearchParams(window.location.search).get('id');
     let currentUser = null;
-    let replyTarget = null; // { id, username }
+    let replyTarget = null;
 
     requireAuth(function(user) {
       currentUser = user;
-      document.getElementById('username-link').textContent = user.email.replace('@illnet.com', '');
+      document.getElementById('username-link').textContent = getUsername(user);
       loadThread();
       loadReplies();
     });
 
-    // ── load OP ──────────────────────────────────────────────────
+    // ── OP ───────────────────────────────────────────────────────
     async function loadThread() {
-      const { data, error } = await client
-        .from('threads')
-        .select('*')
-        .eq('id', threadId)
-        .single();
-
+      const { data, error } = await client.from('threads').select('*').eq('id', threadId).single();
       if (error) { console.error(error); return; }
 
-      document.title = `illnet / ${data.title}`;
       const board = data.board || 'b';
-      document.getElementById('board-crumb').textContent = `illnet / /${board}/`;
+      document.title = `illnet / ${data.title}`;
+      document.getElementById('board-crumb').textContent = `/${board}/`;
       document.getElementById('back-link').href = `/illnet/forum/board.html?b=${board}`;
       document.getElementById('back-link').textContent = `← /${board}/`;
 
       document.getElementById('op-post').innerHTML = `
         <div class="op-post">
           <div class="op-header">
-            <span class="op-author">${escHtml(data.username || '?')}</span>
+            <a href="/illnet/forum/user.html?u=${encodeURIComponent(data.username || '')}" class="user-link op-author">${escHtml(data.username || '?')}</a>
             <span class="op-time">${fmtTime(data.created_at)}</span>
           </div>
-          <div style="font-size:16px;font-weight:normal;color:var(--text-bright);margin-bottom:10px">${escHtml(data.title)}</div>
+          <div class="op-title">${escHtml(data.title)}</div>
           <div class="op-body">${parseMentions(data.body)}</div>
         </div>
       `;
     }
 
-    // ── load & render replies ─────────────────────────────────────
+    // ── replies ───────────────────────────────────────────────────
     async function loadReplies() {
       const { data, error } = await client
-        .from('replies')
-        .select('*')
-        .eq('thread_id', threadId)
-        .order('created_at', { ascending: true });
-
+        .from('replies').select('*').eq('thread_id', threadId).order('created_at', { ascending: true });
       if (error) { console.error(error); return; }
 
       const label = document.getElementById('replies-label');
@@ -102,49 +90,37 @@
       list.innerHTML = '';
 
       if (!data.length) { label.style.display = 'none'; return; }
-
       label.style.display = 'block';
-      const tree = buildTree(data);
-      tree.forEach(node => list.appendChild(renderReply(node)));
 
-      // event delegation for reply + collapse buttons
-      list.onclick = handleReplyListClick;
+      buildTree(data).forEach(node => list.appendChild(renderReply(node)));
+      list.onclick = handleClick;
     }
 
-    // ── tree builder ──────────────────────────────────────────────
     function buildTree(rows) {
       const map = {};
       const roots = [];
       rows.forEach(r => map[r.id] = { ...r, children: [] });
       rows.forEach(r => {
-        if (r.parent_id && map[r.parent_id]) {
-          map[r.parent_id].children.push(map[r.id]);
-        } else {
-          roots.push(map[r.id]);
-        }
+        if (r.parent_id && map[r.parent_id]) map[r.parent_id].children.push(map[r.id]);
+        else roots.push(map[r.id]);
       });
       return roots;
     }
 
-    // ── render a reply node (recursive) ──────────────────────────
     function renderReply(reply) {
       const hasChildren = reply.children.length > 0;
       const node = document.createElement('div');
       node.className = 'reply-node';
       node.dataset.id = reply.id;
 
-      const collapseBtn = hasChildren
-        ? `<button class="btn-ghost collapse-btn" data-id="${reply.id}" title="collapse">▾</button>`
-        : '';
-
       node.innerHTML = `
         <div class="reply-content">
           <div class="reply-header">
-            <span class="reply-author">${escHtml(reply.username || '?')}</span>
+            <a href="/illnet/forum/user.html?u=${encodeURIComponent(reply.username || '')}" class="user-link reply-author">${escHtml(reply.username || '?')}</a>
             <span class="reply-time">${fmtTime(reply.created_at)}</span>
             <div class="reply-actions">
               <button class="btn-ghost reply-btn" data-id="${reply.id}" data-user="${escHtml(reply.username || '?')}">reply</button>
-              ${collapseBtn}
+              ${hasChildren ? `<button class="btn-ghost collapse-btn" data-id="${reply.id}">▾</button>` : ''}
             </div>
           </div>
           <div class="reply-body">${parseMentions(reply.body)}</div>
@@ -153,38 +129,30 @@
       `;
 
       if (hasChildren) {
-        const childrenEl = node.querySelector('.reply-children');
-        reply.children.forEach(child => childrenEl.appendChild(renderReply(child)));
+        const el = node.querySelector('.reply-children');
+        reply.children.forEach(c => el.appendChild(renderReply(c)));
       }
-
       return node;
     }
 
-    // ── click delegation ──────────────────────────────────────────
-    function handleReplyListClick(e) {
-      const replyBtn = e.target.closest('.reply-btn');
-      if (replyBtn) {
-        setReplyTarget(replyBtn.dataset.id, replyBtn.dataset.user);
-        return;
-      }
-      const collapseBtn = e.target.closest('.collapse-btn');
-      if (collapseBtn) {
-        const node = collapseBtn.closest('.reply-node');
-        const children = node.querySelector('.reply-children');
-        const isCollapsed = children.style.display === 'none';
-        children.style.display = isCollapsed ? '' : 'none';
-        collapseBtn.textContent = isCollapsed ? '▾' : '▸';
-        collapseBtn.title = isCollapsed ? 'collapse' : 'expand';
+    function handleClick(e) {
+      const rb = e.target.closest('.reply-btn');
+      if (rb) { setReplyTarget(rb.dataset.id, rb.dataset.user); return; }
+
+      const cb = e.target.closest('.collapse-btn');
+      if (cb) {
+        const children = cb.closest('.reply-node').querySelector('.reply-children');
+        const collapsed = children.style.display === 'none';
+        children.style.display = collapsed ? '' : 'none';
+        cb.textContent = collapsed ? '▾' : '▸';
       }
     }
 
-    // ── reply target state ────────────────────────────────────────
     function setReplyTarget(id, username) {
       replyTarget = { id, username };
-      const ctx = document.getElementById('reply-context');
       document.getElementById('reply-context-text').innerHTML =
         `replying to <span class="mention">@${escHtml(username)}</span>`;
-      ctx.classList.add('active');
+      document.getElementById('reply-context').classList.add('active');
       document.getElementById('reply-body').focus();
       document.getElementById('reply-form-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -194,23 +162,19 @@
       document.getElementById('reply-context').classList.remove('active');
     };
 
-    // ── submit reply ──────────────────────────────────────────────
     document.getElementById('reply-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const body = document.getElementById('reply-body').value.trim();
       if (!body) return;
 
-      const username = currentUser.email.replace('@illnet.com', '');
       const { error } = await client.from('replies').insert({
-        thread_id: threadId,
-        body,
+        thread_id: threadId, body,
         user_id: currentUser.id,
-        username,
+        username: getUsername(currentUser),
         parent_id: replyTarget ? replyTarget.id : null
       });
 
-      if (error) { alert('Error: ' + error.message); return; }
-
+      if (error) { alert(error.message); return; }
       e.target.reset();
       replyTarget = null;
       document.getElementById('reply-context').classList.remove('active');
@@ -219,20 +183,13 @@
 
     // ── helpers ───────────────────────────────────────────────────
     function escHtml(t) {
-      return String(t)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-
     function parseMentions(text) {
       return escHtml(text).replace(/@(\w+)/g, '<span class="mention">@$1</span>');
     }
-
     function fmtTime(iso) {
-      return new Date(iso).toLocaleString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
+      return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
   </script>
 

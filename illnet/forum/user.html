@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>illnet / profile</title>
+  <title>illnet / user</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
   <script>
@@ -12,51 +12,22 @@
       document.documentElement.setAttribute('data-theme', t);
     })();
   </script>
-  <style>
-    .profile-block {
-      margin-top: 16px;
-    }
-    .profile-name {
-      font-size: 22px;
-      font-weight: normal;
-      color: var(--text-bright);
-      margin-bottom: 6px;
-    }
-    .profile-meta {
-      font-size: 11px;
-      color: var(--dim);
-      letter-spacing: 0.08em;
-    }
-    .profile-meta span { color: var(--muted); }
-    .profile-divider {
-      border-top: 1px solid var(--sep);
-      margin: 24px 0;
-    }
-    .stat-row {
-      display: flex;
-      gap: 32px;
-    }
-    .stat { display: flex; flex-direction: column; gap: 2px; }
-    .stat-num { font-size: 18px; color: var(--text-bright); }
-    .stat-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; }
-  </style>
 </head>
 <body>
 
   <header class="site-header">
-    <span class="site-title">illnet / profile</span>
+    <span class="site-title" id="page-title">illnet / user</span>
     <div class="header-actions">
+      <a class="btn-ghost" id="self-link" href="/illnet/forum/user.html" style="text-decoration:none"></a>
       <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
       <button class="btn-ghost" onclick="logout()">logout</button>
     </div>
   </header>
 
-  <a class="back" href="/illnet/forum/">&larr; board</a>
+  <a class="back" href="/illnet/forum/">&larr; boards</a>
 
-  <div class="profile-block">
-    <div class="profile-name" id="profile-name">—</div>
-    <div class="profile-meta">member since <span id="profile-since">—</span></div>
-  </div>
+  <div class="profile-name" id="profile-name">—</div>
+  <div class="profile-since" id="profile-since"></div>
 
   <div class="profile-divider"></div>
 
@@ -71,25 +42,79 @@
     </div>
   </div>
 
+  <div class="profile-divider"></div>
+
+  <span class="section-label">threads</span>
+  <div class="post-history" id="thread-history"></div>
+
+  <div style="margin-top:28px"></div>
+  <span class="section-label">replies</span>
+  <div class="post-history" id="reply-history"></div>
+
   <script src="../auth.js"></script>
   <script>
+    const targetUser = new URLSearchParams(window.location.search).get('u');
+
     requireAuth(async function(user) {
-      const username = user.email.replace('@illnet.com', '');
-      const since = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const selfName = getUsername(user);
+      document.getElementById('self-link').textContent = selfName;
 
-      document.getElementById('profile-name').textContent = username;
-      document.getElementById('profile-since').textContent = since;
-      document.title = 'illnet / ' + username;
+      // Viewing own profile vs. someone else's
+      const viewingName = targetUser || selfName;
+      document.getElementById('profile-name').textContent = viewingName;
+      document.getElementById('page-title').textContent = `illnet / ${viewingName}`;
+      document.title = `illnet / ${viewingName}`;
 
-      // Thread + reply counts
-      const [{ count: threadCount }, { count: replyCount }] = await Promise.all([
-        client.from('threads').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-        client.from('replies').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      // Own profile: show join date from auth
+      if (!targetUser || targetUser === selfName) {
+        const since = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('profile-since').textContent = `member since ${since}`;
+      }
+
+      loadHistory(viewingName);
+    });
+
+    async function loadHistory(username) {
+      const [{ data: threads }, { data: replies }] = await Promise.all([
+        client.from('threads').select('id, title, board, created_at').eq('username', username).order('created_at', { ascending: false }),
+        client.from('replies').select('id, body, thread_id, created_at, parent_id').eq('username', username).order('created_at', { ascending: false })
       ]);
 
-      document.getElementById('stat-threads').textContent = threadCount ?? 0;
-      document.getElementById('stat-replies').textContent = replyCount ?? 0;
-    });
+      document.getElementById('stat-threads').textContent = (threads || []).length;
+      document.getElementById('stat-replies').textContent = (replies || []).length;
+
+      renderThreadHistory(threads || []);
+      renderReplyHistory(replies || []);
+    }
+
+    function renderThreadHistory(threads) {
+      const el = document.getElementById('thread-history');
+      if (!threads.length) { el.innerHTML = `<div class="history-row" style="color:var(--dim);font-size:12px;">no threads.</div>`; return; }
+      el.innerHTML = threads.map(t => `
+        <div class="history-row">
+          <a href="/illnet/forum/thread.html?id=${t.id}">${escHtml(t.title)}</a>
+          <div class="history-meta"><span class="board-tag">/${t.board}/</span> · ${fmtDate(t.created_at)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderReplyHistory(replies) {
+      const el = document.getElementById('reply-history');
+      if (!replies.length) { el.innerHTML = `<div class="history-row" style="color:var(--dim);font-size:12px;">no replies.</div>`; return; }
+      el.innerHTML = replies.map(r => `
+        <div class="history-row">
+          <a href="/illnet/forum/thread.html?id=${r.thread_id}">${escHtml(r.body.slice(0, 80))}${r.body.length > 80 ? '…' : ''}</a>
+          <div class="history-meta">${fmtDate(r.created_at)}</div>
+        </div>
+      `).join('');
+    }
+
+    function escHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
   </script>
 
 </body>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illnet / admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="site-title">illnet / admin</span>
+    <div class="header-actions">
+      <a class="btn-ghost" href="/illnet/forum/" style="text-decoration:none">forum</a>
+      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-ghost" onclick="logout()">logout</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="admin-stats">
+    <div class="stat">
+      <span class="stat-num" id="stat-threads">—</span>
+      <span class="stat-label">threads</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-replies">—</span>
+      <span class="stat-label">replies</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-users">—</span>
+      <span class="stat-label">users</span>
+    </div>
+  </div>
+
+  <!-- Users -->
+  <span class="section-label">users</span>
+  <div style="margin-bottom:32px">
+    <table class="admin-table" id="user-table">
+      <thead>
+        <tr>
+          <th>username</th>
+          <th>threads</th>
+          <th>replies</th>
+        </tr>
+      </thead>
+      <tbody id="user-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Threads -->
+  <span class="section-label">all threads</span>
+  <table class="admin-table" id="thread-table">
+    <thead>
+      <tr>
+        <th>board</th>
+        <th>title</th>
+        <th>author</th>
+        <th>date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="thread-tbody"></tbody>
+  </table>
+
+  <div style="margin-top:40px"></div>
+  <span class="section-label">all replies</span>
+  <table class="admin-table" id="reply-table">
+    <thead>
+      <tr>
+        <th>author</th>
+        <th>body</th>
+        <th>date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="reply-tbody"></tbody>
+  </table>
+
+  <script src="../auth.js"></script>
+  <script>
+    requireAdmin(function() {
+      loadAll();
+    });
+
+    async function loadAll() {
+      const [{ data: threads }, { data: replies }] = await Promise.all([
+        client.from('threads').select('*').order('created_at', { ascending: false }),
+        client.from('replies').select('*').order('created_at', { ascending: false })
+      ]);
+
+      const t = threads || [];
+      const r = replies || [];
+
+      // Stats
+      const userSet = new Set([...t.map(x => x.username), ...r.map(x => x.username)].filter(Boolean));
+      document.getElementById('stat-threads').textContent = t.length;
+      document.getElementById('stat-replies').textContent = r.length;
+      document.getElementById('stat-users').textContent = userSet.size;
+
+      // Users table
+      const threadsByUser = {}, repliesByUser = {};
+      t.forEach(x => threadsByUser[x.username] = (threadsByUser[x.username] || 0) + 1);
+      r.forEach(x => repliesByUser[x.username] = (repliesByUser[x.username] || 0) + 1);
+      const users = [...userSet].sort();
+      document.getElementById('user-tbody').innerHTML = users.map(u => `
+        <tr>
+          <td><a href="/illnet/forum/user.html?u=${encodeURIComponent(u)}">${escHtml(u)}</a></td>
+          <td>${threadsByUser[u] || 0}</td>
+          <td>${repliesByUser[u] || 0}</td>
+        </tr>
+      `).join('');
+
+      // Threads table
+      document.getElementById('thread-tbody').innerHTML = t.map(th => `
+        <tr id="thread-row-${th.id}">
+          <td class="board-tag">/${th.board}/</td>
+          <td><a href="/illnet/forum/thread.html?id=${th.id}">${escHtml(th.title)}</a></td>
+          <td><a href="/illnet/forum/user.html?u=${encodeURIComponent(th.username || '')}">${escHtml(th.username || '?')}</a></td>
+          <td>${fmtDate(th.created_at)}</td>
+          <td><button class="del-btn" onclick="deleteThread(${th.id})">delete</button></td>
+        </tr>
+      `).join('');
+
+      // Replies table
+      document.getElementById('reply-tbody').innerHTML = r.map(re => `
+        <tr id="reply-row-${re.id}">
+          <td><a href="/illnet/forum/user.html?u=${encodeURIComponent(re.username || '')}">${escHtml(re.username || '?')}</a></td>
+          <td style="max-width:40ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            <a href="/illnet/forum/thread.html?id=${re.thread_id}">${escHtml(re.body.slice(0, 80))}${re.body.length > 80 ? '…' : ''}</a>
+          </td>
+          <td>${fmtDate(re.created_at)}</td>
+          <td><button class="del-btn" onclick="deleteReply(${re.id})">delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteThread(id) {
+      if (!confirm('Delete this thread and all its replies?')) return;
+      const { error } = await client.from('threads').delete().eq('id', id);
+      if (error) { alert(error.message); return; }
+      document.getElementById('thread-row-' + id)?.remove();
+    }
+
+    async function deleteReply(id) {
+      if (!confirm('Delete this reply?')) return;
+      const { error } = await client.from('replies').delete().eq('id', id);
+      if (error) { alert(error.message); return; }
+      document.getElementById('reply-row-' + id)?.remove();
+    }
+
+    function escHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  </script>
+
+</body>
+</html>
