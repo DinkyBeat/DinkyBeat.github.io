@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illnet</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="site-title" id="board-title">illnet</span>
+    <div class="header-actions">
+      <a class="btn-ghost" id="username-link" href="/illnet/forum/user.html" style="text-decoration:none"></a>
+      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-ghost" onclick="logout()">logout</button>
+    </div>
+  </header>
+
+  <a class="back" href="/illnet/forum/">&larr; boards</a>
+
+  <div class="form-section">
+    <span class="form-label">new thread</span>
+    <form id="new-thread-form">
+      <input id="thread-title" type="text" placeholder="title" required>
+      <textarea id="thread-body" placeholder="post body" required></textarea>
+      <button type="submit">post</button>
+    </form>
+  </div>
+
+  <div id="thread-list"></div>
+
+  <script src="../auth.js"></script>
+  <script>
+    const BOARDS = { b: 'random', econ: 'economics', math: 'math', cs: 'cs & programming', meta: 'meta' };
+    const board = new URLSearchParams(window.location.search).get('b') || 'b';
+    const boardName = BOARDS[board] || board;
+
+    document.getElementById('board-title').textContent = `illnet / ${board}`;
+    document.title = `illnet / /${board}/`;
+
+    let currentUser = null;
+
+    requireAuth(function(user) {
+      currentUser = user;
+      document.getElementById('username-link').textContent = user.email.replace('@illnet.com', '');
+      loadThreads();
+    });
+
+    async function loadThreads() {
+      const { data, error } = await client
+        .from('threads')
+        .select('id, title, body, username, created_at')
+        .eq('board', board)
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error(error); return; }
+
+      const list = document.getElementById('thread-list');
+      list.innerHTML = '';
+
+      if (!data.length) {
+        list.innerHTML = `<div style="padding:14px;color:var(--dim);font-size:12px;">no threads yet.</div>`;
+        return;
+      }
+
+      data.forEach(thread => {
+        const row = document.createElement('div');
+        row.className = 'thread-row';
+        row.innerHTML = `
+          <div>
+            <h3><a href="/illnet/forum/thread.html?id=${thread.id}">${escHtml(thread.title)}</a></h3>
+            <span class="thread-author" style="font-size:11px;color:var(--dim)">${escHtml(thread.username || '?')}</span>
+          </div>
+          <div class="thread-meta">${fmtTime(thread.created_at)}</div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    document.getElementById('new-thread-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('thread-title').value.trim();
+      const body = document.getElementById('thread-body').value.trim();
+      const username = currentUser.email.replace('@illnet.com', '');
+
+      const { error } = await client.from('threads').insert({
+        title, body, board,
+        user_id: currentUser.id,
+        username
+      });
+
+      if (error) { alert('Error: ' + error.message); return; }
+      e.target.reset();
+      loadThreads();
+    });
+
+    function escHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function fmtTime(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  </script>
+
+</body>
+</html>
