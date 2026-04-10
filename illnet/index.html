@@ -22,7 +22,7 @@
   <div class="login-wrap">
     <h1>illnet</h1>
     <form id="login-form">
-      <input id="email" type="email" placeholder="email" required autocomplete="email">
+      <input id="username" type="text" placeholder="username" required autocomplete="username" spellcheck="false">
       <input id="password" type="password" placeholder="password" required autocomplete="current-password">
       <button type="submit">sign in</button>
     </form>
@@ -40,11 +40,12 @@
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       const errEl = document.getElementById('error-msg');
       errEl.style.display = 'none';
 
+      const email = username + '@illnet';
       const { error } = await client.auth.signInWithPassword({ email, password });
       if (error) {
         errEl.textContent = error.message;
