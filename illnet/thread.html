@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thread</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div id="thread-content"></div>
+  <hr>
+  <h3>Reply</h3>
+  <form id="reply-form">
+    <textarea id="reply-body" placeholder="Your reply" required></textarea>
+    <button type="submit">Reply</button>
+  </form>
+  <div id="reply-list"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Get the thread ID from the URL
+    // e.g. thread.html?id=5 → threadId = "5"
+    // URLSearchParams parses query strings (?key=value) from URLs
+    const threadId = new URLSearchParams(window.location.search).get('id');
+
+    async function loadThread() {
+      // .eq('id', threadId) = filter where id equals threadId
+      const { data, error } = await client
+        .from('threads')
+        .select('*')
+        .eq('id', threadId)
+        .single(); // .single() returns one object instead of an array
+
+      if (error) { console.error(error); return; }
+
+      document.getElementById('thread-content').innerHTML = `
+        <h2>${data.title}</h2>
+        <p>${data.body}</p>
+      `;
+    }
+
+    async function loadReplies() {
+      const { data, error } = await client
+        .from('replies')
+        .select('*')
+        .eq('thread_id', threadId)
+        .order('created_at', { ascending: true });
+
+      if (error) { console.error(error); return; }
+
+      const list = document.getElementById('reply-list');
+      list.innerHTML = '';
+
+      data.forEach(reply => {
+        const div = document.createElement('div');
+        div.innerHTML = `<p>${reply.body}</p><small>${new Date(reply.created_at).toLocaleString()}</small><hr>`;
+        list.appendChild(div);
+      });
+    }
+
+    document.getElementById('reply-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = document.getElementById('reply-body').value;
+
+      const { error } = await client
+        .from('replies')
+        .insert({ thread_id: threadId, body });
+
+      if (error) { alert('Error: ' + error.message); return; }
+
+      e.target.reset();
+      loadReplies();
+    });
+
+    loadThread();
+    loadReplies();
+  </script>
+
+</body>
+</html>
