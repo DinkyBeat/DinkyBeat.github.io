@@ -15,61 +15,43 @@
 </head>
 <body>
 
-  <header class="site-header">
-    <span class="site-title">illnet / board</span>
-    <div class="header-actions">
-      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
-      <button class="btn-ghost" onclick="logout()">logout</button>
-    </div>
-  </header>
+  <div style="display:flex;justify-content:flex-end">
+    <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+  </div>
 
-  <form id="new-thread-form">
-    <input id="thread-title" type="text" placeholder="title" required>
-    <textarea id="thread-body" placeholder="post body" required></textarea>
-    <button type="submit">post</button>
-  </form>
-
-  <div id="thread-list"></div>
+  <div class="login-wrap">
+    <h1>illnet</h1>
+    <form id="login-form">
+      <input id="email" type="email" placeholder="email" required autocomplete="email">
+      <input id="password" type="password" placeholder="password" required autocomplete="current-password">
+      <button type="submit">sign in</button>
+    </form>
+    <div class="error-msg" id="error-msg"></div>
+  </div>
 
   <script src="./auth.js"></script>
   <script>
-    requireAuth(function() {
-      loadThreads();
+    // If already logged in, skip straight to the forum
+    client.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = '/illnet/forum/';
     });
 
-    async function loadThreads() {
-      const { data, error } = await client
-        .from('threads')
-        .select('*')
-        .order('created_at', { ascending: false });
+    syncThemeBtn();
 
-      if (error) { console.error(error); return; }
-
-      const list = document.getElementById('thread-list');
-      list.innerHTML = '';
-
-      data.forEach(thread => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <h3><a href="/illnet/thread.html?id=${thread.id}">${thread.title}</a></h3>
-          <p>${thread.body}</p>
-          <small>${new Date(thread.created_at).toLocaleString()}</small>
-          <hr>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    document.getElementById('new-thread-form').addEventListener('submit', async (e) => {
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const title = document.getElementById('thread-title').value;
-      const body = document.getElementById('thread-body').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('error-msg');
+      errEl.style.display = 'none';
 
-      const { error } = await client.from('threads').insert({ title, body });
-      if (error) { alert('Error posting: ' + error.message); return; }
-
-      e.target.reset();
-      loadThreads();
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = error.message;
+        errEl.style.display = 'block';
+        return;
+      }
+      window.location.href = '/illnet/forum/';
     });
   </script>
 

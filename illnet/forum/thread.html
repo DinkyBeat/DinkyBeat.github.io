@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>illnet / thread</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="../style.css">
   <script>
     (function() {
       const t = localStorage.getItem('illnet-theme') || 'dark';
@@ -23,7 +23,7 @@
     </div>
   </header>
 
-  <a class="back" href="/illnet/">&larr; board</a>
+  <a class="back" href="/illnet/forum/">&larr; board</a>
 
   <div id="thread-content"></div>
   <hr>
@@ -35,7 +35,7 @@
   </form>
   <div id="reply-list"></div>
 
-  <script src="./auth.js"></script>
+  <script src="../auth.js"></script>
   <script>
     const threadId = new URLSearchParams(window.location.search).get('id');
 
