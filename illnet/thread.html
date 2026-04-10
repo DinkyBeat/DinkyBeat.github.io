@@ -5,113 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>illnet / thread</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0e0e0e;
-      color: #d4d4d4;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
-    }
-
-    a.back {
-      display: inline-block;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #555;
-      text-decoration: none;
-      margin-bottom: 28px;
-    }
-    a.back:hover { color: #cc2200; }
-
-    #thread-content {
-      border-left: 2px solid #cc2200;
-      padding: 12px 14px;
-      margin-bottom: 32px;
-    }
-
-    #thread-content h2 {
-      font-size: 15px;
-      font-weight: normal;
-      color: #e8e8e8;
-      margin-bottom: 8px;
-    }
-
-    #thread-content p { color: #aaa; font-size: 13px; white-space: pre-wrap; }
-
-    hr { border: none; border-top: 1px solid #1c1c1c; margin: 0 0 24px; }
-
-    h3.reply-label {
-      font-size: 11px;
-      font-weight: normal;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #cc2200;
-      margin-bottom: 12px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 32px;
-    }
-
-    textarea {
-      background: #161616;
-      border: 1px solid #2a2a2a;
-      color: #d4d4d4;
-      font-family: inherit;
-      font-size: 13px;
-      padding: 8px 10px;
-      outline: none;
-      width: 100%;
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    textarea:focus { border-color: #cc2200; }
-
-    button {
-      background: none;
-      border: 1px solid #cc2200;
-      color: #cc2200;
-      font-family: inherit;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 7px 16px;
-      cursor: pointer;
-      align-self: flex-start;
-    }
-
-    button:hover { background: #cc2200; color: #0e0e0e; }
-
-    #reply-list { display: flex; flex-direction: column; gap: 0; }
-
-    #reply-list > div {
-      border-left: 2px solid #2a2a2a;
-      padding: 10px 14px;
-    }
-
-    #reply-list > div:hover { border-left-color: #555; }
-
-    #reply-list p { font-size: 13px; color: #bbb; margin-bottom: 4px; white-space: pre-wrap; }
-    #reply-list small { font-size: 11px; color: #444; }
-
-    hr.reply-sep { border: none; border-top: 1px solid #1a1a1a; margin: 0; }
-  </style>
+  <link rel="stylesheet" href="./style.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
+  <header class="site-header">
+    <span class="site-title">illnet / thread</span>
+    <div class="header-actions">
+      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-ghost" onclick="logout()">logout</button>
+    </div>
+  </header>
+
   <a class="back" href="/illnet/">&larr; board</a>
+
   <div id="thread-content"></div>
   <hr>
+
   <h3 class="reply-label">replies</h3>
   <form id="reply-form">
     <textarea id="reply-body" placeholder="your reply" required></textarea>
@@ -119,23 +35,21 @@
   </form>
   <div id="reply-list"></div>
 
+  <script src="./auth.js"></script>
   <script>
-    const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Get the thread ID from the URL
-    // e.g. thread.html?id=5 → threadId = "5"
-    // URLSearchParams parses query strings (?key=value) from URLs
     const threadId = new URLSearchParams(window.location.search).get('id');
 
+    requireAuth(function() {
+      loadThread();
+      loadReplies();
+    });
+
     async function loadThread() {
-      // .eq('id', threadId) = filter where id equals threadId
       const { data, error } = await client
         .from('threads')
         .select('*')
         .eq('id', threadId)
-        .single(); // .single() returns one object instead of an array
+        .single();
 
       if (error) { console.error(error); return; }
 
@@ -168,18 +82,12 @@
       e.preventDefault();
       const body = document.getElementById('reply-body').value;
 
-      const { error } = await client
-        .from('replies')
-        .insert({ thread_id: threadId, body });
-
+      const { error } = await client.from('replies').insert({ thread_id: threadId, body });
       if (error) { alert('Error: ' + error.message); return; }
 
       e.target.reset();
       loadReplies();
     });
-
-    loadThread();
-    loadReplies();
   </script>
 
 </body>

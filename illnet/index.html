@@ -5,134 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>illnet</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0e0e0e;
-      color: #d4d4d4;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
-    }
-
-    h1 {
-      font-size: 13px;
-      font-weight: normal;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #cc2200;
-      border-bottom: 1px solid #cc2200;
-      padding-bottom: 10px;
-      margin-bottom: 32px;
-    }
-
-    form {
-      margin-bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    input, textarea {
-      background: #161616;
-      border: 1px solid #2a2a2a;
-      color: #d4d4d4;
-      font-family: inherit;
-      font-size: 13px;
-      padding: 8px 10px;
-      outline: none;
-      width: 100%;
-      resize: vertical;
-    }
-
-    input:focus, textarea:focus {
-      border-color: #cc2200;
-    }
-
-    textarea { min-height: 80px; }
-
-    button {
-      background: none;
-      border: 1px solid #cc2200;
-      color: #cc2200;
-      font-family: inherit;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 7px 16px;
-      cursor: pointer;
-      align-self: flex-start;
-    }
-
-    button:hover { background: #cc2200; color: #0e0e0e; }
-
-    #thread-list { display: flex; flex-direction: column; gap: 0; }
-
-    #thread-list > div {
-      border-left: 2px solid #2a2a2a;
-      padding: 12px 14px;
-      transition: border-color 0.1s;
-    }
-
-    #thread-list > div:hover { border-left-color: #cc2200; }
-
-    #thread-list h3 { font-size: 13px; font-weight: normal; margin-bottom: 4px; }
-
-    #thread-list h3 a { color: #e8e8e8; text-decoration: none; }
-    #thread-list h3 a:hover { color: #cc2200; }
-
-    #thread-list p { color: #888; font-size: 12px; margin-bottom: 4px; white-space: pre-wrap; }
-
-    #thread-list small { color: #444; font-size: 11px; }
-
-    hr { border: none; border-top: 1px solid #1c1c1c; margin: 0; }
-  </style>
+  <link rel="stylesheet" href="./style.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
-  <h1>illnet / board</h1>
+  <header class="site-header">
+    <span class="site-title">illnet / board</span>
+    <div class="header-actions">
+      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-ghost" onclick="logout()">logout</button>
+    </div>
+  </header>
 
-  <!-- Form to create a new thread -->
   <form id="new-thread-form">
     <input id="thread-title" type="text" placeholder="title" required>
     <textarea id="thread-body" placeholder="post body" required></textarea>
     <button type="submit">post</button>
   </form>
 
-  <!-- This div will be filled with threads by JS -->
   <div id="thread-list"></div>
 
+  <script src="./auth.js"></script>
   <script>
-    // Initialize Supabase client
-    // Replace these strings with your actual values from Supabase dashboard
-    const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
+    requireAuth(function() {
+      loadThreads();
+    });
 
-    // supabase.createClient() sets up the connection to your database
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Load and display all threads when page opens
     async function loadThreads() {
-      // .from('threads') = which table
-      // .select('*') = get all columns
-      // .order(...) = newest first
       const { data, error } = await client
         .from('threads')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error(error);
-        return;
-      }
+      if (error) { console.error(error); return; }
 
       const list = document.getElementById('thread-list');
-      list.innerHTML = ''; // Clear old content
+      list.innerHTML = '';
 
-      // Loop through threads and create an HTML element for each
       data.forEach(thread => {
         const div = document.createElement('div');
         div.innerHTML = `
@@ -145,30 +60,17 @@
       });
     }
 
-    // Handle new thread form submission
     document.getElementById('new-thread-form').addEventListener('submit', async (e) => {
-      e.preventDefault(); // Prevents page reload on form submit
-
+      e.preventDefault();
       const title = document.getElementById('thread-title').value;
       const body = document.getElementById('thread-body').value;
 
-      // .insert() adds a new row to the table
-      const { error } = await client
-        .from('threads')
-        .insert({ title, body });
+      const { error } = await client.from('threads').insert({ title, body });
+      if (error) { alert('Error posting: ' + error.message); return; }
 
-      if (error) {
-        alert('Error posting: ' + error.message);
-        return;
-      }
-
-      // Clear the form and reload threads
       e.target.reset();
       loadThreads();
     });
-
-    // Run loadThreads when the page loads
-    loadThreads();
   </script>
 
 </body>

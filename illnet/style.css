@@ -1,0 +1,188 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --text: #d4d4d4;
+  --text-bright: #e8e8e8;
+  --muted: #888;
+  --dim: #444;
+  --border: #2a2a2a;
+  --sep: #1c1c1c;
+  --red: #cc2200;
+}
+
+[data-theme="light"] {
+  --bg: #f6f4f1;
+  --surface: #edeae5;
+  --text: #2e2e2e;
+  --text-bright: #0e0e0e;
+  --muted: #666;
+  --dim: #aaa;
+  --border: #ccc8c0;
+  --sep: #dedad4;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  width: min(66.67vw, 1100px);
+  min-width: 320px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  transition: background 0.12s, color 0.12s;
+}
+
+/* ── header ── */
+.site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--red);
+  padding-bottom: 10px;
+  margin-bottom: 32px;
+}
+
+.site-title {
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+}
+.btn-ghost:hover { color: var(--red); }
+
+/* ── forms ── */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 40px;
+}
+
+input, textarea {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  width: 100%;
+  resize: vertical;
+  transition: border-color 0.1s;
+}
+input:focus, textarea:focus { border-color: var(--red); }
+textarea { min-height: 80px; }
+
+button[type="submit"] {
+  background: none;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.1s, color 0.1s;
+}
+button[type="submit"]:hover { background: var(--red); color: var(--bg); }
+
+/* ── back link ── */
+a.back {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+a.back:hover { color: var(--red); }
+
+/* ── dividers ── */
+hr { border: none; border-top: 1px solid var(--sep); margin: 0; }
+
+/* ── thread list (index) ── */
+#thread-list { display: flex; flex-direction: column; }
+
+#thread-list > div {
+  border-left: 2px solid var(--border);
+  padding: 12px 14px;
+  transition: border-color 0.1s;
+}
+#thread-list > div:hover { border-left-color: var(--red); }
+
+#thread-list h3 { font-size: 13px; font-weight: normal; margin-bottom: 4px; }
+#thread-list h3 a { color: var(--text-bright); text-decoration: none; }
+#thread-list h3 a:hover { color: var(--red); }
+#thread-list p { color: var(--muted); font-size: 12px; margin-bottom: 4px; white-space: pre-wrap; }
+#thread-list small { color: var(--dim); font-size: 11px; }
+
+/* ── thread page ── */
+#thread-content {
+  border-left: 2px solid var(--red);
+  padding: 12px 14px;
+  margin-bottom: 32px;
+}
+#thread-content h2 { font-size: 15px; font-weight: normal; color: var(--text-bright); margin-bottom: 8px; }
+#thread-content p { font-size: 13px; white-space: pre-wrap; }
+
+.reply-label {
+  font-size: 11px;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 24px 0 12px;
+}
+
+#reply-list { display: flex; flex-direction: column; }
+#reply-list > div { border-left: 2px solid var(--border); padding: 10px 14px; }
+#reply-list > div:hover { border-left-color: var(--muted); }
+#reply-list p { font-size: 13px; margin-bottom: 4px; white-space: pre-wrap; }
+#reply-list small { font-size: 11px; color: var(--dim); }
+
+/* ── login page ── */
+.login-wrap {
+  max-width: 340px;
+  margin: 80px auto 0;
+}
+.login-wrap h1 {
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  border-bottom: 1px solid var(--red);
+  padding-bottom: 10px;
+  margin-bottom: 32px;
+}
+.error-msg {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 6px;
+  display: none;
+}
