@@ -6,6 +6,14 @@
   <title>illnet / thread</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$','$']], displayMath: [['\\[','\\]']], macros: { Ima: '\\operatorname{im}' } },
+      startup: { typeset: false }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
   <script>
     (function() {
       const t = localStorage.getItem('illnet-theme') || 'dark';
@@ -26,8 +34,10 @@
 
   <a class="back" id="back-link" href="/illnet/forum/">&larr; board</a>
 
+  <!-- OP -->
   <div id="op-post"></div>
 
+  <!-- Reply form -->
   <h3 class="reply-label">reply</h3>
   <div id="reply-form-wrap">
     <div class="reply-context" id="reply-context">
@@ -35,19 +45,28 @@
       <button class="btn-ghost" id="cancel-reply">× cancel</button>
     </div>
     <form id="reply-form">
-      <textarea id="reply-body" placeholder="write a reply" required></textarea>
+      <textarea id="reply-body" placeholder="write a reply  |  **bold**  *italic*  \`code\`  \`\`\`lang block\`\`\`  >>ID  $LaTeX$" required></textarea>
       <button type="submit">post</button>
     </form>
   </div>
 
+  <!-- Replies tree -->
   <h3 class="reply-label" id="replies-label" style="display:none">replies</h3>
   <div id="reply-list"></div>
+
+  <!-- Citation hover preview -->
+  <div class="cite-preview" id="cite-preview">
+    <div class="cite-preview-author" id="cite-preview-author"></div>
+    <div class="cite-preview-body" id="cite-preview-body"></div>
+  </div>
 
   <script src="../auth.js"></script>
   <script>
     const threadId = new URLSearchParams(window.location.search).get('id');
     let currentUser = null;
     let replyTarget = null;
+    const replyMap = new Map(); // id (number) → { username, body }
+    let opData = null;
 
     requireAuth(function(user) {
       currentUser = user;
@@ -56,49 +75,62 @@
       loadReplies();
     });
 
-    // ── OP ───────────────────────────────────────────────────────
+    // ── OP ─────────────────────────────────────────────────────────
     async function loadThread() {
       const { data, error } = await client.from('threads').select('*').eq('id', threadId).single();
       if (error) { console.error(error); return; }
+      opData = data;
 
       const board = data.board || 'b';
       document.title = `illnet / ${data.title}`;
       document.getElementById('board-crumb').textContent = `/${board}/`;
-      document.getElementById('back-link').href = `/illnet/forum/board.html?b=${board}`;
+      document.getElementById('back-link').href  = `/illnet/forum/board.html?b=${board}`;
       document.getElementById('back-link').textContent = `← /${board}/`;
 
+      const isMine = data.user_id === currentUser.id;
       document.getElementById('op-post').innerHTML = `
-        <div class="op-post">
+        <div class="op-post" id="op-inner">
           <div class="op-header">
-            <a href="/illnet/forum/user.html?u=${encodeURIComponent(data.username || '')}" class="user-link op-author">${escHtml(data.username || '?')}</a>
+            <a href="/illnet/forum/user.html?u=${enc(data.username)}" class="user-link op-author">${escHtml(data.username || '?')}</a>
             <span class="op-time">${fmtTime(data.created_at)}</span>
+            <span class="post-num">#OP</span>
           </div>
           <div class="op-title">${escHtml(data.title)}</div>
-          <div class="op-body">${parseMentions(data.body)}</div>
+          <div class="op-body" id="op-body">${parseBody(data.body)}</div>
+          ${isMine ? `
+            <div class="op-actions">
+              <button class="btn-ghost" onclick="startEditOp()">edit</button>
+              <button class="btn-ghost" onclick="deleteOp()" style="color:var(--dim)">delete</button>
+            </div>` : ''}
         </div>
       `;
+      typeset(document.getElementById('op-body'));
     }
 
-    // ── replies ───────────────────────────────────────────────────
+    // ── Replies ─────────────────────────────────────────────────────
     async function loadReplies() {
       const { data, error } = await client
         .from('replies').select('*').eq('thread_id', threadId).order('created_at', { ascending: true });
       if (error) { console.error(error); return; }
 
       const label = document.getElementById('replies-label');
-      const list = document.getElementById('reply-list');
+      const list  = document.getElementById('reply-list');
       list.innerHTML = '';
+      replyMap.clear();
 
       if (!data.length) { label.style.display = 'none'; return; }
       label.style.display = 'block';
 
+      data.forEach(r => replyMap.set(r.id, { username: r.username || '?', body: r.body }));
+
       buildTree(data).forEach(node => list.appendChild(renderReply(node)));
-      list.onclick = handleClick;
+      list.addEventListener('click', handleListClick);
+      typeset(list);
     }
 
+    // ── Tree ────────────────────────────────────────────────────────
     function buildTree(rows) {
-      const map = {};
-      const roots = [];
+      const map = {}, roots = [];
       rows.forEach(r => map[r.id] = { ...r, children: [] });
       rows.forEach(r => {
         if (r.parent_id && map[r.parent_id]) map[r.parent_id].children.push(map[r.id]);
@@ -108,46 +140,110 @@
     }
 
     function renderReply(reply) {
-      const hasChildren = reply.children.length > 0;
+      const isMine = reply.user_id === currentUser.id;
+      const hasKids = reply.children.length > 0;
       const node = document.createElement('div');
       node.className = 'reply-node';
-      node.dataset.id = reply.id;
+      node.id = `r${reply.id}`;
+      node.dataset.raw = reply.body;
 
       node.innerHTML = `
         <div class="reply-content">
           <div class="reply-header">
-            <a href="/illnet/forum/user.html?u=${encodeURIComponent(reply.username || '')}" class="user-link reply-author">${escHtml(reply.username || '?')}</a>
+            <a href="/illnet/forum/user.html?u=${enc(reply.username)}" class="user-link reply-author">${escHtml(reply.username || '?')}</a>
             <span class="reply-time">${fmtTime(reply.created_at)}</span>
+            <span class="post-num">#${reply.id}</span>
             <div class="reply-actions">
               <button class="btn-ghost reply-btn" data-id="${reply.id}" data-user="${escHtml(reply.username || '?')}">reply</button>
-              ${hasChildren ? `<button class="btn-ghost collapse-btn" data-id="${reply.id}">▾</button>` : ''}
+              ${hasKids ? `<button class="btn-ghost collapse-btn">▾</button>` : ''}
+              ${isMine ? `<button class="btn-ghost edit-btn" data-id="${reply.id}">edit</button>` : ''}
+              ${isMine ? `<button class="btn-ghost del-reply-btn" data-id="${reply.id}" style="color:var(--dim)">delete</button>` : ''}
             </div>
           </div>
-          <div class="reply-body">${parseMentions(reply.body)}</div>
+          <div class="reply-body" id="rb-${reply.id}">${parseBody(reply.body)}</div>
         </div>
-        ${hasChildren ? `<div class="reply-children"></div>` : ''}
+        ${hasKids ? `<div class="reply-children"></div>` : ''}
       `;
 
-      if (hasChildren) {
+      if (hasKids) {
         const el = node.querySelector('.reply-children');
         reply.children.forEach(c => el.appendChild(renderReply(c)));
       }
       return node;
     }
 
-    function handleClick(e) {
+    // ── Event delegation ────────────────────────────────────────────
+    function handleListClick(e) {
+      // reply
       const rb = e.target.closest('.reply-btn');
       if (rb) { setReplyTarget(rb.dataset.id, rb.dataset.user); return; }
 
+      // collapse
       const cb = e.target.closest('.collapse-btn');
       if (cb) {
-        const children = cb.closest('.reply-node').querySelector('.reply-children');
-        const collapsed = children.style.display === 'none';
-        children.style.display = collapsed ? '' : 'none';
+        const node = cb.closest('.reply-node');
+        const kids = node.querySelector('.reply-children');
+        const collapsed = kids.style.display === 'none';
+        kids.style.display = collapsed ? '' : 'none';
         cb.textContent = collapsed ? '▾' : '▸';
+        return;
       }
+
+      // edit
+      const eb = e.target.closest('.edit-btn');
+      if (eb) { startEditReply(eb.dataset.id); return; }
+
+      // delete
+      const db = e.target.closest('.del-reply-btn');
+      if (db) { deleteReply(db.dataset.id); return; }
+
+      // save edit
+      const sb = e.target.closest('.save-edit-btn');
+      if (sb) { saveEditReply(sb.dataset.id); return; }
+
+      // cancel edit
+      const xb = e.target.closest('.cancel-edit-btn');
+      if (xb) { cancelEditReply(xb.dataset.id); return; }
     }
 
+    // ── Citation jump (global) ──────────────────────────────────────
+    document.addEventListener('click', e => {
+      const cite = e.target.closest('.cite');
+      if (!cite) return;
+      const target = document.getElementById('r' + cite.dataset.id);
+      if (!target) return;
+      target.classList.remove('cited');
+      void target.offsetWidth; // reflow to restart animation
+      target.classList.add('cited');
+      setTimeout(() => target.classList.remove('cited'), 1800);
+    });
+
+    // ── Citation hover preview ──────────────────────────────────────
+    const preview = document.getElementById('cite-preview');
+
+    document.addEventListener('mouseover', e => {
+      const cite = e.target.closest('.cite');
+      if (!cite) return;
+      const data = replyMap.get(Number(cite.dataset.id));
+      if (!data) return;
+      document.getElementById('cite-preview-author').textContent = data.username;
+      document.getElementById('cite-preview-body').textContent = data.body.slice(0, 220) + (data.body.length > 220 ? '…' : '');
+      preview.style.display = 'block';
+    });
+
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest('.cite')) preview.style.display = 'none';
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (preview.style.display !== 'block') return;
+      const x = Math.min(e.clientX + 14, window.innerWidth  - 380);
+      const y = Math.min(e.clientY + 14, window.innerHeight - 160);
+      preview.style.left = x + 'px';
+      preview.style.top  = y + 'px';
+    });
+
+    // ── Reply target ────────────────────────────────────────────────
     function setReplyTarget(id, username) {
       replyTarget = { id, username };
       document.getElementById('reply-context-text').innerHTML =
@@ -162,7 +258,8 @@
       document.getElementById('reply-context').classList.remove('active');
     };
 
-    document.getElementById('reply-form').addEventListener('submit', async (e) => {
+    // ── Submit reply ─────────────────────────────────────────────────
+    document.getElementById('reply-form').addEventListener('submit', async e => {
       e.preventDefault();
       const body = document.getElementById('reply-body').value.trim();
       if (!body) return;
@@ -173,23 +270,171 @@
         username: getUsername(currentUser),
         parent_id: replyTarget ? replyTarget.id : null
       });
-
       if (error) { alert(error.message); return; }
+
       e.target.reset();
       replyTarget = null;
       document.getElementById('reply-context').classList.remove('active');
+      // Re-attach listener after reload
+      const list = document.getElementById('reply-list');
+      list.removeEventListener('click', handleListClick);
       loadReplies();
     });
 
-    // ── helpers ───────────────────────────────────────────────────
-    function escHtml(t) {
-      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    // ── Edit OP ──────────────────────────────────────────────────────
+    function startEditOp() {
+      const bodyEl = document.getElementById('op-body');
+      const raw = opData.body;
+      bodyEl.outerHTML = `
+        <div class="edit-form" id="op-edit-form">
+          <textarea class="op-edit-area" id="op-edit-area">${escAttr(raw)}</textarea>
+          <div class="edit-actions">
+            <button type="button" class="btn-ghost" onclick="saveEditOp()" style="color:var(--red)">save</button>
+            <button type="button" class="btn-ghost" onclick="cancelEditOp()">cancel</button>
+          </div>
+        </div>
+      `;
+      const ta = document.getElementById('op-edit-area');
+      if (ta) { ta.style.minHeight = '120px'; ta.focus(); }
     }
-    function parseMentions(text) {
-      return escHtml(text).replace(/@(\w+)/g, '<span class="mention">@$1</span>');
+
+    async function saveEditOp() {
+      const val = document.getElementById('op-edit-area')?.value.trim();
+      if (!val) return;
+      const { error } = await client.from('threads').update({ body: val }).eq('id', threadId);
+      if (error) { alert(error.message); return; }
+      opData.body = val;
+      const form = document.getElementById('op-edit-form');
+      if (form) {
+        const newEl = document.createElement('div');
+        newEl.className = 'op-body';
+        newEl.id = 'op-body';
+        newEl.innerHTML = parseBody(val);
+        form.replaceWith(newEl);
+        typeset(newEl);
+      }
     }
+
+    function cancelEditOp() {
+      const form = document.getElementById('op-edit-form');
+      if (!form) return;
+      const newEl = document.createElement('div');
+      newEl.className = 'op-body';
+      newEl.id = 'op-body';
+      newEl.innerHTML = parseBody(opData.body);
+      form.replaceWith(newEl);
+      typeset(newEl);
+    }
+
+    async function deleteOp() {
+      if (!confirm('Delete this thread and all replies?')) return;
+      const { error } = await client.from('threads').delete().eq('id', threadId);
+      if (error) { alert(error.message); return; }
+      window.location.href = `/illnet/forum/board.html?b=${opData.board || 'b'}`;
+    }
+
+    // ── Edit reply ───────────────────────────────────────────────────
+    function startEditReply(id) {
+      const node = document.getElementById('r' + id);
+      if (!node) return;
+      const raw = node.dataset.raw;
+      const bodyEl = document.getElementById('rb-' + id);
+      if (!bodyEl) return;
+      bodyEl.outerHTML = `
+        <div class="edit-form" id="ef-${id}">
+          <textarea id="ea-${id}" style="min-height:70px">${escAttr(raw)}</textarea>
+          <div class="edit-actions">
+            <button type="button" class="btn-ghost save-edit-btn" data-id="${id}" style="color:var(--red)">save</button>
+            <button type="button" class="btn-ghost cancel-edit-btn" data-id="${id}">cancel</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('ea-' + id)?.focus();
+    }
+
+    async function saveEditReply(id) {
+      const val = document.getElementById('ea-' + id)?.value.trim();
+      if (!val) return;
+      const { error } = await client.from('replies').update({ body: val }).eq('id', id);
+      if (error) { alert(error.message); return; }
+      const node = document.getElementById('r' + id);
+      if (node) node.dataset.raw = val;
+      replyMap.set(Number(id), { ...(replyMap.get(Number(id)) || {}), body: val });
+      const form = document.getElementById('ef-' + id);
+      if (form) {
+        const newEl = document.createElement('div');
+        newEl.className = 'reply-body';
+        newEl.id = 'rb-' + id;
+        newEl.innerHTML = parseBody(val);
+        form.replaceWith(newEl);
+        typeset(newEl);
+      }
+    }
+
+    function cancelEditReply(id) {
+      const node = document.getElementById('r' + id);
+      const form = document.getElementById('ef-' + id);
+      if (!form || !node) return;
+      const newEl = document.createElement('div');
+      newEl.className = 'reply-body';
+      newEl.id = 'rb-' + id;
+      newEl.innerHTML = parseBody(node.dataset.raw);
+      form.replaceWith(newEl);
+      typeset(newEl);
+    }
+
+    async function deleteReply(id) {
+      if (!confirm('Delete this reply?')) return;
+      const { error } = await client.from('replies').delete().eq('id', id);
+      if (error) { alert(error.message); return; }
+      document.getElementById('r' + id)?.remove();
+      replyMap.delete(Number(id));
+    }
+
+    // ── Body parser ─────────────────────────────────────────────────
+    // Handles: ```code blocks```, `inline`, **bold**, *italic*, >>ID, @mention
+    // LaTeX ($...$, \[...\]) is preserved and left to MathJax
+    function parseBody(raw) {
+      const parts = raw.split(/(```[\s\S]*?```)/g);
+      return parts.map(part => {
+        if (part.startsWith('```')) {
+          const inner = part.slice(3, -3);
+          const nl    = inner.indexOf('\n');
+          const lang  = nl >= 0 ? inner.slice(0, nl).trim() : '';
+          const code  = nl >= 0 ? inner.slice(nl + 1) : inner;
+          return `<pre class="code-block">${lang ? `<span class="code-lang">${escHtml(lang)}</span>` : ''}<code>${escHtml(code)}</code></pre>`;
+        }
+        // Placeholders before HTML escaping so >> and @ survive
+        let s = part
+          .replace(/>>(\d+)/g, '\x01CITE:$1\x01')
+          .replace(/@(\w+)/g,  '\x01MENT:$1\x01');
+        // HTML escape (preserves $ and \ for MathJax)
+        s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        // Inline formatting
+        s = s
+          .replace(/`([^`\n]+)`/g,       '<code class="inline-code">$1</code>')
+          .replace(/\*\*([^*\n]+)\*\*/g,  '<strong>$1</strong>')
+          .replace(/\*([^*\n]+)\*/g,      '<em>$1</em>')
+          .replace(/\n/g, '<br>');
+        // Restore placeholders
+        s = s
+          .replace(/\x01CITE:(\d+)\x01/g, '<a class="cite" href="#r$1" data-id="$1">&gt;&gt;$1</a>')
+          .replace(/\x01MENT:(\w+)\x01/g,  '<span class="mention">@$1</span>');
+        return s;
+      }).join('');
+    }
+
+    // ── MathJax ─────────────────────────────────────────────────────
+    function typeset(el) {
+      if (window.MathJax?.typesetPromise) MathJax.typesetPromise([el]).catch(console.error);
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────
+    function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function escAttr(t) { return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function enc(t) { return encodeURIComponent(t || ''); }
     function fmtTime(iso) {
-      return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
     }
   </script>
 

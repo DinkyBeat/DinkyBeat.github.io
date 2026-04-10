@@ -39,7 +39,6 @@
 
   <script src="../auth.js"></script>
   <script>
-    const BOARD_NAMES = { b: 'random', econ: 'economics', math: 'math', cs: 'cs', meta: 'meta' };
     const board = new URLSearchParams(window.location.search).get('b') || 'b';
     document.getElementById('board-title').textContent = `/${board}/`;
     document.title = `illnet / /${board}/`;
@@ -55,7 +54,7 @@
     async function loadThreads() {
       const { data: threads, error } = await client
         .from('threads')
-        .select('id, title, username, created_at')
+        .select('id, title, username, created_at, user_id')
         .eq('board', board)
         .order('created_at', { ascending: false });
 
@@ -69,26 +68,38 @@
         return;
       }
 
-      // Get reply counts in one query
       const ids = threads.map(t => t.id);
-      const { data: replies } = await client.from('replies').select('thread_id').in('thread_id', ids);
+
+      // Get reply counts + latest reply per thread in one query
+      const { data: replies } = await client
+        .from('replies')
+        .select('thread_id, username, created_at')
+        .in('thread_id', ids)
+        .order('created_at', { ascending: false });
+
       const replyCount = {};
-      (replies || []).forEach(r => replyCount[r.thread_id] = (replyCount[r.thread_id] || 0) + 1);
+      const lastReply = {};
+      (replies || []).forEach(r => {
+        replyCount[r.thread_id] = (replyCount[r.thread_id] || 0) + 1;
+        if (!lastReply[r.thread_id]) lastReply[r.thread_id] = r;
+      });
 
       threads.forEach(t => {
+        const n = replyCount[t.id] || 0;
+        const last = lastReply[t.id];
         const row = document.createElement('div');
         row.className = 'thread-row';
-        const n = replyCount[t.id] || 0;
         row.innerHTML = `
           <div>
             <a class="thread-title" href="/illnet/forum/thread.html?id=${t.id}">${escHtml(t.title)}</a>
             <div class="thread-byline">
-              <a href="/illnet/forum/user.html?u=${encodeURIComponent(t.username || '')}" class="user-link">${escHtml(t.username || '?')}</a>
+              <a href="/illnet/forum/user.html?u=${enc(t.username)}" class="user-link">${escHtml(t.username || '?')}</a>
+              · ${fmtDate(t.created_at)}
             </div>
           </div>
           <div class="thread-meta">
             <span class="thread-replies">${n} ${n === 1 ? 'reply' : 'replies'}</span>
-            ${fmtDate(t.created_at)}
+            ${last ? `<span class="last-reply">last: <a href="/illnet/forum/user.html?u=${enc(last.username)}" class="user-link">${escHtml(last.username || '?')}</a> · ${relTime(last.created_at)}</span>` : ''}
           </div>
         `;
         list.appendChild(row);
@@ -98,7 +109,7 @@
     document.getElementById('new-thread-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('thread-title').value.trim();
-      const body = document.getElementById('thread-body').value.trim();
+      const body  = document.getElementById('thread-body').value.trim();
       const { error } = await client.from('threads').insert({
         title, body, board,
         user_id: currentUser.id,
@@ -109,11 +120,16 @@
       loadThreads();
     });
 
-    function escHtml(t) {
-      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function fmtDate(iso) {
-      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function enc(t) { return encodeURIComponent(t || ''); }
+    function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+    function relTime(iso) {
+      const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+      if (m < 1) return 'just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h/24)}d ago`;
     }
   </script>
 

@@ -24,32 +24,37 @@
     </div>
   </header>
 
-  <div class="board-list" id="board-list">
+  <div class="board-list">
     <a class="board-row" href="/illnet/forum/board.html?b=b">
       <span class="board-code">/b/</span>
       <span class="board-name">random</span>
-      <span class="board-count" id="count-b">—</span>
+      <span class="board-count" id="count-b"></span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=econ">
       <span class="board-code">/econ/</span>
       <span class="board-name">economics</span>
-      <span class="board-count" id="count-econ">—</span>
+      <span class="board-count" id="count-econ"></span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=math">
       <span class="board-code">/math/</span>
       <span class="board-name">math</span>
-      <span class="board-count" id="count-math">—</span>
+      <span class="board-count" id="count-math"></span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=cs">
       <span class="board-code">/cs/</span>
       <span class="board-name">cs</span>
-      <span class="board-count" id="count-cs">—</span>
+      <span class="board-count" id="count-cs"></span>
     </a>
     <a class="board-row" href="/illnet/forum/board.html?b=meta">
       <span class="board-code">/meta/</span>
       <span class="board-name">meta</span>
-      <span class="board-count" id="count-meta">—</span>
+      <span class="board-count" id="count-meta"></span>
     </a>
+  </div>
+
+  <div style="margin-top: 40px; margin-bottom: 16px;">
+    <span class="section-label">recent activity</span>
+    <div class="activity-list" id="activity-list"></div>
   </div>
 
   <script src="../auth.js"></script>
@@ -57,6 +62,7 @@
     requireAuth(function(user) {
       document.getElementById('username-link').textContent = getUsername(user);
       loadCounts();
+      loadActivity();
     });
 
     async function loadCounts() {
@@ -64,10 +70,53 @@
       if (!data) return;
       const counts = {};
       data.forEach(t => counts[t.board] = (counts[t.board] || 0) + 1);
-      ['b', 'econ', 'math', 'cs', 'meta'].forEach(b => {
+      ['b','econ','math','cs','meta'].forEach(b => {
         const el = document.getElementById('count-' + b);
         if (el) el.textContent = counts[b] ? counts[b] + (counts[b] === 1 ? ' thread' : ' threads') : '';
       });
+    }
+
+    async function loadActivity() {
+      const [{ data: threads }, { data: replies }] = await Promise.all([
+        client.from('threads').select('id, title, board, username, created_at').order('created_at', { ascending: false }).limit(12),
+        client.from('replies').select('id, body, thread_id, username, created_at, threads(title, board)').order('created_at', { ascending: false }).limit(12)
+      ]);
+
+      const items = [
+        ...(threads || []).map(t => ({ type: 'thread', time: t.created_at, username: t.username, title: t.title, board: t.board, href: `/illnet/forum/thread.html?id=${t.id}` })),
+        ...(replies || []).map(r => ({ type: 'reply', time: r.created_at, username: r.username, title: r.threads?.title || '?', board: r.threads?.board || '?', href: `/illnet/forum/thread.html?id=${r.thread_id}#r${r.id}`, excerpt: r.body }))
+      ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 15);
+
+      const list = document.getElementById('activity-list');
+      if (!items.length) { list.innerHTML = `<div class="activity-row" style="color:var(--dim)">no activity yet.</div>`; return; }
+
+      list.innerHTML = items.map(item => `
+        <div class="activity-row">
+          <a href="${item.href}">
+            <span style="color:var(--red)">${escHtml(item.username || '?')}</span>
+            ${item.type === 'thread' ? 'posted' : 'replied in'}
+            <span style="color:var(--muted)">/${item.board}/</span>
+            — ${escHtml(item.title)}
+          </a>
+          <div class="activity-meta">${relTime(item.time)}</div>
+        </div>
+      `).join('');
+    }
+
+    function relTime(iso) {
+      const diff = Date.now() - new Date(iso).getTime();
+      const m = Math.floor(diff / 60000);
+      if (m < 1)  return 'just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      const d = Math.floor(h / 24);
+      if (d < 30) return `${d}d ago`;
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function escHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
   </script>
 

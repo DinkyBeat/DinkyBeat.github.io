@@ -74,7 +74,7 @@ input, textarea {
 input:focus, textarea:focus { border-color: var(--red); }
 textarea { min-height: 80px; }
 
-/* ── nav links ── */
+/* ── links ── */
 a.back {
   display: inline-block; font-size: 11px; letter-spacing: 0.15em;
   text-transform: uppercase; color: var(--muted); text-decoration: none; margin-bottom: 28px;
@@ -96,9 +96,8 @@ hr { border: none; border-top: 1px solid var(--sep); margin: 0; }
 .board-list { display: flex; flex-direction: column; }
 a.board-row {
   display: grid;
-  grid-template-columns: 80px 1fr 60px;
+  grid-template-columns: 80px 1fr 80px;
   align-items: baseline;
-  gap: 0;
   padding: 11px 14px;
   text-decoration: none;
   color: var(--text);
@@ -111,12 +110,26 @@ a.board-row:hover { border-left-color: var(--red); }
 .board-name { font-size: 13px; color: var(--text-bright); }
 .board-count { font-size: 11px; color: var(--dim); text-align: right; }
 
+/* ── activity feed ── */
+.activity-list { display: flex; flex-direction: column; }
+.activity-row {
+  padding: 9px 14px;
+  border-left: 2px solid var(--border);
+  font-size: 12px;
+  transition: border-color 0.1s;
+}
+.activity-row + .activity-row { border-top: 1px solid var(--sep); }
+.activity-row:hover { border-left-color: var(--muted); }
+.activity-row a { color: var(--text-bright); text-decoration: none; }
+.activity-row a:hover { color: var(--red); }
+.activity-meta { color: var(--dim); font-size: 11px; margin-top: 2px; }
+
 /* ── thread list (board page) ── */
 #thread-list { display: flex; flex-direction: column; }
 .thread-row {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: baseline;
+  align-items: start;
   gap: 16px;
   padding: 11px 14px;
   border-left: 2px solid var(--border);
@@ -124,22 +137,25 @@ a.board-row:hover { border-left-color: var(--red); }
 }
 .thread-row + .thread-row { border-top: 1px solid var(--sep); }
 .thread-row:hover { border-left-color: var(--red); }
-.thread-title { font-size: 13px; color: var(--text-bright); text-decoration: none; display: block; margin-bottom: 2px; }
+.thread-title { font-size: 13px; color: var(--text-bright); text-decoration: none; display: block; margin-bottom: 3px; }
 .thread-title:hover { color: var(--red); }
 .thread-byline { font-size: 11px; color: var(--dim); }
 .thread-meta { font-size: 11px; color: var(--dim); text-align: right; white-space: nowrap; }
-.thread-replies { display: block; color: var(--muted); }
+.thread-replies { display: block; margin-bottom: 2px; }
+.last-reply { color: var(--dim); font-size: 11px; }
 
 /* ── new thread form ── */
 .form-section { margin-bottom: 40px; }
 
 /* ── thread view: OP ── */
 .op-post { border-left: 2px solid var(--red); padding: 14px 16px; margin-bottom: 24px; }
-.op-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
-.op-author { color: var(--red); font-size: 12px; }
+.op-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.op-author { font-size: 12px; }
 .op-time { color: var(--dim); font-size: 11px; }
+.post-num { color: var(--dim); font-size: 11px; }
 .op-title { font-size: 16px; color: var(--text-bright); margin-bottom: 10px; }
-.op-body { font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+.op-body { font-size: 13px; line-height: 1.65; }
+.op-actions { margin-top: 10px; display: flex; gap: 12px; }
 
 /* ── reply context banner ── */
 .reply-context {
@@ -155,14 +171,65 @@ a.board-row:hover { border-left-color: var(--red); }
 .reply-node { }
 .reply-content { padding: 10px 14px; border-left: 2px solid var(--border); transition: border-color 0.1s; }
 .reply-content:hover { border-left-color: var(--muted); }
-.reply-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+.reply-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
 .reply-author { font-size: 12px; }
 .reply-time { color: var(--dim); font-size: 11px; }
 .reply-actions { margin-left: auto; display: flex; gap: 10px; }
-.reply-body { font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
+.reply-body { font-size: 13px; line-height: 1.65; }
 .reply-children { border-left: 1px solid var(--border); margin-left: 20px; }
 .reply-node + .reply-node { margin-top: 2px; }
+
+/* ── flash highlight for >>N jumps ── */
+@keyframes cite-flash {
+  0%   { border-left-color: var(--red); background: rgba(204,34,0,0.07); }
+  100% { border-left-color: var(--border); background: transparent; }
+}
+.reply-node.cited > .reply-content { animation: cite-flash 1.8s ease-out; }
+
+/* ── citation link & hover preview ── */
+.cite { color: var(--red); text-decoration: none; font-weight: bold; }
+.cite:hover { text-decoration: underline; }
+
+.cite-preview {
+  position: fixed;
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--red);
+  padding: 10px 13px;
+  max-width: 360px;
+  font-size: 12px;
+  z-index: 200;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.cite-preview-author { color: var(--red); font-size: 11px; margin-bottom: 5px; }
+.cite-preview-body { color: var(--text); line-height: 1.45; max-height: 120px; overflow: hidden; }
+
+/* ── inline formatting ── */
 .mention { color: var(--red); }
+
+code.inline-code {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 1px 5px; font-size: 12px; font-family: 'Courier New', monospace;
+}
+
+pre.code-block {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 2px solid var(--dim);
+  padding: 12px 14px; margin: 8px 0;
+  overflow-x: auto; font-size: 12px; line-height: 1.5;
+}
+pre.code-block code { font-family: 'Courier New', monospace; white-space: pre; }
+.code-lang {
+  display: block; font-size: 10px; color: var(--dim);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+}
+
+/* ── edit UI ── */
+.edit-form { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.edit-form textarea { min-height: 60px; font-size: 13px; }
+.edit-actions { display: flex; gap: 10px; }
 
 /* ── reply label ── */
 .reply-label {
@@ -172,24 +239,19 @@ a.board-row:hover { border-left-color: var(--red); }
 
 /* ── user profile ── */
 .profile-name { font-size: 20px; font-weight: normal; color: var(--text-bright); margin-bottom: 4px; }
-.profile-since { font-size: 11px; color: var(--dim); letter-spacing: 0.06em; }
+.profile-since { font-size: 11px; color: var(--dim); }
 .profile-divider { border-top: 1px solid var(--sep); margin: 20px 0; }
 .stat-row { display: flex; gap: 32px; }
 .stat { display: flex; flex-direction: column; gap: 2px; }
 .stat-num { font-size: 18px; color: var(--text-bright); }
 .stat-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; }
-
 .post-history { display: flex; flex-direction: column; }
-.history-row {
-  padding: 10px 14px; border-left: 2px solid var(--border);
-  transition: border-color 0.1s;
-}
+.history-row { padding: 10px 14px; border-left: 2px solid var(--border); transition: border-color 0.1s; }
 .history-row + .history-row { border-top: 1px solid var(--sep); }
 .history-row:hover { border-left-color: var(--muted); }
 .history-row a { color: var(--text-bright); text-decoration: none; font-size: 13px; }
 .history-row a:hover { color: var(--red); }
 .history-meta { font-size: 11px; color: var(--dim); margin-top: 2px; }
-.history-body { font-size: 12px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60ch; }
 
 /* ── admin panel ── */
 .admin-stats { display: flex; gap: 40px; margin-bottom: 32px; }
@@ -197,18 +259,14 @@ a.board-row:hover { border-left-color: var(--red); }
 .admin-table th {
   text-align: left; font-weight: normal; font-size: 11px;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--dim); padding: 6px 10px;
-  border-bottom: 1px solid var(--border);
+  color: var(--dim); padding: 6px 10px; border-bottom: 1px solid var(--border);
 }
 .admin-table td { padding: 9px 10px; border-bottom: 1px solid var(--sep); vertical-align: baseline; }
 .admin-table tr:hover td { background: var(--surface); }
 .admin-table a { color: var(--text-bright); text-decoration: none; }
 .admin-table a:hover { color: var(--red); }
 .board-tag { color: var(--red); font-size: 11px; }
-.del-btn {
-  background: none; border: none; color: var(--dim);
-  font-family: inherit; font-size: 11px; cursor: pointer; padding: 0;
-}
+.del-btn { background: none; border: none; color: var(--dim); font-family: inherit; font-size: 11px; cursor: pointer; padding: 0; }
 .del-btn:hover { color: var(--red); }
 
 /* ── login page ── */
