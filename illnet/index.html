@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Board</title>
+  <!-- Supabase JS library, loaded from CDN -->
+  <!-- CDN = Content Delivery Network, a way to load libraries 
+       without installing anything -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <h1>Board</h1>
+
+  <!-- Form to create a new thread -->
+  <form id="new-thread-form">
+    <input id="thread-title" type="text" placeholder="Title" required>
+    <textarea id="thread-body" placeholder="Post body" required></textarea>
+    <button type="submit">Post Thread</button>
+  </form>
+
+  <!-- This div will be filled with threads by JS -->
+  <div id="thread-list"></div>
+
+  <script>
+    // Initialize Supabase client
+    // Replace these strings with your actual values from Supabase dashboard
+    const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
+
+    // supabase.createClient() sets up the connection to your database
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Load and display all threads when page opens
+    async function loadThreads() {
+      // .from('threads') = which table
+      // .select('*') = get all columns
+      // .order(...) = newest first
+      const { data, error } = await client
+        .from('threads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const list = document.getElementById('thread-list');
+      list.innerHTML = ''; // Clear old content
+
+      // Loop through threads and create an HTML element for each
+      data.forEach(thread => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <h3><a href="/board/thread.html?id=${thread.id}">${thread.title}</a></h3>
+          <p>${thread.body}</p>
+          <small>${new Date(thread.created_at).toLocaleString()}</small>
+          <hr>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // Handle new thread form submission
+    document.getElementById('new-thread-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevents page reload on form submit
+
+      const title = document.getElementById('thread-title').value;
+      const body = document.getElementById('thread-body').value;
+
+      // .insert() adds a new row to the table
+      const { error } = await client
+        .from('threads')
+        .insert({ title, body });
+
+      if (error) {
+        alert('Error posting: ' + error.message);
+        return;
+      }
+
+      // Clear the form and reload threads
+      e.target.reset();
+      loadThreads();
+    });
+
+    // Run loadThreads when the page loads
+    loadThreads();
+  </script>
+
+</body>
+</html>
