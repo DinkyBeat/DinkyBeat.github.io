@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illnet / profile</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    .profile-block {
+      margin-top: 16px;
+    }
+    .profile-name {
+      font-size: 22px;
+      font-weight: normal;
+      color: var(--text-bright);
+      margin-bottom: 6px;
+    }
+    .profile-meta {
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+    }
+    .profile-meta span { color: var(--muted); }
+    .profile-divider {
+      border-top: 1px solid var(--sep);
+      margin: 24px 0;
+    }
+    .stat-row {
+      display: flex;
+      gap: 32px;
+    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-num { font-size: 18px; color: var(--text-bright); }
+    .stat-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.1em; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="site-title">illnet / profile</span>
+    <div class="header-actions">
+      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-ghost" onclick="logout()">logout</button>
+    </div>
+  </header>
+
+  <a class="back" href="/illnet/forum/">&larr; board</a>
+
+  <div class="profile-block">
+    <div class="profile-name" id="profile-name">—</div>
+    <div class="profile-meta">member since <span id="profile-since">—</span></div>
+  </div>
+
+  <div class="profile-divider"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <span class="stat-num" id="stat-threads">—</span>
+      <span class="stat-label">threads</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-replies">—</span>
+      <span class="stat-label">replies</span>
+    </div>
+  </div>
+
+  <script src="../auth.js"></script>
+  <script>
+    requireAuth(async function(user) {
+      const username = user.email.replace('@illnet.com', '');
+      const since = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('profile-name').textContent = username;
+      document.getElementById('profile-since').textContent = since;
+      document.title = 'illnet / ' + username;
+
+      // Thread + reply counts
+      const [{ count: threadCount }, { count: replyCount }] = await Promise.all([
+        client.from('threads').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+        client.from('replies').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      ]);
+
+      document.getElementById('stat-threads').textContent = threadCount ?? 0;
+      document.getElementById('stat-replies').textContent = replyCount ?? 0;
+    });
+  </script>
+
+</body>
+</html>

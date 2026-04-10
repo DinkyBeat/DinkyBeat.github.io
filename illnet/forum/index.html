@@ -18,6 +18,7 @@
   <header class="site-header">
     <span class="site-title">illnet / board</span>
     <div class="header-actions">
+      <a class="btn-ghost" id="username-link" href="/illnet/forum/user.html" style="text-decoration:none"></a>
       <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
       <button class="btn-ghost" onclick="logout()">logout</button>
     </div>
@@ -33,7 +34,8 @@
 
   <script src="../auth.js"></script>
   <script>
-    requireAuth(function() {
+    requireAuth(function(user) {
+      document.getElementById('username-link').textContent = user.email.replace('@illnet.com', '');
       loadThreads();
     });
 

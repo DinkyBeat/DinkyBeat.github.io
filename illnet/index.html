@@ -45,7 +45,7 @@
       const errEl = document.getElementById('error-msg');
       errEl.style.display = 'none';
 
-      const email = username + '@illnet';
+      const email = username + '@illnet.com';
       const { error } = await client.auth.signInWithPassword({ email, password });
       if (error) {
         errEl.textContent = error.message;
