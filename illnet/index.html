@@ -6,7 +6,12 @@
   <title>illnet</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="./style.css">
-  <script>eval(atob("CiAgICAoZnVuY3Rpb24oKSB7CiAgICAgIGNvbnN0IHQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnaWxsbmV0LXRoZW1lJykgfHwgJ2RhcmsnOwogICAgICBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgdCk7CiAgICB9KSgpOwogIA=="))</script>
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
@@ -30,7 +35,31 @@
   </div>
 
   <script src="./auth.js"></script>
-  <script>eval(atob("CiAgICAvLyBJZiBhbHJlYWR5IGxvZ2dlZCBpbiwgc2tpcCBzdHJhaWdodCB0byB0aGUgZm9ydW0KICAgIGNsaWVudC5hdXRoLmdldFNlc3Npb24oKS50aGVuKCh7IGRhdGE6IHsgc2Vzc2lvbiB9IH0pID0+IHsKICAgICAgaWYgKHNlc3Npb24pIHdpbmRvdy5sb2NhdGlvbi5ocmVmID0gJy9pbGxuZXQvZm9ydW0vJzsKICAgIH0pOwoKICAgIHN5bmNUaGVtZUJ0bigpOwoKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2dpbi1mb3JtJykuYWRkRXZlbnRMaXN0ZW5lcignc3VibWl0JywgYXN5bmMgKGUpID0+IHsKICAgICAgZS5wcmV2ZW50RGVmYXVsdCgpOwogICAgICBjb25zdCB1c2VybmFtZSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1c2VybmFtZScpLnZhbHVlLnRyaW0oKTsKICAgICAgY29uc3QgcGFzc3dvcmQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGFzc3dvcmQnKS52YWx1ZTsKICAgICAgY29uc3QgZXJyRWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZXJyb3ItbXNnJyk7CiAgICAgIGVyckVsLnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CgogICAgICBjb25zdCBlbWFpbCA9IHVzZXJuYW1lICsgJ0BpbGxuZXQuY29tJzsKICAgICAgY29uc3QgeyBlcnJvciB9ID0gYXdhaXQgY2xpZW50LmF1dGguc2lnbkluV2l0aFBhc3N3b3JkKHsgZW1haWwsIHBhc3N3b3JkIH0pOwogICAgICBpZiAoZXJyb3IpIHsKICAgICAgICBlcnJFbC50ZXh0Q29udGVudCA9IGVycm9yLm1lc3NhZ2U7CiAgICAgICAgZXJyRWwuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7CiAgICAgICAgcmV0dXJuOwogICAgICB9CiAgICAgIHdpbmRvdy5sb2NhdGlvbi5ocmVmID0gJy9pbGxuZXQvZm9ydW0vJzsKICAgIH0pOwogIA=="))</script>
+  <script>
+    // If already logged in, skip straight to the forum
+    client.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = '/illnet/forum/';
+    });
+
+    syncThemeBtn();
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('error-msg');
+      errEl.style.display = 'none';
+
+      const email = username + '@illnet.com';
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = error.message;
+        errEl.style.display = 'block';
+        return;
+      }
+      window.location.href = '/illnet/forum/';
+    });
+  </script>
 
 </body>
 </html>

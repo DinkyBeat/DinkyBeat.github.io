@@ -6,7 +6,12 @@
   <title>illnet / user</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
-  <script>eval(atob("CiAgICAoZnVuY3Rpb24oKSB7CiAgICAgIGNvbnN0IHQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnaWxsbmV0LXRoZW1lJykgfHwgJ2RhcmsnOwogICAgICBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgdCk7CiAgICB9KSgpOwogIA=="))</script>
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
@@ -47,7 +52,70 @@
   <div class="post-history" id="reply-history"></div>
 
   <script src="../auth.js"></script>
-  <script>eval(atob("CiAgICBjb25zdCB0YXJnZXRVc2VyID0gbmV3IFVSTFNlYXJjaFBhcmFtcyh3aW5kb3cubG9jYXRpb24uc2VhcmNoKS5nZXQoJ3UnKTsKCiAgICByZXF1aXJlQXV0aChhc3luYyBmdW5jdGlvbih1c2VyKSB7CiAgICAgIGNvbnN0IHNlbGZOYW1lID0gZ2V0VXNlcm5hbWUodXNlcik7CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzZWxmLWxpbmsnKS50ZXh0Q29udGVudCA9IHNlbGZOYW1lOwoKICAgICAgLy8gVmlld2luZyBvd24gcHJvZmlsZSB2cy4gc29tZW9uZSBlbHNlJ3MKICAgICAgY29uc3Qgdmlld2luZ05hbWUgPSB0YXJnZXRVc2VyIHx8IHNlbGZOYW1lOwogICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncHJvZmlsZS1uYW1lJykudGV4dENvbnRlbnQgPSB2aWV3aW5nTmFtZTsKICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BhZ2UtdGl0bGUnKS50ZXh0Q29udGVudCA9IGBpbGxuZXQgLyAke3ZpZXdpbmdOYW1lfWA7CiAgICAgIGRvY3VtZW50LnRpdGxlID0gYGlsbG5ldCAvICR7dmlld2luZ05hbWV9YDsKCiAgICAgIC8vIE93biBwcm9maWxlOiBzaG93IGpvaW4gZGF0ZSBmcm9tIGF1dGgKICAgICAgaWYgKCF0YXJnZXRVc2VyIHx8IHRhcmdldFVzZXIgPT09IHNlbGZOYW1lKSB7CiAgICAgICAgY29uc3Qgc2luY2UgPSBuZXcgRGF0ZSh1c2VyLmNyZWF0ZWRfYXQpLnRvTG9jYWxlRGF0ZVN0cmluZygnZW4tVVMnLCB7IHllYXI6ICdudW1lcmljJywgbW9udGg6ICdsb25nJywgZGF5OiAnbnVtZXJpYycgfSk7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Byb2ZpbGUtc2luY2UnKS50ZXh0Q29udGVudCA9IGBtZW1iZXIgc2luY2UgJHtzaW5jZX1gOwogICAgICB9CgogICAgICBsb2FkSGlzdG9yeSh2aWV3aW5nTmFtZSk7CiAgICB9KTsKCiAgICBhc3luYyBmdW5jdGlvbiBsb2FkSGlzdG9yeSh1c2VybmFtZSkgewogICAgICBjb25zdCBbeyBkYXRhOiB0aHJlYWRzIH0sIHsgZGF0YTogcmVwbGllcyB9XSA9IGF3YWl0IFByb21pc2UuYWxsKFsKICAgICAgICBjbGllbnQuZnJvbSgndGhyZWFkcycpLnNlbGVjdCgnaWQsIHRpdGxlLCBib2FyZCwgY3JlYXRlZF9hdCcpLmVxKCd1c2VybmFtZScsIHVzZXJuYW1lKS5vcmRlcignY3JlYXRlZF9hdCcsIHsgYXNjZW5kaW5nOiBmYWxzZSB9KSwKICAgICAgICBjbGllbnQuZnJvbSgncmVwbGllcycpLnNlbGVjdCgnaWQsIGJvZHksIHRocmVhZF9pZCwgY3JlYXRlZF9hdCwgcGFyZW50X2lkJykuZXEoJ3VzZXJuYW1lJywgdXNlcm5hbWUpLm9yZGVyKCdjcmVhdGVkX2F0JywgeyBhc2NlbmRpbmc6IGZhbHNlIH0pCiAgICAgIF0pOwoKICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXQtdGhyZWFkcycpLnRleHRDb250ZW50ID0gKHRocmVhZHMgfHwgW10pLmxlbmd0aDsKICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXQtcmVwbGllcycpLnRleHRDb250ZW50ID0gKHJlcGxpZXMgfHwgW10pLmxlbmd0aDsKCiAgICAgIHJlbmRlclRocmVhZEhpc3RvcnkodGhyZWFkcyB8fCBbXSk7CiAgICAgIHJlbmRlclJlcGx5SGlzdG9yeShyZXBsaWVzIHx8IFtdKTsKICAgIH0KCiAgICBmdW5jdGlvbiByZW5kZXJUaHJlYWRIaXN0b3J5KHRocmVhZHMpIHsKICAgICAgY29uc3QgZWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndGhyZWFkLWhpc3RvcnknKTsKICAgICAgaWYgKCF0aHJlYWRzLmxlbmd0aCkgeyBlbC5pbm5lckhUTUwgPSBgPGRpdiBjbGFzcz0iaGlzdG9yeS1yb3ciIHN0eWxlPSJjb2xvcjp2YXIoLS1kaW0pO2ZvbnQtc2l6ZToxMnB4OyI+bm8gdGhyZWFkcy48L2Rpdj5gOyByZXR1cm47IH0KICAgICAgZWwuaW5uZXJIVE1MID0gdGhyZWFkcy5tYXAodCA9PiBgCiAgICAgICAgPGRpdiBjbGFzcz0iaGlzdG9yeS1yb3ciPgogICAgICAgICAgPGEgaHJlZj0iL2lsbG5ldC9mb3J1bS90aHJlYWQuaHRtbD9pZD0ke3QuaWR9Ij4ke2VzY0h0bWwodC50aXRsZSl9PC9hPgogICAgICAgICAgPGRpdiBjbGFzcz0iaGlzdG9yeS1tZXRhIj48c3BhbiBjbGFzcz0iYm9hcmQtdGFnIj4vJHt0LmJvYXJkfS88L3NwYW4+IMK3ICR7Zm10RGF0ZSh0LmNyZWF0ZWRfYXQpfTwvZGl2PgogICAgICAgIDwvZGl2PgogICAgICBgKS5qb2luKCcnKTsKICAgIH0KCiAgICBmdW5jdGlvbiByZW5kZXJSZXBseUhpc3RvcnkocmVwbGllcykgewogICAgICBjb25zdCBlbCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZXBseS1oaXN0b3J5Jyk7CiAgICAgIGlmICghcmVwbGllcy5sZW5ndGgpIHsgZWwuaW5uZXJIVE1MID0gYDxkaXYgY2xhc3M9Imhpc3Rvcnktcm93IiBzdHlsZT0iY29sb3I6dmFyKC0tZGltKTtmb250LXNpemU6MTJweDsiPm5vIHJlcGxpZXMuPC9kaXY+YDsgcmV0dXJuOyB9CiAgICAgIGVsLmlubmVySFRNTCA9IHJlcGxpZXMubWFwKHIgPT4gYAogICAgICAgIDxkaXYgY2xhc3M9Imhpc3Rvcnktcm93Ij4KICAgICAgICAgIDxhIGhyZWY9Ii9pbGxuZXQvZm9ydW0vdGhyZWFkLmh0bWw/aWQ9JHtyLnRocmVhZF9pZH0iPiR7ZXNjSHRtbChyLmJvZHkuc2xpY2UoMCwgODApKX0ke3IuYm9keS5sZW5ndGggPiA4MCA/ICfigKYnIDogJyd9PC9hPgogICAgICAgICAgPGRpdiBjbGFzcz0iaGlzdG9yeS1tZXRhIj4ke2ZtdERhdGUoci5jcmVhdGVkX2F0KX08L2Rpdj4KICAgICAgICA8L2Rpdj4KICAgICAgYCkuam9pbignJyk7CiAgICB9CgogICAgZnVuY3Rpb24gZXNjSHRtbCh0KSB7CiAgICAgIHJldHVybiBTdHJpbmcodCkucmVwbGFjZSgvJi9nLCcmYW1wOycpLnJlcGxhY2UoLzwvZywnJmx0OycpLnJlcGxhY2UoLz4vZywnJmd0OycpOwogICAgfQogICAgZnVuY3Rpb24gZm10RGF0ZShpc28pIHsKICAgICAgcmV0dXJuIG5ldyBEYXRlKGlzbykudG9Mb2NhbGVEYXRlU3RyaW5nKCdlbi1VUycsIHsgbW9udGg6ICdzaG9ydCcsIGRheTogJ251bWVyaWMnLCB5ZWFyOiAnbnVtZXJpYycgfSk7CiAgICB9CiAg"))</script>
+  <script>
+    const targetUser = new URLSearchParams(window.location.search).get('u');
+
+    requireAuth(async function(user) {
+      const selfName = getUsername(user);
+      document.getElementById('self-link').textContent = selfName;
+
+      // Viewing own profile vs. someone else's
+      const viewingName = targetUser || selfName;
+      document.getElementById('profile-name').textContent = viewingName;
+      document.getElementById('page-title').textContent = `illnet / ${viewingName}`;
+      document.title = `illnet / ${viewingName}`;
+
+      // Own profile: show join date from auth
+      if (!targetUser || targetUser === selfName) {
+        const since = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('profile-since').textContent = `member since ${since}`;
+      }
+
+      loadHistory(viewingName);
+    });
+
+    async function loadHistory(username) {
+      const [{ data: threads }, { data: replies }] = await Promise.all([
+        client.from('threads').select('id, title, board, created_at').eq('username', username).order('created_at', { ascending: false }),
+        client.from('replies').select('id, body, thread_id, created_at, parent_id').eq('username', username).order('created_at', { ascending: false })
+      ]);
+
+      document.getElementById('stat-threads').textContent = (threads || []).length;
+      document.getElementById('stat-replies').textContent = (replies || []).length;
+
+      renderThreadHistory(threads || []);
+      renderReplyHistory(replies || []);
+    }
+
+    function renderThreadHistory(threads) {
+      const el = document.getElementById('thread-history');
+      if (!threads.length) { el.innerHTML = `<div class="history-row" style="color:var(--dim);font-size:12px;">no threads.</div>`; return; }
+      el.innerHTML = threads.map(t => `
+        <div class="history-row">
+          <a href="/illnet/forum/thread.html?id=${t.id}">${escHtml(t.title)}</a>
+          <div class="history-meta"><span class="board-tag">/${t.board}/</span> · ${fmtDate(t.created_at)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderReplyHistory(replies) {
+      const el = document.getElementById('reply-history');
+      if (!replies.length) { el.innerHTML = `<div class="history-row" style="color:var(--dim);font-size:12px;">no replies.</div>`; return; }
+      el.innerHTML = replies.map(r => `
+        <div class="history-row">
+          <a href="/illnet/forum/thread.html?id=${r.thread_id}">${escHtml(r.body.slice(0, 80))}${r.body.length > 80 ? '…' : ''}</a>
+          <div class="history-meta">${fmtDate(r.created_at)}</div>
+        </div>
+      `).join('');
+    }
+
+    function escHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  </script>
 
 </body>
 </html>

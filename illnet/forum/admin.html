@@ -6,7 +6,12 @@
   <title>illnet / admin</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
-  <script>eval(atob("CiAgICAoZnVuY3Rpb24oKSB7CiAgICAgIGNvbnN0IHQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnaWxsbmV0LXRoZW1lJykgfHwgJ2RhcmsnOwogICAgICBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgdCk7CiAgICB9KSgpOwogIA=="))</script>
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
@@ -80,7 +85,84 @@
   </table>
 
   <script src="../auth.js"></script>
-  <script>eval(atob("CiAgICByZXF1aXJlQWRtaW4oZnVuY3Rpb24oKSB7CiAgICAgIGxvYWRBbGwoKTsKICAgIH0pOwoKICAgIGFzeW5jIGZ1bmN0aW9uIGxvYWRBbGwoKSB7CiAgICAgIGNvbnN0IFt7IGRhdGE6IHRocmVhZHMgfSwgeyBkYXRhOiByZXBsaWVzIH1dID0gYXdhaXQgUHJvbWlzZS5hbGwoWwogICAgICAgIGNsaWVudC5mcm9tKCd0aHJlYWRzJykuc2VsZWN0KCcqJykub3JkZXIoJ2NyZWF0ZWRfYXQnLCB7IGFzY2VuZGluZzogZmFsc2UgfSksCiAgICAgICAgY2xpZW50LmZyb20oJ3JlcGxpZXMnKS5zZWxlY3QoJyonKS5vcmRlcignY3JlYXRlZF9hdCcsIHsgYXNjZW5kaW5nOiBmYWxzZSB9KQogICAgICBdKTsKCiAgICAgIGNvbnN0IHQgPSB0aHJlYWRzIHx8IFtdOwogICAgICBjb25zdCByID0gcmVwbGllcyB8fCBbXTsKCiAgICAgIC8vIFN0YXRzCiAgICAgIGNvbnN0IHVzZXJTZXQgPSBuZXcgU2V0KFsuLi50Lm1hcCh4ID0+IHgudXNlcm5hbWUpLCAuLi5yLm1hcCh4ID0+IHgudXNlcm5hbWUpXS5maWx0ZXIoQm9vbGVhbikpOwogICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3RhdC10aHJlYWRzJykudGV4dENvbnRlbnQgPSB0Lmxlbmd0aDsKICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N0YXQtcmVwbGllcycpLnRleHRDb250ZW50ID0gci5sZW5ndGg7CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdGF0LXVzZXJzJykudGV4dENvbnRlbnQgPSB1c2VyU2V0LnNpemU7CgogICAgICAvLyBVc2VycyB0YWJsZQogICAgICBjb25zdCB0aHJlYWRzQnlVc2VyID0ge30sIHJlcGxpZXNCeVVzZXIgPSB7fTsKICAgICAgdC5mb3JFYWNoKHggPT4gdGhyZWFkc0J5VXNlclt4LnVzZXJuYW1lXSA9ICh0aHJlYWRzQnlVc2VyW3gudXNlcm5hbWVdIHx8IDApICsgMSk7CiAgICAgIHIuZm9yRWFjaCh4ID0+IHJlcGxpZXNCeVVzZXJbeC51c2VybmFtZV0gPSAocmVwbGllc0J5VXNlclt4LnVzZXJuYW1lXSB8fCAwKSArIDEpOwogICAgICBjb25zdCB1c2VycyA9IFsuLi51c2VyU2V0XS5zb3J0KCk7CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1c2VyLXRib2R5JykuaW5uZXJIVE1MID0gdXNlcnMubWFwKHUgPT4gYAogICAgICAgIDx0cj4KICAgICAgICAgIDx0ZD48YSBocmVmPSIvaWxsbmV0L2ZvcnVtL3VzZXIuaHRtbD91PSR7ZW5jb2RlVVJJQ29tcG9uZW50KHUpfSI+JHtlc2NIdG1sKHUpfTwvYT48L3RkPgogICAgICAgICAgPHRkPiR7dGhyZWFkc0J5VXNlclt1XSB8fCAwfTwvdGQ+CiAgICAgICAgICA8dGQ+JHtyZXBsaWVzQnlVc2VyW3VdIHx8IDB9PC90ZD4KICAgICAgICA8L3RyPgogICAgICBgKS5qb2luKCcnKTsKCiAgICAgIC8vIFRocmVhZHMgdGFibGUKICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RocmVhZC10Ym9keScpLmlubmVySFRNTCA9IHQubWFwKHRoID0+IGAKICAgICAgICA8dHIgaWQ9InRocmVhZC1yb3ctJHt0aC5pZH0iPgogICAgICAgICAgPHRkIGNsYXNzPSJib2FyZC10YWciPi8ke3RoLmJvYXJkfS88L3RkPgogICAgICAgICAgPHRkPjxhIGhyZWY9Ii9pbGxuZXQvZm9ydW0vdGhyZWFkLmh0bWw/aWQ9JHt0aC5pZH0iPiR7ZXNjSHRtbCh0aC50aXRsZSl9PC9hPjwvdGQ+CiAgICAgICAgICA8dGQ+PGEgaHJlZj0iL2lsbG5ldC9mb3J1bS91c2VyLmh0bWw/dT0ke2VuY29kZVVSSUNvbXBvbmVudCh0aC51c2VybmFtZSB8fCAnJyl9Ij4ke2VzY0h0bWwodGgudXNlcm5hbWUgfHwgJz8nKX08L2E+PC90ZD4KICAgICAgICAgIDx0ZD4ke2ZtdERhdGUodGguY3JlYXRlZF9hdCl9PC90ZD4KICAgICAgICAgIDx0ZD48YnV0dG9uIGNsYXNzPSJkZWwtYnRuIiBvbmNsaWNrPSJkZWxldGVUaHJlYWQoJHt0aC5pZH0pIj5kZWxldGU8L2J1dHRvbj48L3RkPgogICAgICAgIDwvdHI+CiAgICAgIGApLmpvaW4oJycpOwoKICAgICAgLy8gUmVwbGllcyB0YWJsZQogICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncmVwbHktdGJvZHknKS5pbm5lckhUTUwgPSByLm1hcChyZSA9PiBgCiAgICAgICAgPHRyIGlkPSJyZXBseS1yb3ctJHtyZS5pZH0iPgogICAgICAgICAgPHRkPjxhIGhyZWY9Ii9pbGxuZXQvZm9ydW0vdXNlci5odG1sP3U9JHtlbmNvZGVVUklDb21wb25lbnQocmUudXNlcm5hbWUgfHwgJycpfSI+JHtlc2NIdG1sKHJlLnVzZXJuYW1lIHx8ICc/Jyl9PC9hPjwvdGQ+CiAgICAgICAgICA8dGQgc3R5bGU9Im1heC13aWR0aDo0MGNoO292ZXJmbG93OmhpZGRlbjt0ZXh0LW92ZXJmbG93OmVsbGlwc2lzO3doaXRlLXNwYWNlOm5vd3JhcCI+CiAgICAgICAgICAgIDxhIGhyZWY9Ii9pbGxuZXQvZm9ydW0vdGhyZWFkLmh0bWw/aWQ9JHtyZS50aHJlYWRfaWR9Ij4ke2VzY0h0bWwocmUuYm9keS5zbGljZSgwLCA4MCkpfSR7cmUuYm9keS5sZW5ndGggPiA4MCA/ICfigKYnIDogJyd9PC9hPgogICAgICAgICAgPC90ZD4KICAgICAgICAgIDx0ZD4ke2ZtdERhdGUocmUuY3JlYXRlZF9hdCl9PC90ZD4KICAgICAgICAgIDx0ZD48YnV0dG9uIGNsYXNzPSJkZWwtYnRuIiBvbmNsaWNrPSJkZWxldGVSZXBseSgke3JlLmlkfSkiPmRlbGV0ZTwvYnV0dG9uPjwvdGQ+CiAgICAgICAgPC90cj4KICAgICAgYCkuam9pbignJyk7CiAgICB9CgogICAgYXN5bmMgZnVuY3Rpb24gZGVsZXRlVGhyZWFkKGlkKSB7CiAgICAgIGlmICghY29uZmlybSgnRGVsZXRlIHRoaXMgdGhyZWFkIGFuZCBhbGwgaXRzIHJlcGxpZXM/JykpIHJldHVybjsKICAgICAgY29uc3QgeyBlcnJvciB9ID0gYXdhaXQgY2xpZW50LmZyb20oJ3RocmVhZHMnKS5kZWxldGUoKS5lcSgnaWQnLCBpZCk7CiAgICAgIGlmIChlcnJvcikgeyBhbGVydChlcnJvci5tZXNzYWdlKTsgcmV0dXJuOyB9CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aHJlYWQtcm93LScgKyBpZCk/LnJlbW92ZSgpOwogICAgfQoKICAgIGFzeW5jIGZ1bmN0aW9uIGRlbGV0ZVJlcGx5KGlkKSB7CiAgICAgIGlmICghY29uZmlybSgnRGVsZXRlIHRoaXMgcmVwbHk/JykpIHJldHVybjsKICAgICAgY29uc3QgeyBlcnJvciB9ID0gYXdhaXQgY2xpZW50LmZyb20oJ3JlcGxpZXMnKS5kZWxldGUoKS5lcSgnaWQnLCBpZCk7CiAgICAgIGlmIChlcnJvcikgeyBhbGVydChlcnJvci5tZXNzYWdlKTsgcmV0dXJuOyB9CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZXBseS1yb3ctJyArIGlkKT8ucmVtb3ZlKCk7CiAgICB9CgogICAgZnVuY3Rpb24gZXNjSHRtbCh0KSB7CiAgICAgIHJldHVybiBTdHJpbmcodCkucmVwbGFjZSgvJi9nLCcmYW1wOycpLnJlcGxhY2UoLzwvZywnJmx0OycpLnJlcGxhY2UoLz4vZywnJmd0OycpOwogICAgfQogICAgZnVuY3Rpb24gZm10RGF0ZShpc28pIHsKICAgICAgcmV0dXJuIG5ldyBEYXRlKGlzbykudG9Mb2NhbGVEYXRlU3RyaW5nKCdlbi1VUycsIHsgbW9udGg6ICdzaG9ydCcsIGRheTogJ251bWVyaWMnLCB5ZWFyOiAnbnVtZXJpYycgfSk7CiAgICB9CiAg"))</script>
+  <script>
+    requireAdmin(function() {
+      loadAll();
+    });
+
+    async function loadAll() {
+      const [{ data: threads }, { data: replies }] = await Promise.all([
+        client.from('threads').select('*').order('created_at', { ascending: false }),
+        client.from('replies').select('*').order('created_at', { ascending: false })
+      ]);
+
+      const t = threads || [];
+      const r = replies || [];
+
+      // Stats
+      const userSet = new Set([...t.map(x => x.username), ...r.map(x => x.username)].filter(Boolean));
+      document.getElementById('stat-threads').textContent = t.length;
+      document.getElementById('stat-replies').textContent = r.length;
+      document.getElementById('stat-users').textContent = userSet.size;
+
+      // Users table
+      const threadsByUser = {}, repliesByUser = {};
+      t.forEach(x => threadsByUser[x.username] = (threadsByUser[x.username] || 0) + 1);
+      r.forEach(x => repliesByUser[x.username] = (repliesByUser[x.username] || 0) + 1);
+      const users = [...userSet].sort();
+      document.getElementById('user-tbody').innerHTML = users.map(u => `
+        <tr>
+          <td><a href="/illnet/forum/user.html?u=${encodeURIComponent(u)}">${escHtml(u)}</a></td>
+          <td>${threadsByUser[u] || 0}</td>
+          <td>${repliesByUser[u] || 0}</td>
+        </tr>
+      `).join('');
+
+      // Threads table
+      document.getElementById('thread-tbody').innerHTML = t.map(th => `
+        <tr id="thread-row-${th.id}">
+          <td class="board-tag">/${th.board}/</td>
+          <td><a href="/illnet/forum/thread.html?id=${th.id}">${escHtml(th.title)}</a></td>
+          <td><a href="/illnet/forum/user.html?u=${encodeURIComponent(th.username || '')}">${escHtml(th.username || '?')}</a></td>
+          <td>${fmtDate(th.created_at)}</td>
+          <td><button class="del-btn" onclick="deleteThread(${th.id})">delete</button></td>
+        </tr>
+      `).join('');
+
+      // Replies table
+      document.getElementById('reply-tbody').innerHTML = r.map(re => `
+        <tr id="reply-row-${re.id}">
+          <td><a href="/illnet/forum/user.html?u=${encodeURIComponent(re.username || '')}">${escHtml(re.username || '?')}</a></td>
+          <td style="max-width:40ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+            <a href="/illnet/forum/thread.html?id=${re.thread_id}">${escHtml(re.body.slice(0, 80))}${re.body.length > 80 ? '…' : ''}</a>
+          </td>
+          <td>${fmtDate(re.created_at)}</td>
+          <td><button class="del-btn" onclick="deleteReply(${re.id})">delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteThread(id) {
+      if (!confirm('Delete this thread and all its replies?')) return;
+      const { error } = await client.from('threads').delete().eq('id', id);
+      if (error) { alert(error.message); return; }
+      document.getElementById('thread-row-' + id)?.remove();
+    }
+
+    async function deleteReply(id) {
+      if (!confirm('Delete this reply?')) return;
+      const { error } = await client.from('replies').delete().eq('id', id);
+      if (error) { alert(error.message); return; }
+      document.getElementById('reply-row-' + id)?.remove();
+    }
+
+    function escHtml(t) {
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  </script>
 
 </body>
 </html>

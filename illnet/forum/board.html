@@ -6,7 +6,12 @@
   <title>illnet</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
-  <script>eval(atob("CiAgICAoZnVuY3Rpb24oKSB7CiAgICAgIGNvbnN0IHQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnaWxsbmV0LXRoZW1lJykgfHwgJ2RhcmsnOwogICAgICBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgdCk7CiAgICB9KSgpOwogIA=="))</script>
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
@@ -33,7 +38,100 @@
   <div id="thread-list"></div>
 
   <script src="../auth.js"></script>
-  <script>eval(atob("CiAgICBjb25zdCBib2FyZCA9IG5ldyBVUkxTZWFyY2hQYXJhbXMod2luZG93LmxvY2F0aW9uLnNlYXJjaCkuZ2V0KCdiJykgfHwgJ2InOwogICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2JvYXJkLXRpdGxlJykudGV4dENvbnRlbnQgPSBgLyR7Ym9hcmR9L2A7CiAgICBkb2N1bWVudC50aXRsZSA9IGBpbGxuZXQgLyAvJHtib2FyZH0vYDsKCiAgICBsZXQgY3VycmVudFVzZXIgPSBudWxsOwoKICAgIHJlcXVpcmVBdXRoKGZ1bmN0aW9uKHVzZXIpIHsKICAgICAgY3VycmVudFVzZXIgPSB1c2VyOwogICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndXNlcm5hbWUtbGluaycpLnRleHRDb250ZW50ID0gZ2V0VXNlcm5hbWUodXNlcik7CiAgICAgIGxvYWRUaHJlYWRzKCk7CiAgICB9KTsKCiAgICBhc3luYyBmdW5jdGlvbiBsb2FkVGhyZWFkcygpIHsKICAgICAgY29uc3QgeyBkYXRhOiB0aHJlYWRzLCBlcnJvciB9ID0gYXdhaXQgY2xpZW50CiAgICAgICAgLmZyb20oJ3RocmVhZHMnKQogICAgICAgIC5zZWxlY3QoJ2lkLCB0aXRsZSwgdXNlcm5hbWUsIGNyZWF0ZWRfYXQsIHVzZXJfaWQnKQogICAgICAgIC5lcSgnYm9hcmQnLCBib2FyZCkKICAgICAgICAub3JkZXIoJ2NyZWF0ZWRfYXQnLCB7IGFzY2VuZGluZzogZmFsc2UgfSk7CgogICAgICBpZiAoZXJyb3IpIHsgY29uc29sZS5lcnJvcihlcnJvcik7IHJldHVybjsgfQoKICAgICAgY29uc3QgbGlzdCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aHJlYWQtbGlzdCcpOwogICAgICBsaXN0LmlubmVySFRNTCA9ICcnOwoKICAgICAgaWYgKCF0aHJlYWRzLmxlbmd0aCkgewogICAgICAgIGxpc3QuaW5uZXJIVE1MID0gYDxkaXYgc3R5bGU9InBhZGRpbmc6MTJweCAxNHB4O2NvbG9yOnZhcigtLWRpbSk7Zm9udC1zaXplOjEycHg7Ij5ubyB0aHJlYWRzLjwvZGl2PmA7CiAgICAgICAgcmV0dXJuOwogICAgICB9CgogICAgICBjb25zdCBpZHMgPSB0aHJlYWRzLm1hcCh0ID0+IHQuaWQpOwoKICAgICAgLy8gR2V0IHJlcGx5IGNvdW50cyArIGxhdGVzdCByZXBseSBwZXIgdGhyZWFkIGluIG9uZSBxdWVyeQogICAgICBjb25zdCB7IGRhdGE6IHJlcGxpZXMgfSA9IGF3YWl0IGNsaWVudAogICAgICAgIC5mcm9tKCdyZXBsaWVzJykKICAgICAgICAuc2VsZWN0KCd0aHJlYWRfaWQsIHVzZXJuYW1lLCBjcmVhdGVkX2F0JykKICAgICAgICAuaW4oJ3RocmVhZF9pZCcsIGlkcykKICAgICAgICAub3JkZXIoJ2NyZWF0ZWRfYXQnLCB7IGFzY2VuZGluZzogZmFsc2UgfSk7CgogICAgICBjb25zdCByZXBseUNvdW50ID0ge307CiAgICAgIGNvbnN0IGxhc3RSZXBseSA9IHt9OwogICAgICAocmVwbGllcyB8fCBbXSkuZm9yRWFjaChyID0+IHsKICAgICAgICByZXBseUNvdW50W3IudGhyZWFkX2lkXSA9IChyZXBseUNvdW50W3IudGhyZWFkX2lkXSB8fCAwKSArIDE7CiAgICAgICAgaWYgKCFsYXN0UmVwbHlbci50aHJlYWRfaWRdKSBsYXN0UmVwbHlbci50aHJlYWRfaWRdID0gcjsKICAgICAgfSk7CgogICAgICB0aHJlYWRzLmZvckVhY2godCA9PiB7CiAgICAgICAgY29uc3QgbiA9IHJlcGx5Q291bnRbdC5pZF0gfHwgMDsKICAgICAgICBjb25zdCBsYXN0ID0gbGFzdFJlcGx5W3QuaWRdOwogICAgICAgIGNvbnN0IHJvdyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpOwogICAgICAgIHJvdy5jbGFzc05hbWUgPSAndGhyZWFkLXJvdyc7CiAgICAgICAgcm93LmlubmVySFRNTCA9IGAKICAgICAgICAgIDxkaXY+CiAgICAgICAgICAgIDxhIGNsYXNzPSJ0aHJlYWQtdGl0bGUiIGhyZWY9Ii9pbGxuZXQvZm9ydW0vdGhyZWFkLmh0bWw/aWQ9JHt0LmlkfSI+JHtlc2NIdG1sKHQudGl0bGUpfTwvYT4KICAgICAgICAgICAgPGRpdiBjbGFzcz0idGhyZWFkLWJ5bGluZSI+CiAgICAgICAgICAgICAgPGEgaHJlZj0iL2lsbG5ldC9mb3J1bS91c2VyLmh0bWw/dT0ke2VuYyh0LnVzZXJuYW1lKX0iIGNsYXNzPSJ1c2VyLWxpbmsiPiR7ZXNjSHRtbCh0LnVzZXJuYW1lIHx8ICc/Jyl9PC9hPgogICAgICAgICAgICAgIMK3ICR7Zm10RGF0ZSh0LmNyZWF0ZWRfYXQpfQogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0idGhyZWFkLW1ldGEiPgogICAgICAgICAgICA8c3BhbiBjbGFzcz0idGhyZWFkLXJlcGxpZXMiPiR7bn0gJHtuID09PSAxID8gJ3JlcGx5JyA6ICdyZXBsaWVzJ308L3NwYW4+CiAgICAgICAgICAgICR7bGFzdCA/IGA8c3BhbiBjbGFzcz0ibGFzdC1yZXBseSI+bGFzdDogPGEgaHJlZj0iL2lsbG5ldC9mb3J1bS91c2VyLmh0bWw/dT0ke2VuYyhsYXN0LnVzZXJuYW1lKX0iIGNsYXNzPSJ1c2VyLWxpbmsiPiR7ZXNjSHRtbChsYXN0LnVzZXJuYW1lIHx8ICc/Jyl9PC9hPiDCtyAke3JlbFRpbWUobGFzdC5jcmVhdGVkX2F0KX08L3NwYW4+YCA6ICcnfQogICAgICAgICAgPC9kaXY+CiAgICAgICAgYDsKICAgICAgICBsaXN0LmFwcGVuZENoaWxkKHJvdyk7CiAgICAgIH0pOwogICAgfQoKICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCduZXctdGhyZWFkLWZvcm0nKS5hZGRFdmVudExpc3RlbmVyKCdzdWJtaXQnLCBhc3luYyAoZSkgPT4gewogICAgICBlLnByZXZlbnREZWZhdWx0KCk7CiAgICAgIGNvbnN0IHRpdGxlID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RocmVhZC10aXRsZScpLnZhbHVlLnRyaW0oKTsKICAgICAgY29uc3QgYm9keSAgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndGhyZWFkLWJvZHknKS52YWx1ZS50cmltKCk7CiAgICAgIGNvbnN0IHsgZXJyb3IgfSA9IGF3YWl0IGNsaWVudC5mcm9tKCd0aHJlYWRzJykuaW5zZXJ0KHsKICAgICAgICB0aXRsZSwgYm9keSwgYm9hcmQsCiAgICAgICAgdXNlcl9pZDogY3VycmVudFVzZXIuaWQsCiAgICAgICAgdXNlcm5hbWU6IGdldFVzZXJuYW1lKGN1cnJlbnRVc2VyKQogICAgICB9KTsKICAgICAgaWYgKGVycm9yKSB7IGFsZXJ0KGVycm9yLm1lc3NhZ2UpOyByZXR1cm47IH0KICAgICAgZS50YXJnZXQucmVzZXQoKTsKICAgICAgbG9hZFRocmVhZHMoKTsKICAgIH0pOwoKICAgIGZ1bmN0aW9uIGVzY0h0bWwodCkgeyByZXR1cm4gU3RyaW5nKHQpLnJlcGxhY2UoLyYvZywnJmFtcDsnKS5yZXBsYWNlKC88L2csJyZsdDsnKS5yZXBsYWNlKC8+L2csJyZndDsnKTsgfQogICAgZnVuY3Rpb24gZW5jKHQpIHsgcmV0dXJuIGVuY29kZVVSSUNvbXBvbmVudCh0IHx8ICcnKTsgfQogICAgZnVuY3Rpb24gZm10RGF0ZShpc28pIHsgcmV0dXJuIG5ldyBEYXRlKGlzbykudG9Mb2NhbGVEYXRlU3RyaW5nKCdlbi1VUycsIHsgbW9udGg6ICdzaG9ydCcsIGRheTogJ251bWVyaWMnLCB5ZWFyOiAnbnVtZXJpYycgfSk7IH0KICAgIGZ1bmN0aW9uIHJlbFRpbWUoaXNvKSB7CiAgICAgIGNvbnN0IG0gPSBNYXRoLmZsb29yKChEYXRlLm5vdygpIC0gbmV3IERhdGUoaXNvKSkgLyA2MDAwMCk7CiAgICAgIGlmIChtIDwgMSkgcmV0dXJuICdqdXN0IG5vdyc7CiAgICAgIGlmIChtIDwgNjApIHJldHVybiBgJHttfW0gYWdvYDsKICAgICAgY29uc3QgaCA9IE1hdGguZmxvb3IobSAvIDYwKTsKICAgICAgaWYgKGggPCAyNCkgcmV0dXJuIGAke2h9aCBhZ29gOwogICAgICByZXR1cm4gYCR7TWF0aC5mbG9vcihoLzI0KX1kIGFnb2A7CiAgICB9CiAg"))</script>
+  <script>
+    const board = new URLSearchParams(window.location.search).get('b') || 'b';
+    document.getElementById('board-title').textContent = `/${board}/`;
+    document.title = `illnet / /${board}/`;
+
+    let currentUser = null;
+
+    requireAuth(function(user) {
+      currentUser = user;
+      document.getElementById('username-link').textContent = getUsername(user);
+      loadThreads();
+    });
+
+    async function loadThreads() {
+      const { data: threads, error } = await client
+        .from('threads')
+        .select('id, title, username, created_at, user_id')
+        .eq('board', board)
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error(error); return; }
+
+      const list = document.getElementById('thread-list');
+      list.innerHTML = '';
+
+      if (!threads.length) {
+        list.innerHTML = `<div style="padding:12px 14px;color:var(--dim);font-size:12px;">no threads.</div>`;
+        return;
+      }
+
+      const ids = threads.map(t => t.id);
+
+      // Get reply counts + latest reply per thread in one query
+      const { data: replies } = await client
+        .from('replies')
+        .select('thread_id, username, created_at')
+        .in('thread_id', ids)
+        .order('created_at', { ascending: false });
+
+      const replyCount = {};
+      const lastReply = {};
+      (replies || []).forEach(r => {
+        replyCount[r.thread_id] = (replyCount[r.thread_id] || 0) + 1;
+        if (!lastReply[r.thread_id]) lastReply[r.thread_id] = r;
+      });
+
+      threads.forEach(t => {
+        const n = replyCount[t.id] || 0;
+        const last = lastReply[t.id];
+        const row = document.createElement('div');
+        row.className = 'thread-row';
+        row.innerHTML = `
+          <div>
+            <a class="thread-title" href="/illnet/forum/thread.html?id=${t.id}">${escHtml(t.title)}</a>
+            <div class="thread-byline">
+              <a href="/illnet/forum/user.html?u=${enc(t.username)}" class="user-link">${escHtml(t.username || '?')}</a>
+              · ${fmtDate(t.created_at)}
+            </div>
+          </div>
+          <div class="thread-meta">
+            <span class="thread-replies">${n} ${n === 1 ? 'reply' : 'replies'}</span>
+            ${last ? `<span class="last-reply">last: <a href="/illnet/forum/user.html?u=${enc(last.username)}" class="user-link">${escHtml(last.username || '?')}</a> · ${relTime(last.created_at)}</span>` : ''}
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    document.getElementById('new-thread-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('thread-title').value.trim();
+      const body  = document.getElementById('thread-body').value.trim();
+      const { error } = await client.from('threads').insert({
+        title, body, board,
+        user_id: currentUser.id,
+        username: getUsername(currentUser)
+      });
+      if (error) { alert(error.message); return; }
+      e.target.reset();
+      loadThreads();
+    });
+
+    function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function enc(t) { return encodeURIComponent(t || ''); }
+    function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+    function relTime(iso) {
+      const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+      if (m < 1) return 'just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h/24)}d ago`;
+    }
+  </script>
 
 </body>
 </html>
