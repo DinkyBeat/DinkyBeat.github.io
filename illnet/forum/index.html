@@ -6,12 +6,7 @@
   <title>illnet</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../style.css">
-  <script>
-    (function() {
-      const t = localStorage.getItem('illnet-theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
-  </script>
+  <script>eval(atob("CiAgICAoZnVuY3Rpb24oKSB7CiAgICAgIGNvbnN0IHQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnaWxsbmV0LXRoZW1lJykgfHwgJ2RhcmsnOwogICAgICBkb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuc2V0QXR0cmlidXRlKCdkYXRhLXRoZW1lJywgdCk7CiAgICB9KSgpOwogIA=="))</script>
 </head>
 <body>
 
@@ -58,67 +53,7 @@
   </div>
 
   <script src="../auth.js"></script>
-  <script>
-    requireAuth(function(user) {
-      document.getElementById('username-link').textContent = getUsername(user);
-      loadCounts();
-      loadActivity();
-    });
-
-    async function loadCounts() {
-      const { data } = await client.from('threads').select('board');
-      if (!data) return;
-      const counts = {};
-      data.forEach(t => counts[t.board] = (counts[t.board] || 0) + 1);
-      ['b','econ','math','cs','meta'].forEach(b => {
-        const el = document.getElementById('count-' + b);
-        if (el) el.textContent = counts[b] ? counts[b] + (counts[b] === 1 ? ' thread' : ' threads') : '';
-      });
-    }
-
-    async function loadActivity() {
-      const [{ data: threads }, { data: replies }] = await Promise.all([
-        client.from('threads').select('id, title, board, username, created_at').order('created_at', { ascending: false }).limit(12),
-        client.from('replies').select('id, body, thread_id, username, created_at, threads(title, board)').order('created_at', { ascending: false }).limit(12)
-      ]);
-
-      const items = [
-        ...(threads || []).map(t => ({ type: 'thread', time: t.created_at, username: t.username, title: t.title, board: t.board, href: `/illnet/forum/thread.html?id=${t.id}` })),
-        ...(replies || []).map(r => ({ type: 'reply', time: r.created_at, username: r.username, title: r.threads?.title || '?', board: r.threads?.board || '?', href: `/illnet/forum/thread.html?id=${r.thread_id}#r${r.id}`, excerpt: r.body }))
-      ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 15);
-
-      const list = document.getElementById('activity-list');
-      if (!items.length) { list.innerHTML = `<div class="activity-row" style="color:var(--dim)">no activity yet.</div>`; return; }
-
-      list.innerHTML = items.map(item => `
-        <div class="activity-row">
-          <a href="${item.href}">
-            <span style="color:var(--red)">${escHtml(item.username || '?')}</span>
-            ${item.type === 'thread' ? 'posted' : 'replied in'}
-            <span style="color:var(--muted)">/${item.board}/</span>
-            — ${escHtml(item.title)}
-          </a>
-          <div class="activity-meta">${relTime(item.time)}</div>
-        </div>
-      `).join('');
-    }
-
-    function relTime(iso) {
-      const diff = Date.now() - new Date(iso).getTime();
-      const m = Math.floor(diff / 60000);
-      if (m < 1)  return 'just now';
-      if (m < 60) return `${m}m ago`;
-      const h = Math.floor(m / 60);
-      if (h < 24) return `${h}h ago`;
-      const d = Math.floor(h / 24);
-      if (d < 30) return `${d}d ago`;
-      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-
-    function escHtml(t) {
-      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-  </script>
+  <script>eval(atob("CiAgICByZXF1aXJlQXV0aChmdW5jdGlvbih1c2VyKSB7CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1c2VybmFtZS1saW5rJykudGV4dENvbnRlbnQgPSBnZXRVc2VybmFtZSh1c2VyKTsKICAgICAgbG9hZENvdW50cygpOwogICAgICBsb2FkQWN0aXZpdHkoKTsKICAgIH0pOwoKICAgIGFzeW5jIGZ1bmN0aW9uIGxvYWRDb3VudHMoKSB7CiAgICAgIGNvbnN0IHsgZGF0YSB9ID0gYXdhaXQgY2xpZW50LmZyb20oJ3RocmVhZHMnKS5zZWxlY3QoJ2JvYXJkJyk7CiAgICAgIGlmICghZGF0YSkgcmV0dXJuOwogICAgICBjb25zdCBjb3VudHMgPSB7fTsKICAgICAgZGF0YS5mb3JFYWNoKHQgPT4gY291bnRzW3QuYm9hcmRdID0gKGNvdW50c1t0LmJvYXJkXSB8fCAwKSArIDEpOwogICAgICBbJ2InLCdlY29uJywnbWF0aCcsJ2NzJywnbWV0YSddLmZvckVhY2goYiA9PiB7CiAgICAgICAgY29uc3QgZWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY291bnQtJyArIGIpOwogICAgICAgIGlmIChlbCkgZWwudGV4dENvbnRlbnQgPSBjb3VudHNbYl0gPyBjb3VudHNbYl0gKyAoY291bnRzW2JdID09PSAxID8gJyB0aHJlYWQnIDogJyB0aHJlYWRzJykgOiAnJzsKICAgICAgfSk7CiAgICB9CgogICAgYXN5bmMgZnVuY3Rpb24gbG9hZEFjdGl2aXR5KCkgewogICAgICBjb25zdCBbeyBkYXRhOiB0aHJlYWRzIH0sIHsgZGF0YTogcmVwbGllcyB9XSA9IGF3YWl0IFByb21pc2UuYWxsKFsKICAgICAgICBjbGllbnQuZnJvbSgndGhyZWFkcycpLnNlbGVjdCgnaWQsIHRpdGxlLCBib2FyZCwgdXNlcm5hbWUsIGNyZWF0ZWRfYXQnKS5vcmRlcignY3JlYXRlZF9hdCcsIHsgYXNjZW5kaW5nOiBmYWxzZSB9KS5saW1pdCgxMiksCiAgICAgICAgY2xpZW50LmZyb20oJ3JlcGxpZXMnKS5zZWxlY3QoJ2lkLCBib2R5LCB0aHJlYWRfaWQsIHVzZXJuYW1lLCBjcmVhdGVkX2F0LCB0aHJlYWRzKHRpdGxlLCBib2FyZCknKS5vcmRlcignY3JlYXRlZF9hdCcsIHsgYXNjZW5kaW5nOiBmYWxzZSB9KS5saW1pdCgxMikKICAgICAgXSk7CgogICAgICBjb25zdCBpdGVtcyA9IFsKICAgICAgICAuLi4odGhyZWFkcyB8fCBbXSkubWFwKHQgPT4gKHsgdHlwZTogJ3RocmVhZCcsIHRpbWU6IHQuY3JlYXRlZF9hdCwgdXNlcm5hbWU6IHQudXNlcm5hbWUsIHRpdGxlOiB0LnRpdGxlLCBib2FyZDogdC5ib2FyZCwgaHJlZjogYC9pbGxuZXQvZm9ydW0vdGhyZWFkLmh0bWw/aWQ9JHt0LmlkfWAgfSkpLAogICAgICAgIC4uLihyZXBsaWVzIHx8IFtdKS5tYXAociA9PiAoeyB0eXBlOiAncmVwbHknLCB0aW1lOiByLmNyZWF0ZWRfYXQsIHVzZXJuYW1lOiByLnVzZXJuYW1lLCB0aXRsZTogci50aHJlYWRzPy50aXRsZSB8fCAnPycsIGJvYXJkOiByLnRocmVhZHM/LmJvYXJkIHx8ICc/JywgaHJlZjogYC9pbGxuZXQvZm9ydW0vdGhyZWFkLmh0bWw/aWQ9JHtyLnRocmVhZF9pZH0jciR7ci5pZH1gLCBleGNlcnB0OiByLmJvZHkgfSkpCiAgICAgIF0uc29ydCgoYSwgYikgPT4gbmV3IERhdGUoYi50aW1lKSAtIG5ldyBEYXRlKGEudGltZSkpLnNsaWNlKDAsIDE1KTsKCiAgICAgIGNvbnN0IGxpc3QgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYWN0aXZpdHktbGlzdCcpOwogICAgICBpZiAoIWl0ZW1zLmxlbmd0aCkgeyBsaXN0LmlubmVySFRNTCA9IGA8ZGl2IGNsYXNzPSJhY3Rpdml0eS1yb3ciIHN0eWxlPSJjb2xvcjp2YXIoLS1kaW0pIj5ubyBhY3Rpdml0eSB5ZXQuPC9kaXY+YDsgcmV0dXJuOyB9CgogICAgICBsaXN0LmlubmVySFRNTCA9IGl0ZW1zLm1hcChpdGVtID0+IGAKICAgICAgICA8ZGl2IGNsYXNzPSJhY3Rpdml0eS1yb3ciPgogICAgICAgICAgPGEgaHJlZj0iJHtpdGVtLmhyZWZ9Ij4KICAgICAgICAgICAgPHNwYW4gc3R5bGU9ImNvbG9yOnZhcigtLXJlZCkiPiR7ZXNjSHRtbChpdGVtLnVzZXJuYW1lIHx8ICc/Jyl9PC9zcGFuPgogICAgICAgICAgICAke2l0ZW0udHlwZSA9PT0gJ3RocmVhZCcgPyAncG9zdGVkJyA6ICdyZXBsaWVkIGluJ30KICAgICAgICAgICAgPHNwYW4gc3R5bGU9ImNvbG9yOnZhcigtLW11dGVkKSI+LyR7aXRlbS5ib2FyZH0vPC9zcGFuPgogICAgICAgICAgICDigJQgJHtlc2NIdG1sKGl0ZW0udGl0bGUpfQogICAgICAgICAgPC9hPgogICAgICAgICAgPGRpdiBjbGFzcz0iYWN0aXZpdHktbWV0YSI+JHtyZWxUaW1lKGl0ZW0udGltZSl9PC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICAgIGApLmpvaW4oJycpOwogICAgfQoKICAgIGZ1bmN0aW9uIHJlbFRpbWUoaXNvKSB7CiAgICAgIGNvbnN0IGRpZmYgPSBEYXRlLm5vdygpIC0gbmV3IERhdGUoaXNvKS5nZXRUaW1lKCk7CiAgICAgIGNvbnN0IG0gPSBNYXRoLmZsb29yKGRpZmYgLyA2MDAwMCk7CiAgICAgIGlmIChtIDwgMSkgIHJldHVybiAnanVzdCBub3cnOwogICAgICBpZiAobSA8IDYwKSByZXR1cm4gYCR7bX1tIGFnb2A7CiAgICAgIGNvbnN0IGggPSBNYXRoLmZsb29yKG0gLyA2MCk7CiAgICAgIGlmIChoIDwgMjQpIHJldHVybiBgJHtofWggYWdvYDsKICAgICAgY29uc3QgZCA9IE1hdGguZmxvb3IoaCAvIDI0KTsKICAgICAgaWYgKGQgPCAzMCkgcmV0dXJuIGAke2R9ZCBhZ29gOwogICAgICByZXR1cm4gbmV3IERhdGUoaXNvKS50b0xvY2FsZURhdGVTdHJpbmcoJ2VuLVVTJywgeyBtb250aDogJ3Nob3J0JywgZGF5OiAnbnVtZXJpYycgfSk7CiAgICB9CgogICAgZnVuY3Rpb24gZXNjSHRtbCh0KSB7CiAgICAgIHJldHVybiBTdHJpbmcodCkucmVwbGFjZSgvJi9nLCcmYW1wOycpLnJlcGxhY2UoLzwvZywnJmx0OycpLnJlcGxhY2UoLz4vZywnJmd0OycpOwogICAgfQogIA=="))</script>
 
 </body>
 </html>
