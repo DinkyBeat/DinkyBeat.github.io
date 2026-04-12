@@ -263,7 +263,7 @@ async function loadData() {
     document.getElementById('data-source').textContent = 'model data (' + (DATA.generated_at||'').slice(0,10) + ')';
   } catch(e) {
     DATA = _buildSampleData();
-    document.getElementById('data-source').textContent = 'sample data — run pipeline to update';
+    document.getElementById('data-source').textContent = '';
   }
   try {
     const r2 = await fetch('./data/prediction_grid.json');
@@ -566,7 +566,7 @@ function runPredict() {
     epa     = _approxEPA(down, ydstogo, yardline, score);
     success = _approxSuccess(down, ydstogo, yardline);
     rz      = _approxRZ(yardline);
-    note    = 'source: built-in approximation — run full pipeline for model predictions';
+    note    = '';
   }
 
   const outEl = document.getElementById('pred-out');
