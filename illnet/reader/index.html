@@ -89,7 +89,7 @@
         const { error: stErr } = await client.storage.from('pdfs').upload(filename, file, { contentType: 'application/pdf' });
         if (stErr) { msg.style.color = 'var(--red)'; msg.textContent = stErr.message; return; }
 
-        const { error: dbErr } = await client.from('pdfs').insert({ title, description: desc, filename });
+        const { error: dbErr } = await client.from('pdfs').insert({ title, description: desc, filename, uploaded_by: currentUser.id });
         if (dbErr) { msg.style.color = 'var(--red)'; msg.textContent = dbErr.message; return; }
 
         msg.style.color = 'var(--muted)';
