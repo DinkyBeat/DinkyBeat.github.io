@@ -120,12 +120,11 @@ function runPredict() {
   if (grid) {
     epa     = grid.pred_epa;
     success = grid.pred_success;
-    rz      = null;
   } else {
     epa     = _approxEPA(down, ydstogo, yardline, score);
     success = _approxSuccess(down, ydstogo, yardline);
-    rz      = _approxRZ(yardline);
   }
+  rz = _approxRZ(yardline);
 
   const epaEl = document.getElementById('out-epa');
   epaEl.textContent = (epa >= 0 ? '+' : '') + epa.toFixed(4);
