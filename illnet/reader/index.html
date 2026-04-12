@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illnet / illreader</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('illnet-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="site-title">illnet / illreader</span>
+    <div class="header-actions">
+      <a class="btn-ghost" href="/illnet/forum/" style="text-decoration:none">forum</a>
+      <a class="btn-ghost" id="username-link" href="/illnet/forum/user.html" style="text-decoration:none"></a>
+      <button class="btn-ghost" id="theme-btn" onclick="toggleTheme()">light</button>
+      <button class="btn-ghost" onclick="logout()">logout</button>
+    </div>
+  </header>
+
+  <div id="upload-section" style="display:none; margin-bottom:40px">
+    <span class="section-label">upload pdf</span>
+    <form id="upload-form">
+      <input type="text" id="upload-title" placeholder="title" required>
+      <input type="text" id="upload-desc" placeholder="description (optional)">
+      <input type="file" id="upload-file" accept=".pdf" required style="color:var(--muted)">
+      <button type="submit">upload</button>
+    </form>
+    <div id="upload-msg" style="display:none; font-size:12px; margin-top:4px"></div>
+  </div>
+
+  <span class="section-label">library</span>
+  <div id="pdf-list"></div>
+
+  <script src="../auth.js"></script>
+  <script>
+    let currentUser = null;
+
+    requireAuth(function(user) {
+      currentUser = user;
+      document.getElementById('username-link').textContent = getUsername(user);
+      if (isAdmin(user)) {
+        document.getElementById('upload-section').style.display = 'block';
+        setupUpload();
+      }
+      loadLibrary();
+    });
+
+    async function loadLibrary() {
+      const list = document.getElementById('pdf-list');
+      const { data, error } = await client.from('pdfs').select('*').order('uploaded_at', { ascending: false });
+      if (error || !data || !data.length) {
+        list.innerHTML = `<div style="color:var(--dim);font-size:12px;padding:10px 14px;border-left:2px solid var(--border)">no pdfs yet.</div>`;
+        return;
+      }
+      list.innerHTML = data.map(pdf => `
+        <a class="board-row" href="/illnet/reader/read.html?id=${pdf.id}" style="grid-template-columns:1fr auto">
+          <div>
+            <div class="board-name">${esc(pdf.title)}</div>
+            ${pdf.description ? `<div style="font-size:11px;color:var(--muted);margin-top:3px">${esc(pdf.description)}</div>` : ''}
+          </div>
+          <span style="font-size:11px;color:var(--dim)">${fmtDate(pdf.uploaded_at)}</span>
+        </a>
+      `).join('');
+    }
+
+    function setupUpload() {
+      document.getElementById('upload-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const title = document.getElementById('upload-title').value.trim();
+        const desc  = document.getElementById('upload-desc').value.trim();
+        const file  = document.getElementById('upload-file').files[0];
+        const msg   = document.getElementById('upload-msg');
+        if (!file || !title) return;
+
+        msg.style.display = 'block';
+        msg.style.color = 'var(--muted)';
+        msg.textContent = 'uploading...';
+
+        const filename = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+        const { error: stErr } = await client.storage.from('pdfs').upload(filename, file, { contentType: 'application/pdf' });
+        if (stErr) { msg.style.color = 'var(--red)'; msg.textContent = stErr.message; return; }
+
+        const { error: dbErr } = await client.from('pdfs').insert({ title, description: desc, filename });
+        if (dbErr) { msg.style.color = 'var(--red)'; msg.textContent = dbErr.message; return; }
+
+        msg.style.color = 'var(--muted)';
+        msg.textContent = 'uploaded.';
+        document.getElementById('upload-form').reset();
+        setTimeout(() => { msg.style.display = 'none'; }, 2000);
+        loadLibrary();
+      });
+    }
+
+    function esc(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  </script>
+
+</body>
+</html>

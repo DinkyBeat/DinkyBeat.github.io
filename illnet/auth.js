@@ -39,10 +39,25 @@ function injectAdminLink() {
   actions.prepend(a);
 }
 
+// Inject reader link into header-actions for all authenticated users
+function injectReaderLink() {
+  if (window.location.pathname.startsWith('/illnet/reader')) return;
+  const actions = document.querySelector('.header-actions');
+  if (!actions) return;
+  const a = document.createElement('a');
+  a.href = '/illnet/reader/';
+  a.className = 'btn-ghost';
+  a.textContent = 'illreader';
+  const usernameLink = document.getElementById('username-link');
+  if (usernameLink) actions.insertBefore(a, usernameLink);
+  else actions.prepend(a);
+}
+
 async function requireAuth(onAuthed) {
   const { data: { session } } = await client.auth.getSession();
   if (!session) { window.location.href = '/illnet/'; return; }
   syncThemeBtn();
+  injectReaderLink();
   if (isAdmin(session.user)) injectAdminLink();
   onAuthed(session.user);
 }
