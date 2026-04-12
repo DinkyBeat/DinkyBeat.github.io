@@ -29,7 +29,9 @@ button:hover{background:#f0f0f0}
 <body>
 
 <h1>OLAVE-NFL</h1>
-<p class="sub">by Vasudevan Govardhanen and Siddharth Kedharnath, epa, success rate, win probability, red zone, drive efficiency (2021&ndash;2023 regular season)</p>
+<p class="sub">EPA, success rate, win probability, red zone, drive efficiency (2021&ndash;2023 regular season)</p>
+<p class="sub">As of now, what is below is a single play estimator since we have not finished our win probability and drive eff. models.</p>
+<p class="sub"><a href="github.com/vasugov/analytics">source code at github</a></p>
 
 
 
@@ -43,6 +45,7 @@ button:hover{background:#f0f0f0}
   <div class="field"><label>Play Type</label><select id="p-type"><option>pass</option><option>run</option></select></div>
 </div>
 <button onclick="runPredict()">Predict</button>
+<p class="sub">"Seconds remaining" is here for future purposes, does not serve a purpose until WP and DE models.</p>
 
 <div class="pred-out" id="pred-out">
   <div class="metrics">
