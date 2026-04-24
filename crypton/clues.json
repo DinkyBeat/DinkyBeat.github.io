@@ -1,0 +1,154 @@
+{
+  "clues": [
+    {
+      "id": 1,
+      "clue": "Overturned ale — it's a meadow (3)",
+      "answer": "LEA",
+      "type": "reversal",
+      "definition": "meadow",
+      "indicators": ["overturned"],
+      "fodder": "ale",
+      "explanation": "ALE reversed = LEA (a type of open meadow)"
+    },
+    {
+      "id": 2,
+      "clue": "Listen to confused hare (4)",
+      "answer": "HEAR",
+      "type": "anagram",
+      "definition": "listen",
+      "indicators": ["confused"],
+      "fodder": "hare",
+      "explanation": "HARE rearranged = HEAR (to listen or perceive sound)"
+    },
+    {
+      "id": 3,
+      "clue": "Live backwards — wicked! (4)",
+      "answer": "EVIL",
+      "type": "reversal",
+      "definition": "wicked",
+      "indicators": ["backwards"],
+      "fodder": "live",
+      "explanation": "LIVE reversed = EVIL (meaning wicked or morally bad)"
+    },
+    {
+      "id": 4,
+      "clue": "Bats rearranged to make a wound (4)",
+      "answer": "STAB",
+      "type": "anagram",
+      "definition": "wound",
+      "indicators": ["rearranged"],
+      "fodder": "bats",
+      "explanation": "BATS rearranged = STAB (to pierce or wound with a blade)"
+    },
+    {
+      "id": 5,
+      "clue": "Notes jumbled into a rock (5)",
+      "answer": "STONE",
+      "type": "anagram",
+      "definition": "rock",
+      "indicators": ["jumbled"],
+      "fodder": "notes",
+      "explanation": "NOTES rearranged = STONE (a rock or hard mineral)"
+    },
+    {
+      "id": 6,
+      "clue": "Revolutionary tar — a rodent! (3)",
+      "answer": "RAT",
+      "type": "reversal",
+      "definition": "rodent",
+      "indicators": ["revolutionary"],
+      "fodder": "tar",
+      "explanation": "TAR reversed = RAT (a small rodent)"
+    },
+    {
+      "id": 7,
+      "clue": "Rats turned around — a celestial body (4)",
+      "answer": "STAR",
+      "type": "reversal",
+      "definition": "celestial body",
+      "indicators": ["turned around"],
+      "fodder": "rats",
+      "explanation": "RATS reversed = STAR (a luminous celestial body)"
+    },
+    {
+      "id": 8,
+      "clue": "Confused melon is yellow fruit (5)",
+      "answer": "LEMON",
+      "type": "anagram",
+      "definition": "yellow fruit",
+      "indicators": ["confused"],
+      "fodder": "melon",
+      "explanation": "MELON rearranged = LEMON (a sour yellow citrus fruit)"
+    },
+    {
+      "id": 9,
+      "clue": "Competition run by confused acre (4)",
+      "answer": "RACE",
+      "type": "anagram",
+      "definition": "competition",
+      "indicators": ["confused"],
+      "fodder": "acre",
+      "explanation": "ACRE rearranged = RACE (a competitive event)"
+    },
+    {
+      "id": 10,
+      "clue": "Flower part from leapt about awkwardly (5)",
+      "answer": "PETAL",
+      "type": "anagram",
+      "definition": "flower part",
+      "indicators": ["awkwardly"],
+      "fodder": "leapt",
+      "explanation": "LEAPT rearranged = PETAL (a leaf-like part of a flower)"
+    },
+    {
+      "id": 11,
+      "clue": "Pans upset — pry! (4)",
+      "answer": "SNAP",
+      "type": "reversal",
+      "definition": "pry",
+      "indicators": ["upset"],
+      "fodder": "pans",
+      "explanation": "PANS reversed = SNAP (to grasp suddenly; to pry into)"
+    },
+    {
+      "id": 12,
+      "clue": "Flower base from rearranged lapse (5)",
+      "answer": "SEPAL",
+      "type": "anagram",
+      "definition": "flower base part",
+      "indicators": ["rearranged"],
+      "fodder": "lapse",
+      "explanation": "LAPSE rearranged = SEPAL (the leaf-like part protecting a flower bud)"
+    },
+    {
+      "id": 13,
+      "clue": "Loop returned — a still body of water (4)",
+      "answer": "POOL",
+      "type": "reversal",
+      "definition": "still body of water",
+      "indicators": ["returned"],
+      "fodder": "loop",
+      "explanation": "LOOP reversed = POOL (a small still body of water)"
+    },
+    {
+      "id": 14,
+      "clue": "Disordered item gives out (4)",
+      "answer": "EMIT",
+      "type": "anagram",
+      "definition": "gives out",
+      "indicators": ["disordered"],
+      "fodder": "item",
+      "explanation": "ITEM disordered = EMIT (to give out or send forth)"
+    },
+    {
+      "id": 15,
+      "clue": "Badly drawn petal forms a plate (5)",
+      "answer": "PLATE",
+      "type": "anagram",
+      "definition": "plate",
+      "indicators": ["badly drawn"],
+      "fodder": "petal",
+      "explanation": "PETAL rearranged = PLATE (a flat dish)"
+    }
+  ]
+}

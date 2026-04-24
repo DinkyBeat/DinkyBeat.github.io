@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypton — Room</title>
+<link rel="stylesheet" href="/crypton/style.css">
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="game-header">
+    <a href="/crypton/" class="logo-small">CRYPT<span>ON</span></a>
+    <div class="room-pill" id="room-pill">Room: <strong id="room-code-display">····</strong></div>
+  </div>
+
+  <!-- Error strip -->
+  <div class="error-strip" id="error-strip"></div>
+
+  <!-- Players bar -->
+  <div class="players-bar" id="players-bar">
+    <div class="player-panel you">
+      <div class="player-tag you-tag">You</div>
+      <div class="player-handle" id="my-handle">—</div>
+      <div class="player-score-val" id="my-score">0</div>
+    </div>
+    <div class="vs-divider">vs</div>
+    <div class="player-panel them">
+      <div class="player-tag" style="text-align:right">Opponent</div>
+      <div class="player-handle" id="their-handle" style="text-align:right">—</div>
+      <div class="player-score-val" id="their-score" style="text-align:right">—</div>
+    </div>
+  </div>
+
+  <!-- Main content area (dynamically replaced each phase) -->
+  <div id="main-content">
+    <div class="waiting-area">
+      <div class="waiting-msg">Connecting…</div>
+      <div class="waiting-indicator">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Supabase UMD -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<script>
+// ──────────────────────────────────────────────────────
+//  CONFIG
+// ──────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const CLUES_PER_GAME = 5;
+const TIMER_SECONDS  = 90;
+
+// ──────────────────────────────────────────────────────
+//  IDENTITY & PARAMS
+// ──────────────────────────────────────────────────────
+const params    = new URLSearchParams(location.search);
+const roomCode  = (params.get('room') || '').toUpperCase();
+const isHost    = params.get('host') === '1';
+
+if (!roomCode || roomCode.length !== 4) {
+  location.href = '/crypton/';
+}
+
+const playerId   = sessionStorage.getItem('crypton-pid')  || (() => { const id = Math.random().toString(36).slice(2,10); sessionStorage.setItem('crypton-pid', id); return id; })();
+const playerName = sessionStorage.getItem('crypton-name') || (() => {
+  const adj  = ['azure','crimson','golden','silver','shadow','storm','frost','ember','void','neon'];
+  const noun = ['fox','crow','wolf','hawk','bear','raven','viper','lynx','crane','moth'];
+  const n = `${adj[Math.floor(Math.random()*adj.length)]} ${noun[Math.floor(Math.random()*noun.length)]}`;
+  sessionStorage.setItem('crypton-name', n);
+  return n;
+})();
+
+// ──────────────────────────────────────────────────────
+//  STATE
+// ──────────────────────────────────────────────────────
+const state = {
+  phase: 'connecting',     // connecting | waiting | playing | revealed | finished
+  players: {},             // { [id]: { name, score } }
+  clues: [],
+  clueOrder: [],           // array of clue indices for this game
+  currentPos: 0,           // index into clueOrder (0‥4)
+  timerVal: TIMER_SECONDS,
+  timerInterval: null,
+  clueWon: false,          // has current clue been resolved?
+  myAnsweredCorrectly: false,
+  myAnswerTime: null,
+};
+
+// ──────────────────────────────────────────────────────
+//  BOOT
+// ──────────────────────────────────────────────────────
+document.getElementById('room-code-display').textContent = roomCode;
+document.getElementById('my-handle').textContent = playerName;
+state.players[playerId] = { name: playerName, score: 0 };
+
+async function init() {
+  try {
+    const res = await fetch('/crypton/clues.json');
+    state.clues = (await res.json()).clues;
+  } catch (e) {
+    showError('Failed to load clue bank. Please refresh.');
+    return;
+  }
+
+  const channel = sb.channel(`crypton-room-${roomCode}`, {
+    config: { broadcast: { self: false } }
+  });
+
+  window._cryptonChannel = channel;
+
+  channel
+    .on('presence', { event: 'sync' },        onPresenceSync)
+    .on('presence', { event: 'join' },  ({ newPresences })  => onPresenceJoin(newPresences))
+    .on('presence', { event: 'leave' }, ({ leftPresences }) => onPresenceLeave(leftPresences))
+    .on('broadcast', { event: 'game_start'   }, ({ payload }) => onGameStart(payload))
+    .on('broadcast', { event: 'player_answer'}, ({ payload }) => onPlayerAnswer(payload))
+    .on('broadcast', { event: 'clue_result'  }, ({ payload }) => onClueResult(payload))
+    .on('broadcast', { event: 'next_clue'    }, ({ payload }) => onNextClue(payload))
+    .on('broadcast', { event: 'game_over'    }, ({ payload }) => onGameOver(payload))
+    .subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await channel.track({ playerId, playerName, isHost });
+        renderWaiting();
+      } else if (status === 'CHANNEL_ERROR') {
+        showError('Connection error. Try refreshing.');
+      }
+    });
+}
+
+// ──────────────────────────────────────────────────────
+//  PRESENCE
+// ──────────────────────────────────────────────────────
+function onPresenceSync() {
+  const ch = window._cryptonChannel;
+  const flat = Object.values(ch.presenceState()).flat();
+  flat.forEach(p => {
+    if (!state.players[p.playerId]) {
+      state.players[p.playerId] = { name: p.playerName, score: 0 };
+    }
+  });
+  updatePlayersBar();
+  if (flat.length >= 2 && state.phase === 'waiting' && isHost) {
+    enableStartBtn();
+  }
+}
+
+function onPresenceJoin(presences) {
+  presences.forEach(p => {
+    if (p.playerId !== playerId) {
+      state.players[p.playerId] = { name: p.playerName, score: 0 };
+    }
+  });
+  updatePlayersBar();
+  const total = Object.keys(state.players).length;
+  if (total >= 2 && state.phase === 'waiting' && isHost) {
+    enableStartBtn();
+  }
+}
+
+function onPresenceLeave(presences) {
+  if (state.phase === 'playing' || state.phase === 'revealed') {
+    presences.forEach(p => { if (p.playerId !== playerId) delete state.players[p.playerId]; });
+    clearInterval(state.timerInterval);
+    showError('Opponent disconnected.');
+    state.phase = 'finished';
+    document.getElementById('main-content').innerHTML = `
+      <div class="waiting-area">
+        <div class="waiting-msg" style="color:var(--wrong)">Opponent disconnected</div>
+        <a href="/crypton/" class="btn btn-secondary" style="text-decoration:none;margin-top:2rem;">Return to Lobby</a>
+      </div>`;
+  }
+}
+
+// ──────────────────────────────────────────────────────
+//  WAITING RENDER
+// ──────────────────────────────────────────────────────
+function renderWaiting() {
+  state.phase = 'waiting';
+  document.getElementById('main-content').innerHTML = `
+    <div class="waiting-area">
+      <div class="waiting-msg">Share this room code with your opponent</div>
+      <div class="waiting-code-display">${roomCode}</div>
+      <div><button class="copy-btn" onclick="copyCode()">copy code</button></div>
+      <div class="waiting-indicator">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+      <div class="waiting-msg" id="wait-status">Waiting for opponent…</div>
+      ${isHost
+        ? '<button class="btn btn-primary" id="start-btn" disabled onclick="startGame()" style="margin-top:1.75rem;opacity:0.35">Start Game</button>'
+        : '<div class="waiting-msg" style="margin-top:1.75rem">Waiting for host to start…</div>'}
+    </div>`;
+}
+
+function enableStartBtn() {
+  const btn = document.getElementById('start-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+  const st = document.getElementById('wait-status');
+  if (st) st.textContent = 'Both players connected. Ready!';
+}
+
+// ──────────────────────────────────────────────────────
+//  GAME START
+// ──────────────────────────────────────────────────────
+function startGame() {
+  if (!isHost) return;
+  const order = shuffle(state.clues.map((_, i) => i)).slice(0, CLUES_PER_GAME);
+  window._cryptonChannel.send({
+    type: 'broadcast', event: 'game_start',
+    payload: { clueOrder: order }
+  });
+  state.clueOrder = order;
+  beginClue(0);
+}
+
+function onGameStart({ clueOrder }) {
+  state.clueOrder = clueOrder;
+  beginClue(0);
+}
+
+// ──────────────────────────────────────────────────────
+//  CLUE PLAY
+// ──────────────────────────────────────────────────────
+function beginClue(pos) {
+  state.phase              = 'playing';
+  state.currentPos         = pos;
+  state.clueWon            = false;
+  state.myAnsweredCorrectly = false;
+  state.myAnswerTime       = null;
+
+  const clue = state.clues[state.clueOrder[pos]];
+  renderClue(clue, pos);
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timerVal = TIMER_SECONDS;
+  updateTimerEl();
+  state.timerInterval = setInterval(() => {
+    state.timerVal--;
+    updateTimerEl();
+    if (state.timerVal <= 0) {
+      clearInterval(state.timerInterval);
+      if (isHost && state.phase === 'playing' && !state.clueWon) {
+        state.clueWon = true;
+        broadcastClueResult(null);
+      }
+    }
+  }, 1000);
+}
+
+// Called globally from inline onclick
+function submitAnswer() {
+  if (state.phase !== 'playing') return;
+  if (state.myAnsweredCorrectly) return;
+
+  const input = document.getElementById('answer-input');
+  if (!input) return;
+  const answer = input.value.trim().toUpperCase();
+  if (!answer) return;
+
+  const clue    = state.clues[state.clueOrder[state.currentPos]];
+  const correct = answer === clue.answer;
+  const time    = Date.now();
+
+  // Always broadcast so opponent sees activity
+  window._cryptonChannel.send({
+    type: 'broadcast', event: 'player_answer',
+    payload: { playerId, playerName, answer, correct, time }
+  });
+
+  if (correct) {
+    state.myAnsweredCorrectly = true;
+    state.myAnswerTime        = time;
+    showStatusMsg('correct', 'Correct!');
+    flashClueBox();
+
+    if (isHost && !state.clueWon) {
+      state.clueWon = true;
+      clearInterval(state.timerInterval);
+      broadcastClueResult(playerId);
+    }
+    // Non-host: wait for clue_result from host
+  } else {
+    showStatusMsg('wrong', 'Wrong — try again!');
+    input.value = '';
+    input.focus();
+    setTimeout(() => { const s = document.getElementById('status-row'); if (s) s.innerHTML = ''; }, 1500);
+  }
+}
+
+function onPlayerAnswer({ playerId: theirId, playerName: theirName, answer, correct, time }) {
+  if (theirId === playerId) return;
+  if (state.phase !== 'playing') return;
+
+  if (correct) {
+    setOppStatus(`${theirName} answered!`);
+    if (isHost && !state.clueWon) {
+      state.clueWon = true;
+      clearInterval(state.timerInterval);
+      let winner;
+      if (state.myAnsweredCorrectly) {
+        winner = (state.myAnswerTime <= time) ? playerId : theirId;
+      } else {
+        winner = theirId;
+      }
+      broadcastClueResult(winner);
+    }
+  } else {
+    setOppStatus(`${theirName}: wrong attempt`);
+    setTimeout(() => setOppStatus(''), 2000);
+  }
+}
+
+// ──────────────────────────────────────────────────────
+//  CLUE RESULT
+// ──────────────────────────────────────────────────────
+function broadcastClueResult(winnerId) {
+  // Update winner score locally before broadcast
+  if (winnerId && state.players[winnerId]) state.players[winnerId].score++;
+
+  const clueIndex = state.clueOrder[state.currentPos];
+  const clue      = state.clues[clueIndex];
+  const scores    = {};
+  Object.entries(state.players).forEach(([id, p]) => { scores[id] = p.score; });
+
+  window._cryptonChannel.send({
+    type: 'broadcast', event: 'clue_result',
+    payload: { winnerId, clue, scores }
+  });
+
+  showReveal(winnerId, clue);
+}
+
+function onClueResult({ winnerId, clue, scores }) {
+  clearInterval(state.timerInterval);
+  Object.entries(scores).forEach(([id, s]) => {
+    if (state.players[id]) state.players[id].score = s;
+  });
+  showReveal(winnerId, clue);
+}
+
+// ──────────────────────────────────────────────────────
+//  REVEAL RENDER
+// ──────────────────────────────────────────────────────
+function showReveal(winnerId, clue) {
+  state.phase = 'revealed';
+  clearInterval(state.timerInterval);
+  updatePlayersBar();
+
+  let wClass = 'nobody', wText = 'Nobody solved it in time';
+  if (winnerId) {
+    if (winnerId === playerId) { wClass = 'you';  wText = 'You solved it!'; }
+    else {
+      const n = state.players[winnerId]?.name || 'Opponent';
+      wClass = 'them'; wText = `${cap(n)} solved it`;
+    }
+  }
+
+  const isLast = state.currentPos >= CLUES_PER_GAME - 1;
+  const nextLabel = isLast ? 'View Results →' : 'Next Clue →';
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="reveal-block">
+      <div class="reveal-answer">${esc(clue.answer)}</div>
+      <div class="reveal-winner ${wClass}">${esc(wText)}</div>
+      <div class="reveal-breakdown">
+        <strong>Definition</strong><br>${esc(clue.definition)}<br><br>
+        <strong>Indicator${clue.indicators.length > 1 ? 's' : ''}</strong><br>${esc(clue.indicators.join(', '))}<br><br>
+        <strong>Fodder</strong><br>${esc(clue.fodder)}<br><br>
+        ${esc(clue.explanation)}
+      </div>
+    </div>
+    <div class="reveal-actions">
+      ${isHost
+        ? `<button class="btn btn-primary" onclick="advanceClue()">${nextLabel}</button>`
+        : '<span class="msg-dim" style="font-size:0.7rem;letter-spacing:0.15em">Waiting for host…</span>'}
+    </div>`;
+}
+
+// ──────────────────────────────────────────────────────
+//  ADVANCE
+// ──────────────────────────────────────────────────────
+function advanceClue() {
+  if (!isHost) return;
+  const nextPos = state.currentPos + 1;
+
+  if (nextPos >= CLUES_PER_GAME) {
+    const scores = {};
+    Object.entries(state.players).forEach(([id, p]) => { scores[id] = p.score; });
+    window._cryptonChannel.send({ type: 'broadcast', event: 'game_over', payload: { scores } });
+    renderGameOver();
+  } else {
+    window._cryptonChannel.send({ type: 'broadcast', event: 'next_clue', payload: { pos: nextPos } });
+    beginClue(nextPos);
+  }
+}
+
+function onNextClue({ pos }) {
+  beginClue(pos);
+}
+
+function onGameOver({ scores }) {
+  Object.entries(scores).forEach(([id, s]) => {
+    if (state.players[id]) state.players[id].score = s;
+  });
+  renderGameOver();
+}
+
+// ──────────────────────────────────────────────────────
+//  GAME OVER RENDER
+// ──────────────────────────────────────────────────────
+function renderGameOver() {
+  state.phase = 'finished';
+  clearInterval(state.timerInterval);
+  updatePlayersBar();
+
+  const myScore  = state.players[playerId]?.score ?? 0;
+  const oppEntry = Object.entries(state.players).find(([id]) => id !== playerId);
+  const theirScore = oppEntry ? oppEntry[1].score : 0;
+  const theirName  = oppEntry ? oppEntry[1].name  : 'Opponent';
+
+  let wClass, wText;
+  if (myScore > theirScore)      { wClass = 'you';  wText = 'You win!'; }
+  else if (theirScore > myScore) { wClass = 'them'; wText = `${cap(theirName)} wins!`; }
+  else                           { wClass = 'tie';  wText = "It's a draw!"; }
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="gameover-area">
+      <div class="gameover-label">Game Over · ${CLUES_PER_GAME} clues</div>
+      <div class="winner-headline ${wClass}">${esc(wText)}</div>
+      <div class="final-scores">
+        <div class="final-score-item">
+          <div class="fs-name">You</div>
+          <div class="fs-score">${myScore}</div>
+        </div>
+        <div class="final-score-item">
+          <div class="fs-name">${esc(theirName)}</div>
+          <div class="fs-score">${theirScore}</div>
+        </div>
+      </div>
+      <a href="/crypton/" class="btn btn-secondary" style="text-decoration:none;">Play Again</a>
+    </div>`;
+}
+
+// ──────────────────────────────────────────────────────
+//  CLUE RENDER
+// ──────────────────────────────────────────────────────
+function renderClue(clue, pos) {
+  document.getElementById('main-content').innerHTML = `
+    <div class="clue-meta">
+      <div class="clue-number">Clue ${pos + 1} / ${CLUES_PER_GAME}</div>
+      <div class="timer" id="timer-el">${fmtTime(state.timerVal)}</div>
+    </div>
+    <div class="type-badge">${esc(clue.type)}</div>
+    <div class="clue-box" id="clue-box">
+      <div class="clue-text">${esc(clue.clue)}</div>
+    </div>
+    <div class="answer-area">
+      <input type="text" id="answer-input" maxlength="20" placeholder="your answer"
+             autocomplete="off" spellcheck="false"
+             oninput="this.value=this.value.toUpperCase()"
+             onkeydown="if(event.key==='Enter')submitAnswer()">
+      <button class="btn btn-primary" onclick="submitAnswer()">Submit</button>
+    </div>
+    <div class="status-row" id="status-row"></div>
+    <div class="status-row" id="opp-status"></div>`;
+
+  document.getElementById('answer-input').focus();
+  updatePlayersBar();
+}
+
+// ──────────────────────────────────────────────────────
+//  SMALL UI HELPERS
+// ──────────────────────────────────────────────────────
+function updatePlayersBar() {
+  const me  = state.players[playerId] || { name: playerName, score: 0 };
+  const opp = Object.entries(state.players).find(([id]) => id !== playerId);
+
+  document.getElementById('my-handle').textContent   = me.name;
+  document.getElementById('my-score').textContent    = me.score;
+  document.getElementById('their-handle').textContent = opp ? opp[1].name  : '—';
+  document.getElementById('their-score').textContent  = opp ? opp[1].score : '—';
+}
+
+function updateTimerEl() {
+  const el = document.getElementById('timer-el');
+  if (!el) return;
+  el.textContent = fmtTime(state.timerVal);
+  el.className = 'timer';
+  if (state.timerVal <= 10)      el.classList.add('danger');
+  else if (state.timerVal <= 30) el.classList.add('warn');
+}
+
+function showStatusMsg(type, text) {
+  const el = document.getElementById('status-row');
+  if (!el) return;
+  const cls = type === 'correct' ? 'msg-correct' : type === 'wrong' ? 'msg-wrong' : 'msg-dim';
+  el.innerHTML = `<span class="${cls}">${esc(text)}</span>`;
+}
+
+function setOppStatus(text) {
+  const el = document.getElementById('opp-status');
+  if (!el) return;
+  el.innerHTML = text ? `<span class="msg-opp">${esc(text)}</span>` : '';
+}
+
+function flashClueBox() {
+  const box = document.getElementById('clue-box');
+  if (!box) return;
+  box.classList.add('flash-correct');
+  setTimeout(() => box.classList.remove('flash-correct'), 600);
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-strip');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(roomCode).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    if (btn) { btn.textContent = 'copied!'; setTimeout(() => { btn.textContent = 'copy code'; }, 2000); }
+  }).catch(() => {});
+}
+
+// ──────────────────────────────────────────────────────
+//  UTILS
+// ──────────────────────────────────────────────────────
+function fmtTime(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const r = (s % 60).toString().padStart(2, '0');
+  return `${m}:${r}`;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function cap(str) {
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+}
+
+// ──────────────────────────────────────────────────────
+//  GO
+// ──────────────────────────────────────────────────────
+init();
+</script>
+
+</body>
+</html>

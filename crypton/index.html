@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypton — Cryptic Word Game</title>
+<link rel="stylesheet" href="/crypton/style.css">
+</head>
+<body>
+
+<div class="page">
+
+  <div class="index-hero">
+    <div class="logo">CRYPT<span>ON</span></div>
+    <div class="tagline">a cryptic word game for two</div>
+  </div>
+
+  <div class="index-grid">
+
+    <!-- Create Room -->
+    <div class="card">
+      <div class="card-title">Create a room</div>
+      <p style="font-size:0.8rem;color:var(--dim);line-height:1.6;">
+        Start a new game and share the code with your opponent.
+      </p>
+      <button class="btn btn-primary" id="create-btn" onclick="createRoom()">Create Room</button>
+    </div>
+
+    <!-- Join Room -->
+    <div class="card">
+      <div class="card-title">Join a room</div>
+      <input type="text" id="join-input" maxlength="4" placeholder="Enter 4-letter code" style="margin-bottom:0.75rem;">
+      <div class="error-strip" id="join-error"></div>
+      <button class="btn btn-primary" onclick="joinRoom()">Join Room</button>
+    </div>
+
+  </div>
+
+  <!-- How to Play -->
+  <div class="how-to-play">
+    <h3>How to play</h3>
+
+    <div class="clue-anatomy">
+      <div class="anatomy-part">
+        <div class="anatomy-label">Definition</div>
+        <div class="anatomy-desc">A synonym or direct description of the answer, usually at the start or end of the clue.</div>
+      </div>
+      <div class="anatomy-part">
+        <div class="anatomy-label">Indicator</div>
+        <div class="anatomy-desc">A signal word that tells you how to manipulate the fodder — e.g. <em>confused</em>, <em>reversed</em>, <em>around</em>.</div>
+      </div>
+      <div class="anatomy-part">
+        <div class="anatomy-label">Fodder</div>
+        <div class="anatomy-desc">The letters or word(s) you actually work with to derive the answer.</div>
+      </div>
+    </div>
+
+    <ul class="rules-list">
+      <li>Both players enter the same room and see the same clue simultaneously.</li>
+      <li>First player to submit the correct answer wins the point for that clue.</li>
+      <li>Each game is 5 clues. You have 90 seconds per clue.</li>
+      <li>After each clue, the answer and breakdown are revealed.</li>
+      <li>Highest score at the end wins.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  function genRoomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    return Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  }
+
+  function genPlayerId() {
+    return Math.random().toString(36).slice(2, 10);
+  }
+
+  const ADJECTIVES = ['azure','crimson','golden','silver','shadow','storm','frost','ember','void','neon'];
+  const NOUNS      = ['fox','crow','wolf','hawk','bear','raven','viper','lynx','crane','moth'];
+
+  function genPlayerName() {
+    const a = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+    const n = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+    return `${a} ${n}`;
+  }
+
+  function ensureIdentity() {
+    if (!sessionStorage.getItem('crypton-pid')) {
+      sessionStorage.setItem('crypton-pid', genPlayerId());
+      sessionStorage.setItem('crypton-name', genPlayerName());
+    }
+  }
+
+  function createRoom() {
+    ensureIdentity();
+    const code = genRoomCode();
+    window.location.href = `/crypton/room.html?room=${code}&host=1`;
+  }
+
+  function joinRoom() {
+    const input = document.getElementById('join-input');
+    const error = document.getElementById('join-error');
+    const code = input.value.trim().toUpperCase();
+
+    error.classList.remove('visible');
+
+    if (code.length !== 4 || !/^[A-Z]+$/.test(code)) {
+      error.textContent = 'Please enter a valid 4-letter room code.';
+      error.classList.add('visible');
+      return;
+    }
+
+    ensureIdentity();
+    window.location.href = `/crypton/room.html?room=${code}`;
+  }
+
+  // Allow Enter key in join input
+  document.getElementById('join-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') joinRoom();
+  });
+
+  // Auto-uppercase join input
+  document.getElementById('join-input').addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase();
+  });
+</script>
+
+</body>
+</html>
