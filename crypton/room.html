@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <!-- Main content area (dynamically replaced each phase) -->
+  <!-- Main content area (replaced each phase) -->
   <div id="main-content">
     <div class="waiting-area">
       <div class="waiting-msg">Connecting…</div>
@@ -46,37 +46,39 @@
 
 </div>
 
-<!-- Supabase UMD -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<!-- PeerJS for WebRTC peer-to-peer (no server config needed) -->
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <script>
 // ──────────────────────────────────────────────────────
 //  CONFIG
 // ──────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://cfdzcbeefuyxrtqfxprn.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_8uIxm9-fWrcTnIl3zyzVGA_bfXOd19g';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const CLUES_PER_GAME = 5;
 const TIMER_SECONDS  = 90;
 
 // ──────────────────────────────────────────────────────
 //  IDENTITY & PARAMS
 // ──────────────────────────────────────────────────────
-const params    = new URLSearchParams(location.search);
-const roomCode  = (params.get('room') || '').toUpperCase();
-const isHost    = params.get('host') === '1';
+const params   = new URLSearchParams(location.search);
+const roomCode = (params.get('room') || '').toUpperCase();
+const isHost   = params.get('host') === '1';
 
-if (!roomCode || roomCode.length !== 4) {
-  location.href = '/crypton/';
-}
+if (!roomCode || roomCode.length !== 4) location.href = '/crypton/';
 
-const playerId   = sessionStorage.getItem('crypton-pid')  || (() => { const id = Math.random().toString(36).slice(2,10); sessionStorage.setItem('crypton-pid', id); return id; })();
-const playerName = sessionStorage.getItem('crypton-name') || (() => {
-  const adj  = ['azure','crimson','golden','silver','shadow','storm','frost','ember','void','neon'];
-  const noun = ['fox','crow','wolf','hawk','bear','raven','viper','lynx','crane','moth'];
-  const n = `${adj[Math.floor(Math.random()*adj.length)]} ${noun[Math.floor(Math.random()*noun.length)]}`;
-  sessionStorage.setItem('crypton-name', n);
+const playerId = (() => {
+  let id = sessionStorage.getItem('crypton-pid');
+  if (!id) { id = Math.random().toString(36).slice(2,10); sessionStorage.setItem('crypton-pid', id); }
+  return id;
+})();
+
+const playerName = (() => {
+  let n = sessionStorage.getItem('crypton-name');
+  if (!n) {
+    const adj  = ['azure','crimson','golden','silver','shadow','storm','frost','ember','void','neon'];
+    const noun = ['fox','crow','wolf','hawk','bear','raven','viper','lynx','crane','moth'];
+    n = `${adj[Math.floor(Math.random()*adj.length)]} ${noun[Math.floor(Math.random()*noun.length)]}`;
+    sessionStorage.setItem('crypton-name', n);
+  }
   return n;
 })();
 
@@ -84,105 +86,124 @@ const playerName = sessionStorage.getItem('crypton-name') || (() => {
 //  STATE
 // ──────────────────────────────────────────────────────
 const state = {
-  phase: 'connecting',     // connecting | waiting | playing | revealed | finished
-  players: {},             // { [id]: { name, score } }
+  phase: 'connecting',
+  me:    { name: playerName, score: 0 },
+  opp:   { name: null, score: 0 },
   clues: [],
-  clueOrder: [],           // array of clue indices for this game
-  currentPos: 0,           // index into clueOrder (0‥4)
-  timerVal: TIMER_SECONDS,
-  timerInterval: null,
-  clueWon: false,          // has current clue been resolved?
-  myAnsweredCorrectly: false,
-  myAnswerTime: null,
+  clueOrder:          [],
+  currentPos:         0,
+  timerVal:           TIMER_SECONDS,
+  timerInterval:      null,
+  clueWon:            false,
+  myAnsweredCorrectly:false,
+  myAnswerTime:       null,
 };
+
+let peer = null;
+let conn = null; // active DataConnection to the other player
 
 // ──────────────────────────────────────────────────────
 //  BOOT
 // ──────────────────────────────────────────────────────
 document.getElementById('room-code-display').textContent = roomCode;
 document.getElementById('my-handle').textContent = playerName;
-state.players[playerId] = { name: playerName, score: 0 };
 
 async function init() {
   try {
-    const res = await fetch('/crypton/clues.json');
+    const res   = await fetch('/crypton/clues.json');
     state.clues = (await res.json()).clues;
-  } catch (e) {
+  } catch {
     showError('Failed to load clue bank. Please refresh.');
     return;
   }
+  isHost ? initHost() : initGuest();
+}
 
-  const channel = sb.channel(`crypton-room-${roomCode}`, {
-    config: { broadcast: { self: false } }
+// ──────────────────────────────────────────────────────
+//  HOST SETUP
+//  Host claims the deterministic peer ID "crypton-XXXX"
+// ──────────────────────────────────────────────────────
+function initHost() {
+  peer = new Peer(`crypton-${roomCode}`);
+
+  peer.on('open', () => {
+    renderWaiting();
   });
 
-  window._cryptonChannel = channel;
+  peer.on('connection', (c) => {
+    if (conn) { c.close(); return; } // reject extra players
+    conn = c;
+    conn.on('open',  ()    => conn.send({ event: 'player_info', name: playerName }));
+    conn.on('data',  (msg) => handleMessage(msg));
+    conn.on('close', ()    => onOpponentLeft());
+    conn.on('error', ()    => onOpponentLeft());
+  });
 
-  channel
-    .on('presence', { event: 'sync' },        onPresenceSync)
-    .on('presence', { event: 'join' },  ({ newPresences })  => onPresenceJoin(newPresences))
-    .on('presence', { event: 'leave' }, ({ leftPresences }) => onPresenceLeave(leftPresences))
-    .on('broadcast', { event: 'game_start'   }, ({ payload }) => onGameStart(payload))
-    .on('broadcast', { event: 'player_answer'}, ({ payload }) => onPlayerAnswer(payload))
-    .on('broadcast', { event: 'clue_result'  }, ({ payload }) => onClueResult(payload))
-    .on('broadcast', { event: 'next_clue'    }, ({ payload }) => onNextClue(payload))
-    .on('broadcast', { event: 'game_over'    }, ({ payload }) => onGameOver(payload))
-    .subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        await channel.track({ playerId, playerName, isHost });
-        renderWaiting();
-      } else if (status === 'CHANNEL_ERROR') {
-        showError('Connection error. Try refreshing.');
-      }
+  peer.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      showError('Room code already active. Please create a new room.');
+    } else {
+      showError(`Connection error (${err.type}). Please refresh.`);
+    }
+  });
+}
+
+// ──────────────────────────────────────────────────────
+//  GUEST SETUP
+//  Guest connects to "crypton-XXXX"
+// ──────────────────────────────────────────────────────
+function initGuest() {
+  peer = new Peer();          // random ID for the guest
+
+  peer.on('open', () => {
+    conn = peer.connect(`crypton-${roomCode}`, { reliable: true, serialization: 'json' });
+
+    conn.on('open', () => {
+      conn.send({ event: 'player_info', name: playerName });
+      renderWaiting();
     });
-}
 
-// ──────────────────────────────────────────────────────
-//  PRESENCE
-// ──────────────────────────────────────────────────────
-function onPresenceSync() {
-  const ch = window._cryptonChannel;
-  const flat = Object.values(ch.presenceState()).flat();
-  flat.forEach(p => {
-    if (!state.players[p.playerId]) {
-      state.players[p.playerId] = { name: p.playerName, score: 0 };
+    conn.on('data',  (msg) => handleMessage(msg));
+    conn.on('close', ()    => onOpponentLeft());
+    conn.on('error', ()    => onOpponentLeft());
+  });
+
+  peer.on('error', (err) => {
+    if (err.type === 'peer-unavailable') {
+      showError('Room not found. Make sure the host has loaded their room first, then refresh.');
+    } else {
+      showError(`Connection error (${err.type}). Please refresh.`);
     }
   });
-  updatePlayersBar();
-  if (flat.length >= 2 && state.phase === 'waiting' && isHost) {
-    enableStartBtn();
-  }
-}
-
-function onPresenceJoin(presences) {
-  presences.forEach(p => {
-    if (p.playerId !== playerId) {
-      state.players[p.playerId] = { name: p.playerName, score: 0 };
-    }
-  });
-  updatePlayersBar();
-  const total = Object.keys(state.players).length;
-  if (total >= 2 && state.phase === 'waiting' && isHost) {
-    enableStartBtn();
-  }
-}
-
-function onPresenceLeave(presences) {
-  if (state.phase === 'playing' || state.phase === 'revealed') {
-    presences.forEach(p => { if (p.playerId !== playerId) delete state.players[p.playerId]; });
-    clearInterval(state.timerInterval);
-    showError('Opponent disconnected.');
-    state.phase = 'finished';
-    document.getElementById('main-content').innerHTML = `
-      <div class="waiting-area">
-        <div class="waiting-msg" style="color:var(--wrong)">Opponent disconnected</div>
-        <a href="/crypton/" class="btn btn-secondary" style="text-decoration:none;margin-top:2rem;">Return to Lobby</a>
-      </div>`;
-  }
 }
 
 // ──────────────────────────────────────────────────────
-//  WAITING RENDER
+//  MESSAGING
+// ──────────────────────────────────────────────────────
+function send(msg) {
+  if (conn && conn.open) conn.send(msg);
+}
+
+function handleMessage(msg) {
+  switch (msg.event) {
+    case 'player_info':   onPlayerInfo(msg);   break;
+    case 'game_start':    onGameStart(msg);    break;
+    case 'player_answer': onPlayerAnswer(msg); break;
+    case 'clue_result':   onClueResult(msg);   break;
+    case 'next_clue':     onNextClue(msg);     break;
+    case 'game_over':     onGameOver(msg);     break;
+  }
+}
+
+function onPlayerInfo({ name }) {
+  state.opp.name = name;
+  document.getElementById('their-handle').textContent = name;
+  document.getElementById('their-score').textContent  = '0';
+  if (isHost) enableStartBtn();
+}
+
+// ──────────────────────────────────────────────────────
+//  WAITING PHASE
 // ──────────────────────────────────────────────────────
 function renderWaiting() {
   state.phase = 'waiting';
@@ -194,19 +215,18 @@ function renderWaiting() {
       <div class="waiting-indicator">
         <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       </div>
-      <div class="waiting-msg" id="wait-status">Waiting for opponent…</div>
+      <div class="waiting-msg" id="wait-status">
+        ${isHost ? 'Waiting for opponent to join…' : 'Waiting for host to start…'}
+      </div>
       ${isHost
-        ? '<button class="btn btn-primary" id="start-btn" disabled onclick="startGame()" style="margin-top:1.75rem;opacity:0.35">Start Game</button>'
-        : '<div class="waiting-msg" style="margin-top:1.75rem">Waiting for host to start…</div>'}
+        ? '<button class="btn btn-primary" id="start-btn" disabled onclick="startGame()" style="margin-top:1.75rem;opacity:0.35;">Start Game</button>'
+        : ''}
     </div>`;
 }
 
 function enableStartBtn() {
   const btn = document.getElementById('start-btn');
-  if (btn) {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-  }
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
   const st = document.getElementById('wait-status');
   if (st) st.textContent = 'Both players connected. Ready!';
 }
@@ -216,12 +236,9 @@ function enableStartBtn() {
 // ──────────────────────────────────────────────────────
 function startGame() {
   if (!isHost) return;
-  const order = shuffle(state.clues.map((_, i) => i)).slice(0, CLUES_PER_GAME);
-  window._cryptonChannel.send({
-    type: 'broadcast', event: 'game_start',
-    payload: { clueOrder: order }
-  });
+  const order = shuffle(state.clues.map((_,i)=>i)).slice(0, CLUES_PER_GAME);
   state.clueOrder = order;
+  send({ event: 'game_start', clueOrder: order });
   beginClue(0);
 }
 
@@ -231,17 +248,15 @@ function onGameStart({ clueOrder }) {
 }
 
 // ──────────────────────────────────────────────────────
-//  CLUE PLAY
+//  CLUE LOOP
 // ──────────────────────────────────────────────────────
 function beginClue(pos) {
-  state.phase              = 'playing';
-  state.currentPos         = pos;
-  state.clueWon            = false;
+  state.phase               = 'playing';
+  state.currentPos          = pos;
+  state.clueWon             = false;
   state.myAnsweredCorrectly = false;
-  state.myAnswerTime       = null;
-
-  const clue = state.clues[state.clueOrder[pos]];
-  renderClue(clue, pos);
+  state.myAnswerTime        = null;
+  renderClue(state.clues[state.clueOrder[pos]], pos);
   startTimer();
 }
 
@@ -256,44 +271,37 @@ function startTimer() {
       clearInterval(state.timerInterval);
       if (isHost && state.phase === 'playing' && !state.clueWon) {
         state.clueWon = true;
-        broadcastClueResult(null);
+        resolveClue(null);       // nobody scored
       }
     }
   }, 1000);
 }
 
-// Called globally from inline onclick
+// Called from inline onclick
 function submitAnswer() {
-  if (state.phase !== 'playing') return;
-  if (state.myAnsweredCorrectly) return;
-
+  if (state.phase !== 'playing' || state.myAnsweredCorrectly) return;
   const input = document.getElementById('answer-input');
   if (!input) return;
   const answer = input.value.trim().toUpperCase();
   if (!answer) return;
 
   const clue    = state.clues[state.clueOrder[state.currentPos]];
-  const correct = answer === clue.answer;
+  const correct = (answer === clue.answer);
   const time    = Date.now();
 
-  // Always broadcast so opponent sees activity
-  window._cryptonChannel.send({
-    type: 'broadcast', event: 'player_answer',
-    payload: { playerId, playerName, answer, correct, time }
-  });
+  send({ event: 'player_answer', answer, correct, time });
 
   if (correct) {
     state.myAnsweredCorrectly = true;
     state.myAnswerTime        = time;
     showStatusMsg('correct', 'Correct!');
     flashClueBox();
-
     if (isHost && !state.clueWon) {
       state.clueWon = true;
       clearInterval(state.timerInterval);
-      broadcastClueResult(playerId);
+      resolveClue('me');  // host = "me"
     }
-    // Non-host: wait for clue_result from host
+    // guest: wait for host to broadcast clue_result
   } else {
     showStatusMsg('wrong', 'Wrong — try again!');
     input.value = '';
@@ -302,75 +310,66 @@ function submitAnswer() {
   }
 }
 
-function onPlayerAnswer({ playerId: theirId, playerName: theirName, answer, correct, time }) {
-  if (theirId === playerId) return;
-  if (state.phase !== 'playing') return;
-
+function onPlayerAnswer({ answer, correct, time }) {
+  // Received from the opponent
   if (correct) {
-    setOppStatus(`${theirName} answered!`);
-    if (isHost && !state.clueWon) {
+    setOppStatus(`${state.opp.name || 'Opponent'} answered!`);
+    if (isHost && state.phase === 'playing' && !state.clueWon) {
       state.clueWon = true;
       clearInterval(state.timerInterval);
-      let winner;
-      if (state.myAnsweredCorrectly) {
-        winner = (state.myAnswerTime <= time) ? playerId : theirId;
-      } else {
-        winner = theirId;
-      }
-      broadcastClueResult(winner);
+      // Both answered correctly: earlier timestamp wins
+      const winner = (state.myAnsweredCorrectly && state.myAnswerTime <= time) ? 'me' : 'opp';
+      resolveClue(winner);
     }
   } else {
-    setOppStatus(`${theirName}: wrong attempt`);
+    setOppStatus(`${state.opp.name || 'Opponent'}: wrong attempt`);
     setTimeout(() => setOppStatus(''), 2000);
   }
 }
 
 // ──────────────────────────────────────────────────────
-//  CLUE RESULT
+//  RESOLVE CLUE  (host-only: broadcasts result to guest)
+//  winner: 'me' = host won, 'opp' = guest won, null = nobody
 // ──────────────────────────────────────────────────────
-function broadcastClueResult(winnerId) {
-  // Update winner score locally before broadcast
-  if (winnerId && state.players[winnerId]) state.players[winnerId].score++;
+function resolveClue(winner) {
+  if (winner === 'me')  state.me.score++;
+  if (winner === 'opp') state.opp.score++;
 
-  const clueIndex = state.clueOrder[state.currentPos];
-  const clue      = state.clues[clueIndex];
-  const scores    = {};
-  Object.entries(state.players).forEach(([id, p]) => { scores[id] = p.score; });
+  const clue = state.clues[state.clueOrder[state.currentPos]];
 
-  window._cryptonChannel.send({
-    type: 'broadcast', event: 'clue_result',
-    payload: { winnerId, clue, scores }
+  // Send to guest with scores from their perspective
+  send({
+    event:    'clue_result',
+    winner:   winner === 'me' ? 'opp' : winner === 'opp' ? 'me' : null,  // flip perspective
+    clue,
+    myScore:  state.opp.score,   // guest's own score
+    oppScore: state.me.score,    // host's score (guest's "opp")
   });
 
-  showReveal(winnerId, clue);
+  showReveal(winner, clue);
 }
 
-function onClueResult({ winnerId, clue, scores }) {
+function onClueResult({ winner, clue, myScore, oppScore }) {
   clearInterval(state.timerInterval);
-  Object.entries(scores).forEach(([id, s]) => {
-    if (state.players[id]) state.players[id].score = s;
-  });
-  showReveal(winnerId, clue);
+  state.me.score  = myScore;
+  state.opp.score = oppScore;
+  showReveal(winner, clue);
 }
 
 // ──────────────────────────────────────────────────────
-//  REVEAL RENDER
+//  REVEAL PHASE
 // ──────────────────────────────────────────────────────
-function showReveal(winnerId, clue) {
+function showReveal(winner, clue) {
+  // winner: 'me' | 'opp' | null   — always from the current player's perspective
   state.phase = 'revealed';
   clearInterval(state.timerInterval);
-  updatePlayersBar();
+  updateScoreDisplay();
 
   let wClass = 'nobody', wText = 'Nobody solved it in time';
-  if (winnerId) {
-    if (winnerId === playerId) { wClass = 'you';  wText = 'You solved it!'; }
-    else {
-      const n = state.players[winnerId]?.name || 'Opponent';
-      wClass = 'them'; wText = `${cap(n)} solved it`;
-    }
-  }
+  if (winner === 'me')  { wClass = 'you';  wText = 'You solved it!'; }
+  if (winner === 'opp') { wClass = 'them'; wText = `${cap(state.opp.name || 'Opponent')} solved it`; }
 
-  const isLast = state.currentPos >= CLUES_PER_GAME - 1;
+  const isLast    = state.currentPos >= CLUES_PER_GAME - 1;
   const nextLabel = isLast ? 'View Results →' : 'Next Clue →';
 
   document.getElementById('main-content').innerHTML = `
@@ -392,51 +391,42 @@ function showReveal(winnerId, clue) {
 }
 
 // ──────────────────────────────────────────────────────
-//  ADVANCE
+//  ADVANCE  (host-only)
 // ──────────────────────────────────────────────────────
 function advanceClue() {
   if (!isHost) return;
   const nextPos = state.currentPos + 1;
-
   if (nextPos >= CLUES_PER_GAME) {
-    const scores = {};
-    Object.entries(state.players).forEach(([id, p]) => { scores[id] = p.score; });
-    window._cryptonChannel.send({ type: 'broadcast', event: 'game_over', payload: { scores } });
+    send({ event: 'game_over', myScore: state.opp.score, oppScore: state.me.score });
     renderGameOver();
   } else {
-    window._cryptonChannel.send({ type: 'broadcast', event: 'next_clue', payload: { pos: nextPos } });
+    send({ event: 'next_clue', pos: nextPos });
     beginClue(nextPos);
   }
 }
 
-function onNextClue({ pos }) {
-  beginClue(pos);
-}
+function onNextClue({ pos }) { beginClue(pos); }
 
-function onGameOver({ scores }) {
-  Object.entries(scores).forEach(([id, s]) => {
-    if (state.players[id]) state.players[id].score = s;
-  });
+function onGameOver({ myScore, oppScore }) {
+  clearInterval(state.timerInterval);
+  state.me.score  = myScore;
+  state.opp.score = oppScore;
   renderGameOver();
 }
 
 // ──────────────────────────────────────────────────────
-//  GAME OVER RENDER
+//  GAME OVER
 // ──────────────────────────────────────────────────────
 function renderGameOver() {
   state.phase = 'finished';
   clearInterval(state.timerInterval);
-  updatePlayersBar();
+  updateScoreDisplay();
 
-  const myScore  = state.players[playerId]?.score ?? 0;
-  const oppEntry = Object.entries(state.players).find(([id]) => id !== playerId);
-  const theirScore = oppEntry ? oppEntry[1].score : 0;
-  const theirName  = oppEntry ? oppEntry[1].name  : 'Opponent';
-
+  const me = state.me.score, them = state.opp.score;
   let wClass, wText;
-  if (myScore > theirScore)      { wClass = 'you';  wText = 'You win!'; }
-  else if (theirScore > myScore) { wClass = 'them'; wText = `${cap(theirName)} wins!`; }
-  else                           { wClass = 'tie';  wText = "It's a draw!"; }
+  if (me > them)      { wClass='you';  wText='You win!'; }
+  else if (them > me) { wClass='them'; wText=`${cap(state.opp.name||'Opponent')} wins!`; }
+  else                { wClass='tie';  wText="It's a draw!"; }
 
   document.getElementById('main-content').innerHTML = `
     <div class="gameover-area">
@@ -445,15 +435,31 @@ function renderGameOver() {
       <div class="final-scores">
         <div class="final-score-item">
           <div class="fs-name">You</div>
-          <div class="fs-score">${myScore}</div>
+          <div class="fs-score">${me}</div>
         </div>
         <div class="final-score-item">
-          <div class="fs-name">${esc(theirName)}</div>
-          <div class="fs-score">${theirScore}</div>
+          <div class="fs-name">${esc(state.opp.name||'Opponent')}</div>
+          <div class="fs-score">${them}</div>
         </div>
       </div>
       <a href="/crypton/" class="btn btn-secondary" style="text-decoration:none;">Play Again</a>
     </div>`;
+}
+
+// ──────────────────────────────────────────────────────
+//  DISCONNECT
+// ──────────────────────────────────────────────────────
+function onOpponentLeft() {
+  if (state.phase === 'playing' || state.phase === 'revealed') {
+    clearInterval(state.timerInterval);
+    showError('Opponent disconnected.');
+    state.phase = 'finished';
+    document.getElementById('main-content').innerHTML = `
+      <div class="waiting-area">
+        <div class="waiting-msg" style="color:var(--wrong)">Opponent disconnected</div>
+        <a href="/crypton/" class="btn btn-secondary" style="text-decoration:none;margin-top:2rem;">Return to Lobby</a>
+      </div>`;
+  }
 }
 
 // ──────────────────────────────────────────────────────
@@ -462,7 +468,7 @@ function renderGameOver() {
 function renderClue(clue, pos) {
   document.getElementById('main-content').innerHTML = `
     <div class="clue-meta">
-      <div class="clue-number">Clue ${pos + 1} / ${CLUES_PER_GAME}</div>
+      <div class="clue-number">Clue ${pos+1} / ${CLUES_PER_GAME}</div>
       <div class="timer" id="timer-el">${fmtTime(state.timerVal)}</div>
     </div>
     <div class="type-badge">${esc(clue.type)}</div>
@@ -478,22 +484,18 @@ function renderClue(clue, pos) {
     </div>
     <div class="status-row" id="status-row"></div>
     <div class="status-row" id="opp-status"></div>`;
-
   document.getElementById('answer-input').focus();
-  updatePlayersBar();
+  updateScoreDisplay();
 }
 
 // ──────────────────────────────────────────────────────
-//  SMALL UI HELPERS
+//  UI HELPERS
 // ──────────────────────────────────────────────────────
-function updatePlayersBar() {
-  const me  = state.players[playerId] || { name: playerName, score: 0 };
-  const opp = Object.entries(state.players).find(([id]) => id !== playerId);
-
-  document.getElementById('my-handle').textContent   = me.name;
-  document.getElementById('my-score').textContent    = me.score;
-  document.getElementById('their-handle').textContent = opp ? opp[1].name  : '—';
-  document.getElementById('their-score').textContent  = opp ? opp[1].score : '—';
+function updateScoreDisplay() {
+  document.getElementById('my-handle').textContent    = state.me.name;
+  document.getElementById('my-score').textContent     = state.me.score;
+  document.getElementById('their-handle').textContent = state.opp.name || '—';
+  document.getElementById('their-score').textContent  = state.opp.name !== null ? state.opp.score : '—';
 }
 
 function updateTimerEl() {
@@ -508,14 +510,13 @@ function updateTimerEl() {
 function showStatusMsg(type, text) {
   const el = document.getElementById('status-row');
   if (!el) return;
-  const cls = type === 'correct' ? 'msg-correct' : type === 'wrong' ? 'msg-wrong' : 'msg-dim';
+  const cls = type==='correct' ? 'msg-correct' : type==='wrong' ? 'msg-wrong' : 'msg-dim';
   el.innerHTML = `<span class="${cls}">${esc(text)}</span>`;
 }
 
 function setOppStatus(text) {
   const el = document.getElementById('opp-status');
-  if (!el) return;
-  el.innerHTML = text ? `<span class="msg-opp">${esc(text)}</span>` : '';
+  if (el) el.innerHTML = text ? `<span class="msg-opp">${esc(text)}</span>` : '';
 }
 
 function flashClueBox() {
@@ -534,36 +535,25 @@ function showError(msg) {
 function copyCode() {
   navigator.clipboard.writeText(roomCode).then(() => {
     const btn = document.querySelector('.copy-btn');
-    if (btn) { btn.textContent = 'copied!'; setTimeout(() => { btn.textContent = 'copy code'; }, 2000); }
-  }).catch(() => {});
+    if (btn) { btn.textContent='copied!'; setTimeout(()=>{ btn.textContent='copy code'; }, 2000); }
+  }).catch(()=>{});
 }
 
 // ──────────────────────────────────────────────────────
 //  UTILS
 // ──────────────────────────────────────────────────────
-function fmtTime(s) {
-  const m = Math.floor(s / 60).toString().padStart(2, '0');
-  const r = (s % 60).toString().padStart(2, '0');
-  return `${m}:${r}`;
-}
-
 function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
-
+function fmtTime(s) {
+  return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+}
 function esc(str) {
-  return String(str ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-function cap(str) {
-  return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
-}
+function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
 
 // ──────────────────────────────────────────────────────
 //  GO
